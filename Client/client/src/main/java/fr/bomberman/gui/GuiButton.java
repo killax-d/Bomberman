@@ -1,15 +1,14 @@
-package fr.bomberman.client.gui;
+package fr.bomberman.gui;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 
-public class GuiButton implements IGuiElement {
+public class GuiButton implements MouseMotionListener {
 
 	private String text;
 	private int x;
@@ -59,52 +58,22 @@ public class GuiButton implements IGuiElement {
 
 	}
 
-	public void mouseClicked(MouseEvent event) {
-
+	public boolean isHovered() {
+		return hovered;
 	}
 
-	public void mouseEntered(MouseEvent event) {
-
-	}
-
-	public void mouseExited(MouseEvent event) {
-
-	}
-
-	public void mousePressed(MouseEvent event) {
-
-	}
-
-	public void mouseReleased(MouseEvent event) {
-
-	}
-
-	public void mouseDragged(MouseEvent event) {
-
-	}
-
+	@Override
 	public void mouseMoved(MouseEvent event) {
 		if (event.getX() >= x && event.getX() <= x + width && event.getY() >= y && event.getY() <= y + height) {
 			hovered = true;
+			System.out.println("dzu");
 		} else {
 			hovered = false;
 		}
 	}
 
-	public void keyPressed(KeyEvent event) {
-
-	}
-
-	public void keyReleased(KeyEvent event) {
-
-	}
-
-	public void keyTyped(KeyEvent event) {
-
-	}
-
-	public boolean isHovered() {
-		return hovered;
+	@Override
+	public void mouseDragged(MouseEvent event) {
 	}
 
 }

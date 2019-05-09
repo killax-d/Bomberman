@@ -24,13 +24,22 @@ public class Assets {
 			return assets.get(path);
 		}
 		try (InputStream is = Assets.class.getResourceAsStream(path)) {
-			if(is != null) {
+			if (is != null) {
 				BufferedImage img = ImageIO.read(is);
 				assets.putIfAbsent(path, img);
 				return img;
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+		return NO_TEXTURE;
+	}
+
+	public static BufferedImage getTile(String path, int width, int height, int x, int y) {
+		BufferedImage tileset = getImage(path);
+		boolean validTexture = tileset.getWidth()>= width && tileset.getHeight() >= height;
+		if (validTexture) {
+			return tileset.getSubimage(x * width, y * height, width, height);
 		}
 		return NO_TEXTURE;
 	}

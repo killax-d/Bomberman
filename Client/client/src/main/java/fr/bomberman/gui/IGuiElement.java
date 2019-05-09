@@ -1,4 +1,4 @@
-package fr.bomberman.client.gui;
+package fr.bomberman.gui;
 
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
