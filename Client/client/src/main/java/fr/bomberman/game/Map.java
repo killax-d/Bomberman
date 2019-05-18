@@ -8,6 +8,7 @@ public class Map {
 	public static final int ROCK_TILE = 1;
 	public static final int PLANT_TILE = 2;
 	public static final int FLOWER_TILE = 3;
+	public static final int BOMB_TILE = 3;
 
 	public static final int MAP_WIDTH = 25;
 	public static final int MAP_HEIGHT = 19;
@@ -44,6 +45,10 @@ public class Map {
 
 	public int getTileTypeAt(int x, int y) {
 		return map[x][y];
+	}
+
+	public int getTileTypeAt(float x, float y) {
+		return getTileTypeAt((int) x, (int) y);
 	}
 
 	public void setTileTypeAt(int x, int y, int type) {

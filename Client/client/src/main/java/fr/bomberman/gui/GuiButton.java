@@ -66,7 +66,6 @@ public class GuiButton implements MouseMotionListener {
 	public void mouseMoved(MouseEvent event) {
 		if (event.getX() >= x && event.getX() <= x + width && event.getY() >= y && event.getY() <= y + height) {
 			hovered = true;
-			System.out.println("dzu");
 		} else {
 			hovered = false;
 		}

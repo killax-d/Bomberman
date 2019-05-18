@@ -59,7 +59,6 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 
 	@Override
 	public void mouseMoved(MouseEvent event) {
-		System.out.println("dze");
 		play.mouseMoved(event);
 	}
 

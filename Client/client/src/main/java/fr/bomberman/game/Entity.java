@@ -5,93 +5,63 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import fr.bomberman.assets.Assets;
+import fr.bomberman.utils.Vec2D;
 
-public class Entity extends TimerTask {
+public abstract class Entity extends TimerTask {
 
-	private static final int MAX_FRAME = 3;
+	private static final int MAX_FRAME = 4;
 	public static final int SPRITE_WIDTH = 32;
 	public static final int SPRITE_HEIGHT = 48;
 
-	private int x, y;
-	private int next_x, next_y;
-	private long last_move;
-
-	private EnumDirection direction;
-	private int frame;
-	private int skin_id = 0;
-	private Map map;
+	protected Map map;
+	protected EnumDirection direction;
+	protected int frame;
+	protected int skin_id = 0;
+	protected Vec2D position;
+	protected Vec2D next_position;
 
 	public Entity() {
-		new Timer().schedule(this, 0, 50);
+		this.position = new Vec2D(1F, 1F);
+		this.next_position = new Vec2D(1F, 1F);
 		this.direction = EnumDirection.SOUTH;
-		this.last_move = System.currentTimeMillis();
 		this.frame = 0;
 		this.skin_id = 0;
+		new Timer().schedule(this, 0, 20);
 	}
 
 	public int getDisplayX() {
-		float offset_x = frame * (((next_x  - x) * Map.TILE_SCALE) / 4);
-		return (int) (x * Map.TILE_SCALE + offset_x);
+		return (int) (position.getX() * Map.TILE_SCALE);
 	}
 
 	public int getDisplayY() {
-		float offset_y = frame * (((next_y  - y) * Map.TILE_SCALE) / 4);
-		return (int) (y * Map.TILE_SCALE - (Entity.SPRITE_HEIGHT - Map.TILE_SCALE) + offset_y);
+		return (int) (position.getY() * Map.TILE_SCALE - (Entity.SPRITE_HEIGHT - Map.TILE_SCALE));
 	}
 
 	public void setPosition(int x, int y) {
-		this.x = x;
-		this.y = y;
-		this.next_x = x;
-		this.next_y = y;
-	}
-
-	public void move(EnumDirection direction) {
-		if (map != null) {
-			if (canMove(direction)) {
-				this.last_move = System.currentTimeMillis();
-				setDirection(direction);
-				switch (direction) {
-				case NORTH:
-					next_y = y - 1;
-					break;
-				case WEST:
-					next_x = x - 1;
-					break;
-				case EST:
-					next_x = x + 1;
-					break;
-				case SOUTH:
-					next_y = y + 1;
-					break;
-				}
-			}
-		}
-
+		position.setXY(x, y);
 	}
 
 	private boolean isMoving() {
-		return x != next_x || y != next_y;
+		return !position.equals(next_position, 0.1F);
 	}
 
 	private boolean canMove(EnumDirection direction) {
-		boolean canMove = false;
+		int tileType = Map.TILE_FREE;
 		switch (direction) {
 		case NORTH:
-			canMove = (map.getTileTypeAt(x, y - 1) == Map.TILE_FREE);
-			break;
-		case WEST:
-			canMove = (map.getTileTypeAt(x - 1, y) == Map.TILE_FREE);
-			break;
-		case EST:
-			canMove = (map.getTileTypeAt(x + 1, y) == Map.TILE_FREE);
+			tileType = map.getTileTypeAt(next_position.getX(), next_position.getY() - 1);
 			break;
 		case SOUTH:
-			canMove = (map.getTileTypeAt(x, y + 1) == Map.TILE_FREE);
+			tileType = map.getTileTypeAt(next_position.getX(), next_position.getY() + 1);
+			break;
+		case EST:
+			tileType = map.getTileTypeAt(next_position.getX() + 1, next_position.getY());
+			break;
+		case WEST:
+			tileType = map.getTileTypeAt(next_position.getX() - 1, next_position.getY());
 			break;
 		}
-
-		return !isMoving() && canMove;
+		return (tileType == Map.TILE_FREE || tileType == Map.FLOWER_TILE);
 	}
 
 	public void setMap(Map map) {
@@ -102,12 +72,12 @@ public class Entity extends TimerTask {
 		this.direction = direction;
 	}
 
-	public void setFrame(int frame) {
-		this.frame = frame % MAX_FRAME;
-	}
-
 	public EnumDirection getDirection() {
 		return direction;
+	}
+
+	public void setFrame(int frame) {
+		this.frame = frame % MAX_FRAME;
 	}
 
 	public int getFrame() {
@@ -120,19 +90,62 @@ public class Entity extends TimerTask {
 	}
 
 	public void update() {
-		System.out.println(System.currentTimeMillis());
+		if (isMoving()) {
+			if (position.getX() < next_position.getX()) {
+				position.addX(0.1F);
+			} else if (position.getX() > next_position.getX()) {
+				position.addX(-0.1F);
+			}
+			if (position.getY() < next_position.getY()) {
+				position.addY(0.1F);
+			} else if (position.getY() > next_position.getY()) {
+				position.addY(-0.1F);
+			}
+		} else {
+			position.setX(next_position.getX());
+			position.setY(next_position.getY());
+		}
+	}
+
+	public void move(EnumDirection direction) {
+		if (isMoving()) {
+			return;
+		}
+		this.direction = direction;
+		if (!canMove(direction)) {
+			return;
+		}
+		switch (direction) {
+		case NORTH:
+			next_position.addY(-1F);
+			break;
+		case SOUTH:
+			next_position.addY(+1F);
+			break;
+		case WEST:
+			next_position.addX(-1F);
+			break;
+		case EST:
+			next_position.addX(+1F);
+			break;
+		}
+	}
+
+	public Vec2D getPosition() {
+		return position;
+	}
+
+	public Vec2D getNextPosition() {
+		return next_position;
 	}
 
 	@Override
 	public void run() {
+		update();
 		if (isMoving()) {
-			if (frame < MAX_FRAME) {
-				++frame;
-			} else {
-				frame = 0;
-				x = next_x;
-				y = next_y;
-			}
+			frame = (frame + 1) % MAX_FRAME;
+		} else {
+			frame = 0;
 		}
 	}
 
