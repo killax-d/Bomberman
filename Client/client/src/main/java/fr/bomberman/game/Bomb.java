@@ -11,13 +11,12 @@ import fr.bomberman.utils.Vec2D;
 
 public class Bomb extends Entity {
 
-	private static Set<Bomb> bombs = new HashSet<Bomb>();
-
 	private static final int MAX_FRAME = 6;
 	public static final int SPRITE_WIDTH = 26;
 	public static final int SPRITE_HEIGHT = 32;
 	public static final int BOMB_TIMING = 0;
-	public static final int BOMB_EXPLODED = 1;
+	public static final int BOMB_EXPLOSION = 1;
+	public static final int BOMB_EXPLODED = 2;
 
 	private int x, y;
 	private int displayX, displayY;
@@ -29,35 +28,39 @@ public class Bomb extends Entity {
 	private int state;
 	private int skin_id;
 	private Map map;
+	
+	private Timer animClock;
 
 	public Bomb(EntityPlayer player, Map map) {
 		super();
 		this.player = player;
+		animClock = new Timer();
+		animClock.schedule(this.animBomb(), 0, 50);
 		new Timer().schedule(this.removeBomb(), 3000);
 		this.frame = 3;
 		this.state = BOMB_TIMING;
 		this.skin_id = 0;
 		this.position = player.getPosition();
-		this.displayX = player.getDisplayX();
-		this.displayY = player.getDisplayY();
+		setPosition((int) position.getX(), (int) position.getY());
 		setMap(map);
-		map.setTileTypeAt(position.getX(), position.getY(), Map.BOMB_TILE);
-		bombs.add(this);
+		map.setTileTypeAt(x, y, Map.BOMB_TILE);
 	}
 
 	@Override
 	public void setPosition(int x, int y) {
+		this.x = x;
+		this.y = y;
 		position.setXY(x, y);
 	}
 	
 	@Override
 	public int getDisplayX() {
-		return displayX;
+		return (int) (x * Map.TILE_SCALE);
 	}
 	
 	@Override
 	public int getDisplayY() {
-		return displayY;
+		return (int) (y * Map.TILE_SCALE - (Entity.SPRITE_HEIGHT - Map.TILE_SCALE));
 	}
 
 	@Override
@@ -123,16 +126,23 @@ public class Bomb extends Entity {
 	public int getState() {
 		return state;
 	}
-
-	@Override
-	public void run() {
-		if(state == 0) {
-			if (frame < MAX_FRAME) {
-				++frame;
-			} else {
-				frame = 0;
+	
+	
+	public TimerTask animBomb() {
+		TimerTask task = new TimerTask() {
+			
+			@Override
+			public void run() {
+				if(state == BOMB_TIMING) {
+					if (frame < MAX_FRAME) {
+						++frame;
+					} else {
+						frame = 0;
+					}
+				}
 			}
-		}
+		};
+		return task;
 	}
 
 	private TimerTask removeBomb() {
@@ -140,14 +150,15 @@ public class Bomb extends Entity {
 
 			@Override
 			public void run() {
-				state = BOMB_EXPLODED;
+				state = BOMB_EXPLOSION;
 				frame = 0;
 				new Timer().schedule(new TimerTask() {
 
 					@Override
 					public void run() {
-						map.setTileTypeAt(position.getX(), position.getY(), Map.TILE_FREE);
+						map.setTileTypeAt(x, y, Map.TILE_FREE);
 						explode();
+						state = BOMB_EXPLODED;
 					}
 
 				}, 150);

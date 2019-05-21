@@ -35,8 +35,8 @@ public class Map {
 					int r = rand.nextInt(100);
 					if (r < 5) {
 						map[i][j] = FLOWER_TILE;
-					} else if (r < 70) {
-						map[i][j] = TILE_FREE;
+					} else if (r < 40) {
+						map[i][j] = PLANT_TILE;
 					}
 				}
 			}

@@ -14,6 +14,7 @@ public abstract class Entity extends TimerTask {
 	public static final int SPRITE_HEIGHT = 48;
 
 	protected Map map;
+	protected Timer clock;
 	protected EnumDirection direction;
 	protected int frame;
 	protected int skin_id = 0;
@@ -25,8 +26,8 @@ public abstract class Entity extends TimerTask {
 		this.next_position = new Vec2D(1F, 1F);
 		this.direction = EnumDirection.SOUTH;
 		this.frame = 0;
-		this.skin_id = 0;
-		new Timer().schedule(this, 0, 20);
+		this.skin_id = 1;
+		new Timer().scheduleAtFixedRate(this, 0, 20);
 	}
 
 	public int getDisplayX() {

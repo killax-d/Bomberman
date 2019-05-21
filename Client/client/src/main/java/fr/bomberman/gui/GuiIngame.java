@@ -34,6 +34,7 @@ public class GuiIngame extends Container implements KeyListener {
 		this.player = new EntityPlayer("Player");
 		this.entities.add(player);
 		player.setPosition(1, 1);
+		map.setTileTypeAt(1, 1, Map.TILE_FREE);
 		player.setMap(map);
 	}
 
@@ -75,7 +76,9 @@ public class GuiIngame extends Container implements KeyListener {
 			player.move(EnumDirection.NORTH);
 			break;
 		case KeyEvent.VK_SPACE:
-			entities.add(new Bomb(player, map));
+			int mapTile = map.getTileTypeAt(player.getPosition().getX(), player.getPosition().getY());
+			if(mapTile == Map.TILE_FREE || mapTile == Map.FLOWER_TILE)
+				entities.add(new Bomb(player, map));
 			break;
 		}
 	}
