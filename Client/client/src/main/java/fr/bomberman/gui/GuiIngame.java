@@ -22,7 +22,6 @@ public class GuiIngame extends Container implements KeyListener {
 	private BufferedImage plant = Assets.getTile("map_tileset.png", 16, 16, 6, 3);
 	private BufferedImage grass = Assets.getTile("map_tileset.png", 16, 16, 7, 3);
 	private BufferedImage flower = Assets.getTile("map_tileset.png", 16, 16, 5, 2);
-	private BufferedImage bomb = Assets.getTile("bombs/bomb_0.png", 26, 32, 3, 0);
 	// Entities on the map
 	private Set<Entity> entities;
 
@@ -53,12 +52,12 @@ public class GuiIngame extends Container implements KeyListener {
 
 	@Override
 	public void keyTyped(KeyEvent event) {
-		System.out.println(event.getKeyCode() + " " + KeyEvent.VK_SPACE);
+//		System.out.println(event.getKeyCode() + " " + KeyEvent.VK_SPACE);
 		movePlayer(event.getKeyCode());
-		if(event.getKeyCode() == KeyEvent.VK_F) {
-			System.out.println("ché");
-			entities.add(new Bomb(player, player.getDisplayX(), player.getDisplayY(), map));
-		}
+//		if(event.getKeyCode() == KeyEvent.VK_F) {
+//			System.out.println("ché");
+//			entities.add(new Bomb(player, map));
+//		}
 	}
 
 	private void movePlayer(int keyCode) {
@@ -75,6 +74,9 @@ public class GuiIngame extends Container implements KeyListener {
 		case KeyEvent.VK_Z:
 			player.move(EnumDirection.NORTH);
 			break;
+		case KeyEvent.VK_SPACE:
+			entities.add(new Bomb(player, map));
+			break;
 		}
 	}
 
@@ -84,10 +86,17 @@ public class GuiIngame extends Container implements KeyListener {
 	}
 
 	private void drawEntities(Graphics g) {
+		Set<Bomb> bombToRemove = new HashSet<Bomb>();
 		for (Entity entity : entities) {
-			g.drawImage(entity.getSprite(), entity.getDisplayX(), entity.getDisplayY(), Entity.SPRITE_WIDTH,
-					Entity.SPRITE_HEIGHT, null);
-
+			if (entity instanceof Bomb && ((Bomb) entity).getState() == Bomb.BOMB_EXPLODED) {
+				bombToRemove.add((Bomb) entity);
+			}
+			else
+				g.drawImage(entity.getSprite(), entity.getDisplayX(), entity.getDisplayY(), Entity.SPRITE_WIDTH,
+						Entity.SPRITE_HEIGHT, null);
+		}
+		for (Bomb bomb : bombToRemove) {
+			entities.remove(bomb);
 		}
 	}
 

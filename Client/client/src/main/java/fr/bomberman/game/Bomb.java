@@ -7,6 +7,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import fr.bomberman.assets.Assets;
+import fr.bomberman.utils.Vec2D;
 
 public class Bomb extends Entity {
 
@@ -15,8 +16,11 @@ public class Bomb extends Entity {
 	private static final int MAX_FRAME = 6;
 	public static final int SPRITE_WIDTH = 26;
 	public static final int SPRITE_HEIGHT = 32;
+	public static final int BOMB_TIMING = 0;
+	public static final int BOMB_EXPLODED = 1;
 
 	private int x, y;
+	private int displayX, displayY;
 
 	private EntityPlayer player;
 	private String type; // Enum ?
@@ -26,25 +30,42 @@ public class Bomb extends Entity {
 	private int skin_id;
 	private Map map;
 
-	public Bomb(EntityPlayer player, int x, int y, Map map) {
+	public Bomb(EntityPlayer player, Map map) {
+		super();
 		this.player = player;
-		new Timer().schedule(this, 0, 50);
 		new Timer().schedule(this.removeBomb(), 3000);
 		this.frame = 3;
-		this.state = 0;
+		this.state = BOMB_TIMING;
 		this.skin_id = 0;
-		setPosition(x, y);
+		this.position = player.getPosition();
+		this.displayX = player.getDisplayX();
+		this.displayY = player.getDisplayY();
 		setMap(map);
-		map.setTileTypeAt(x, y, Map.BOMB_TILE);
+		map.setTileTypeAt(position.getX(), position.getY(), Map.BOMB_TILE);
 		bombs.add(this);
 	}
 
 	@Override
 	public void setPosition(int x, int y) {
-		this.x = x;
-		this.y = y;
+		position.setXY(x, y);
+	}
+	
+	@Override
+	public int getDisplayX() {
+		return displayX;
+	}
+	
+	@Override
+	public int getDisplayY() {
+		return displayY;
 	}
 
+	@Override
+	public void move(EnumDirection direction) {}
+
+	@Override
+	public void update() {}
+	
 	@Override
 	public void setMap(Map map) {
 		this.map = map;
@@ -62,16 +83,7 @@ public class Bomb extends Entity {
 
 	@Override
 	public BufferedImage getSprite() {
-		return Assets.getTile(String.format("bombs/bomb_%d.png", skin_id), SPRITE_WIDTH, SPRITE_HEIGHT, this.frame, this.state);
-	}
-
-	public static Bomb getBombAt(int x, int y) {
-		for (Bomb bomb : bombs) {
-			if (bomb.x == x && bomb.y == y){
-				return bomb;
-			}
-		}
-		return null;
+		return Assets.getTile(String.format("skins/bomb_%d.png", skin_id), SPRITE_WIDTH, SPRITE_HEIGHT, this.frame, this.state);
 	}
 
 	private void explode() {
@@ -107,6 +119,10 @@ public class Bomb extends Entity {
 		}
 
 	}
+	
+	public int getState() {
+		return state;
+	}
 
 	@Override
 	public void run() {
@@ -124,15 +140,14 @@ public class Bomb extends Entity {
 
 			@Override
 			public void run() {
-				state = 1;
+				state = BOMB_EXPLODED;
 				frame = 0;
 				new Timer().schedule(new TimerTask() {
 
 					@Override
 					public void run() {
-						map.setTileTypeAt(x, y, Map.TILE_FREE);
+						map.setTileTypeAt(position.getX(), position.getY(), Map.TILE_FREE);
 						explode();
-						bombs.remove(this);
 					}
 
 				}, 150);

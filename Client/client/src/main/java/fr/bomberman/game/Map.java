@@ -8,7 +8,7 @@ public class Map {
 	public static final int ROCK_TILE = 1;
 	public static final int PLANT_TILE = 2;
 	public static final int FLOWER_TILE = 3;
-	public static final int BOMB_TILE = 3;
+	public static final int BOMB_TILE = 4;
 
 	public static final int MAP_WIDTH = 25;
 	public static final int MAP_HEIGHT = 19;
@@ -53,6 +53,10 @@ public class Map {
 
 	public void setTileTypeAt(int x, int y, int type) {
 		map[x][y] = type;
+	}
+
+	public void setTileTypeAt(float x, float y, int type) {
+		map[(int) x][(int) y] = type;
 	}
 
 }
