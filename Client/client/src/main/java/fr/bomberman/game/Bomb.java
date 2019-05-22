@@ -7,6 +7,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import fr.bomberman.assets.Assets;
+import fr.bomberman.gui.GuiIngame;
 import fr.bomberman.utils.Vec2D;
 
 public class Bomb extends Entity {
@@ -19,7 +20,7 @@ public class Bomb extends Entity {
 	public static final int BOMB_EXPLODED = 2;
 
 	private int x, y;
-	private int displayX, displayY;
+	private Set<Set<Effect>> effects;
 
 	private EntityPlayer player;
 	private String type; // Enum ?
@@ -31,9 +32,10 @@ public class Bomb extends Entity {
 	
 	private Timer animClock;
 
-	public Bomb(EntityPlayer player, Map map) {
+	public Bomb(EntityPlayer player, Map map, Set<Set<Effect>> effects) {
 		super();
 		this.player = player;
+		this.effects = effects;
 		animClock = new Timer();
 		animClock.schedule(this.animBomb(), 0, 50);
 		new Timer().schedule(this.removeBomb(), 3000);
@@ -93,33 +95,39 @@ public class Bomb extends Entity {
 		int power = player.getPower() + 1;
 
 		Set<EnumDirection> blockedDir = new HashSet<EnumDirection>();
+		Set<Effect> effectToAdd = new HashSet<Effect>();
 
 		for (int i = 0; i < power; i++) {
 			if(!blockedDir.contains(EnumDirection.EST) && x+i < Map.MAP_WIDTH
 						&& (map.getTileTypeAt(x+i, y) == Map.TILE_FREE || map.getTileTypeAt(x+i, y) == Map.PLANT_TILE)) {
 				map.setTileTypeAt(x+i, y, Map.TILE_FREE);
+				effectToAdd.add(new EffectTrail(x+i, y));
 			} else {
 				blockedDir.add(EnumDirection.EST);
 			}
 			if(!blockedDir.contains(EnumDirection.WEST) && x-i > 0
 						&& (map.getTileTypeAt(x-i, y) == Map.TILE_FREE || map.getTileTypeAt(x-i, y) == Map.PLANT_TILE)) {
 				map.setTileTypeAt(x-i, y, Map.TILE_FREE);
+				effectToAdd.add(new EffectTrail(x-i, y));
 			} else {
 				blockedDir.add(EnumDirection.WEST);
 			}
 			if(!blockedDir.contains(EnumDirection.SOUTH) && y+i < Map.MAP_HEIGHT
 						&& (map.getTileTypeAt(x, y+i) == Map.TILE_FREE || map.getTileTypeAt(x, y+i) == Map.PLANT_TILE)) {
 				map.setTileTypeAt(x, y+i, Map.TILE_FREE);
+				effectToAdd.add(new EffectTrail(x, y+i));
 			} else {
 				blockedDir.add(EnumDirection.SOUTH);
 			}
 			if(!blockedDir.contains(EnumDirection.NORTH) && y-i > 0
 						&& (map.getTileTypeAt(x, y-i) == Map.TILE_FREE || map.getTileTypeAt(x, y-i) == Map.PLANT_TILE)) {
 				map.setTileTypeAt(x, y-i, Map.TILE_FREE);
+				effectToAdd.add(new EffectTrail(x, y-i));
 			} else {
 				blockedDir.add(EnumDirection.NORTH);
 			}
 		}
+		effects.add(effectToAdd);
 
 	}
 	

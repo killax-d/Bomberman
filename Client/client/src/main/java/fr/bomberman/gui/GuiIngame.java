@@ -10,6 +10,8 @@ import java.util.Set;
 
 import fr.bomberman.assets.Assets;
 import fr.bomberman.game.Bomb;
+import fr.bomberman.game.Effect;
+import fr.bomberman.game.EffectTrail;
 import fr.bomberman.game.Entity;
 import fr.bomberman.game.EntityPlayer;
 import fr.bomberman.game.EnumDirection;
@@ -24,6 +26,7 @@ public class GuiIngame extends Container implements KeyListener {
 	private BufferedImage flower = Assets.getTile("map_tileset.png", 16, 16, 5, 2);
 	// Entities on the map
 	private Set<Entity> entities;
+	private Set<Set<Effect>> effects;
 
 	private Map map;
 	private EntityPlayer player;
@@ -31,6 +34,7 @@ public class GuiIngame extends Container implements KeyListener {
 	public GuiIngame() {
 		this.map = new Map();
 		this.entities = new HashSet<Entity>();
+		this.effects = new HashSet<Set<Effect>>();
 		this.player = new EntityPlayer("Player");
 		this.entities.add(player);
 		player.setPosition(1, 1);
@@ -43,6 +47,7 @@ public class GuiIngame extends Container implements KeyListener {
 		drawGrass(g);
 		drawMap(g);
 		drawEntities(g);
+		drawEffects(g);
 		super.paint(g);
 	}
 
@@ -78,7 +83,7 @@ public class GuiIngame extends Container implements KeyListener {
 		case KeyEvent.VK_SPACE:
 			int mapTile = map.getTileTypeAt(player.getPosition().getX(), player.getPosition().getY());
 			if(mapTile == Map.TILE_FREE || mapTile == Map.FLOWER_TILE)
-				entities.add(new Bomb(player, map));
+				entities.add(new Bomb(player, map, effects));
 			break;
 		}
 	}
@@ -100,6 +105,25 @@ public class GuiIngame extends Container implements KeyListener {
 		}
 		for (Bomb bomb : bombToRemove) {
 			entities.remove(bomb);
+		}
+	}
+
+	private void drawEffects(Graphics g) {
+		Set<EffectTrail> effectToRemove = new HashSet<EffectTrail>();
+		for (Set<Effect> effectArray : effects) {
+			for (Effect effect : effectArray) {
+				if(effect != null) {
+					if (effect instanceof EffectTrail && ((EffectTrail) effect).getState() == EffectTrail.EFFECT_ENDED) {
+						effectToRemove.add((EffectTrail) effect);
+					}
+					else
+						g.drawImage(effect.getSprite(), effect.getDisplayX(), effect.getDisplayY(), Effect.SPRITE_WIDTH,
+								Effect.SPRITE_HEIGHT, null);
+				}
+			}
+		}
+		for (EffectTrail effectTrail : effectToRemove) {
+			entities.remove(effectTrail);
 		}
 	}
 
