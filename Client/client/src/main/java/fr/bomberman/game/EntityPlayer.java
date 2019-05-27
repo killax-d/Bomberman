@@ -4,8 +4,8 @@ public class EntityPlayer extends EntityLiving {
 
 	private String name;
 
-	public EntityPlayer(String name) {
-		super(8);
+	public EntityPlayer(String name, int x, int y) {
+		super(8, x, y);
 		this.setName(name);
 	}
 

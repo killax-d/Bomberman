@@ -13,6 +13,7 @@ import fr.bomberman.game.Bomb;
 import fr.bomberman.game.Effect;
 import fr.bomberman.game.EffectTrail;
 import fr.bomberman.game.Entity;
+import fr.bomberman.game.EntityAIPlayer;
 import fr.bomberman.game.EntityPlayer;
 import fr.bomberman.game.EnumDirection;
 import fr.bomberman.game.Map;
@@ -28,18 +29,25 @@ public class GuiIngame extends Container implements KeyListener {
 	private Set<Entity> entities;
 	private Set<Set<Effect>> effects;
 
+	public static GuiIngame instance;
+	
 	private Map map;
 	private EntityPlayer player;
+	private EntityAIPlayer AIplayer;
 
 	public GuiIngame() {
+		instance = this;
 		this.map = new Map();
 		this.entities = new HashSet<Entity>();
 		this.effects = new HashSet<Set<Effect>>();
-		this.player = new EntityPlayer("Player");
+		this.player = new EntityPlayer("Player", 1, 1);
+		this.AIplayer = new EntityAIPlayer("AI", Map.MAP_WIDTH - 2, 1);
 		this.entities.add(player);
-		player.setPosition(1, 1);
+		this.entities.add(AIplayer);
 		map.setTileTypeAt(1, 1, Map.TILE_FREE);
+		map.setTileTypeAt(Map.MAP_WIDTH - 2, 1, Map.TILE_FREE);
 		player.setMap(map);
+		AIplayer.setMap(map);
 	}
 
 	@Override
@@ -64,6 +72,10 @@ public class GuiIngame extends Container implements KeyListener {
 //			System.out.println("ché");
 //			entities.add(new Bomb(player, map));
 //		}
+	}
+	
+	public Set<Entity> getEntities(){
+		return entities;
 	}
 
 	private void movePlayer(int keyCode) {

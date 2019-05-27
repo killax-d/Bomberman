@@ -21,9 +21,9 @@ public abstract class Entity extends TimerTask {
 	protected Vec2D position;
 	protected Vec2D next_position;
 
-	public Entity() {
-		this.position = new Vec2D(1F, 1F);
-		this.next_position = new Vec2D(1F, 1F);
+	public Entity(Vec2D position) {
+		this.position = position;
+		this.next_position = new Vec2D(position.getX(), position.getY());
 		this.direction = EnumDirection.SOUTH;
 		this.frame = 0;
 		this.skin_id = 1;

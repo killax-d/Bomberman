@@ -11,6 +11,14 @@ public class Vec2D {
 	public Vec2D(float x, float y) {
 		setXY(x, y);
 	}
+	
+	public double dist(Vec2D location) {
+		return Math.sqrt(Math.pow(location.getX() - getX(), 2) + Math.pow(location.getY() - getY(), 2));
+	}
+	
+	public static double dist(Vec2D A, Vec2D B) {
+		return Math.sqrt(Math.pow(B.getX() - A.getX(), 2) + Math.pow(B.getY() - A.getY(), 2));
+	}
 
 	public float getX() {
 		return x;
