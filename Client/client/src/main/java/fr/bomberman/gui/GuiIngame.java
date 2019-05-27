@@ -27,7 +27,7 @@ public class GuiIngame extends Container implements KeyListener {
 	private BufferedImage flower = Assets.getTile("map_tileset.png", 16, 16, 5, 2);
 	// Entities on the map
 	private Set<Entity> entities;
-	private Set<Set<Effect>> effects;
+	private Set<Effect> effects;
 
 	public static GuiIngame instance;
 	
@@ -39,7 +39,7 @@ public class GuiIngame extends Container implements KeyListener {
 		instance = this;
 		this.map = new Map();
 		this.entities = new HashSet<Entity>();
-		this.effects = new HashSet<Set<Effect>>();
+		this.effects = new HashSet<Effect>();
 		this.player = new EntityPlayer("Player", 1, 1);
 		this.AIplayer = new EntityAIPlayer("AI", Map.MAP_WIDTH - 2, 1);
 		this.entities.add(player);
@@ -76,6 +76,10 @@ public class GuiIngame extends Container implements KeyListener {
 	
 	public Set<Entity> getEntities(){
 		return entities;
+	}
+	
+	public Set<Effect> getEffects(){
+		return effects;
 	}
 
 	private void movePlayer(int keyCode) {
@@ -121,21 +125,20 @@ public class GuiIngame extends Container implements KeyListener {
 	}
 
 	private void drawEffects(Graphics g) {
+		Set<Effect> effectToDisplay = effects;
 		Set<EffectTrail> effectToRemove = new HashSet<EffectTrail>();
-		for (Set<Effect> effectArray : effects) {
-			for (Effect effect : effectArray) {
-				if(effect != null) {
-					if (effect instanceof EffectTrail && ((EffectTrail) effect).getState() == EffectTrail.EFFECT_ENDED) {
-						effectToRemove.add((EffectTrail) effect);
-					}
-					else
-						g.drawImage(effect.getSprite(), effect.getDisplayX(), effect.getDisplayY(), Effect.SPRITE_WIDTH,
-								Effect.SPRITE_HEIGHT, null);
+		for (Effect effect : effectToDisplay) {
+			if(effect != null) {
+				if (effect instanceof EffectTrail && ((EffectTrail) effect).getState() == EffectTrail.EFFECT_ENDED) {
+					effectToRemove.add((EffectTrail) effect);
 				}
+				else
+					g.drawImage(effect.getSprite(), effect.getDisplayX(), effect.getDisplayY(), Effect.SPRITE_WIDTH,
+							Effect.SPRITE_HEIGHT, null);
 			}
 		}
 		for (EffectTrail effectTrail : effectToRemove) {
-			entities.remove(effectTrail);
+			effects.remove(effectTrail);
 		}
 	}
 

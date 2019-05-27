@@ -46,7 +46,7 @@ public abstract class Entity extends TimerTask {
 		return !position.equals(next_position, 0.1F);
 	}
 
-	private boolean canMove(EnumDirection direction) {
+	protected boolean canMove(EnumDirection direction) {
 		int tileType = Map.TILE_FREE;
 		switch (direction) {
 		case NORTH:

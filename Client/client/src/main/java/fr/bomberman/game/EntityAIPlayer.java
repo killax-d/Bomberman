@@ -14,6 +14,7 @@ public class EntityAIPlayer extends EntityLiving {
 	
 	public EntityAIPlayer(String name, int x, int y) {
 		super(8, x, y);
+		game = GuiIngame.instance;
 		this.setName(name);
 		new Timer().scheduleAtFixedRate(play(), 0, 50);
 	}
@@ -27,7 +28,6 @@ public class EntityAIPlayer extends EntityLiving {
 	}
 	
 	public Vec2D getNearestEnnemy() {
-		game = GuiIngame.instance;
 		Vec2D nearest = null;
 		Double near = null;
 		for (Entity entity : game.getEntities()) {
@@ -41,16 +41,44 @@ public class EntityAIPlayer extends EntityLiving {
 	
 	public void moveToPoint(Vec2D point) {
 		if (position.getX() < point.getX()) {
-			move(EnumDirection.EST);
+			if(!canMove(EnumDirection.EST)) {
+				if(getBombCount() != getBombPlaced()) {
+					game.getEntities().add(new Bomb(this, map, game.getEffects()));
+					addBombPlaced();
+				}
+			}
+			else
+				move(EnumDirection.EST);
 		}
-		if (position.getX() > point.getX()) {
-			move(EnumDirection.WEST);
+		else if (position.getX() > point.getX()) {
+			if(!canMove(EnumDirection.WEST)) {
+				if(getBombCount() != getBombPlaced()) {
+					game.getEntities().add(new Bomb(this, map, game.getEffects()));
+					addBombPlaced();
+				}
+			}
+			else
+				move(EnumDirection.WEST);
 		}
-		if (position.getY() < point.getY()) {
-			move(EnumDirection.SOUTH);
+		else if (position.getY() < point.getY()) {
+			if(!canMove(EnumDirection.SOUTH)) {
+				if(getBombCount() != getBombPlaced()) {
+					game.getEntities().add(new Bomb(this, map, game.getEffects()));
+					addBombPlaced();
+				}
+			}
+			else
+				move(EnumDirection.SOUTH);
 		}
-		if (position.getY() > point.getY()) {
-			move(EnumDirection.NORTH);
+		else if (position.getY() > point.getY()) {
+			if(!canMove(EnumDirection.NORTH)) {
+				if(getBombCount() != getBombPlaced()) {
+					game.getEntities().add(new Bomb(this, map, game.getEffects()));
+					addBombPlaced();
+				}
+			}
+			else
+				move(EnumDirection.NORTH);
 		}
 	}
 	

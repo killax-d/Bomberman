@@ -20,9 +20,9 @@ public class Bomb extends Entity {
 	public static final int BOMB_EXPLODED = 2;
 
 	private int x, y;
-	private Set<Set<Effect>> effects;
+	private Set<Effect> effects;
 
-	private EntityPlayer player;
+	private EntityLiving player;
 	private String type; // Enum ?
 
 	private int frame;
@@ -32,8 +32,8 @@ public class Bomb extends Entity {
 	
 	private Timer animClock;
 
-	public Bomb(EntityPlayer player, Map map, Set<Set<Effect>> effects) {
-		super();
+	public Bomb(EntityLiving player, Map map, Set<Effect> effects) {
+		super(player.getPosition());
 		this.player = player;
 		this.effects = effects;
 		animClock = new Timer();
@@ -127,7 +127,9 @@ public class Bomb extends Entity {
 				blockedDir.add(EnumDirection.NORTH);
 			}
 		}
-		effects.add(effectToAdd);
+		for (Effect effect : effectToAdd) {
+			effects.add(effect);
+		}
 
 	}
 	
