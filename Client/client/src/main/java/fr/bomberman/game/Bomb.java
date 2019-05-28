@@ -87,11 +87,17 @@ public class Bomb extends Entity {
 
 	@Override
 	public BufferedImage getSprite() {
-		return Assets.getTile(String.format("skins/bomb_%d.png", skin_id), SPRITE_WIDTH, SPRITE_HEIGHT, this.frame, this.state);
+		return Assets.getTile(String.format("skins/bomb_%d.png", skin_id), SPRITE_WIDTH, SPRITE_HEIGHT, this.frame, (this.state <= 1 ? this.state : 1));
 	}
 
 	private void killIfEntity(int x, int y) {
-		Set<Entity> entities = GuiIngame.instance.getEntities();
+		Set<Entity> entities = new HashSet<Entity>();
+		for (Entity entity : GuiIngame.instance.getEntities()) {
+			if(entity instanceof EntityLiving) {
+				entities.add(entity);
+			}
+		}
+		
 		for (Entity entity : entities) {
 			if (x == entity.getPosition().getX()
 					&& y == entity.getPosition().getY())

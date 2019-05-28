@@ -108,9 +108,9 @@ public class GuiIngame extends Container implements KeyListener {
 	}
 
 	private void drawEntities(Graphics g) {
-		Set<Entity> entityToDraw = entities;
+		Set<Entity> entityToDisplay = new HashSet<Entity>();
 		Set<Entity> entityToRemove = new HashSet<Entity>();
-		for (Entity entity : entityToDraw) {
+		for (Entity entity : entities) {
 			if (entity instanceof Bomb && ((Bomb) entity).getState() == Bomb.BOMB_EXPLODED) {
 				entityToRemove.add((Bomb) entity);
 			}
@@ -118,8 +118,11 @@ public class GuiIngame extends Container implements KeyListener {
 				entityToRemove.add((Bomb) entity);
 			}
 			else
-				g.drawImage(entity.getSprite(), entity.getDisplayX(), entity.getDisplayY(), Entity.SPRITE_WIDTH,
-						Entity.SPRITE_HEIGHT, null);
+				entityToDisplay.add(entity);
+		}
+		for (Entity entity : entityToDisplay) {
+			g.drawImage(entity.getSprite(), entity.getDisplayX(), entity.getDisplayY(), Entity.SPRITE_WIDTH,
+					Entity.SPRITE_HEIGHT, null);
 		}
 		for (Entity entity : entityToRemove) {
 			entities.remove(entity);
@@ -127,20 +130,23 @@ public class GuiIngame extends Container implements KeyListener {
 	}
 
 	private void drawEffects(Graphics g) {
-		Set<Effect> effectToDisplay = effects;
-		Set<EffectTrail> effectToRemove = new HashSet<EffectTrail>();
-		for (Effect effect : effectToDisplay) {
+		Set<Effect> effectToDisplay = new HashSet<Effect>();
+		Set<Effect> effectToRemove = new HashSet<Effect>();
+		for (Effect effect : effects) {
 			if(effect != null) {
 				if (effect instanceof EffectTrail && ((EffectTrail) effect).getState() == EffectTrail.EFFECT_ENDED) {
-					effectToRemove.add((EffectTrail) effect);
+					effectToRemove.add(effect);
 				}
 				else
-					g.drawImage(effect.getSprite(), effect.getDisplayX(), effect.getDisplayY(), Effect.SPRITE_WIDTH,
-							Effect.SPRITE_HEIGHT, null);
+					effectToDisplay.add(effect);
 			}
 		}
-		for (EffectTrail effectTrail : effectToRemove) {
-			effects.remove(effectTrail);
+		for (Effect effect : effectToDisplay) {
+			g.drawImage(effect.getSprite(), effect.getDisplayX(), effect.getDisplayY(), Effect.SPRITE_WIDTH,
+					Effect.SPRITE_HEIGHT, null);
+		}
+		for (Effect effect : effectToRemove) {
+			effects.remove(effect);
 		}
 	}
 

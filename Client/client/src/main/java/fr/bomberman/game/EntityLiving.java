@@ -7,8 +7,9 @@ public abstract class EntityLiving extends Entity {
 	private int power;
 	private int bombCount;
 	private int bombPlaced;
+	private int bombMax;
 
-	public EntityLiving(int power, Map map, int x, int y) {
+	public EntityLiving(int power, int maxBomb, Map map, int x, int y) {
 		super(new Vec2D(x, y), map);
 		setPower(power);
 		setBombCount(2);
@@ -26,6 +27,10 @@ public abstract class EntityLiving extends Entity {
 		this.power = power <= 0 || power > 8 ? 1 : power;
 	}
 	
+	private void setMaxBomb(int bombMax) {
+		this.bombMax = bombMax <= 0 || bombMax > 8 ? 1 : bombMax;
+	}
+	
 	private void setBombCount(int count) {
 		this.bombCount = count <= 0 || count > 8 ? 1 : count;
 	}
@@ -33,6 +38,11 @@ public abstract class EntityLiving extends Entity {
 	public int getBombPlaced() {
 		return bombPlaced;
 	}
+
+	public int getMaxBomb() {
+		return bombMax;
+	}
+	
 	
 	public int getPower() {
 		return power;
