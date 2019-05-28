@@ -36,7 +36,7 @@ public class Map {
 					if (r < 5) {
 						map[i][j] = FLOWER_TILE;
 					} else if (r < 40) {
-						map[i][j] = PLANT_TILE;
+						map[i][j] = TILE_FREE;
 					}
 				}
 			}

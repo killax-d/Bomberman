@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.jgrapht.GraphPath;
 import org.jgrapht.alg.interfaces.ShortestPathAlgorithm.SingleSourcePaths;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultDirectedGraph;
@@ -19,7 +20,7 @@ public class EntityAIPlayer extends EntityLiving {
 	private String name;
 	private GuiIngame game;
 	private DefaultDirectedGraph<String, DefaultEdge> graph;
-	private Set<Vec2D> path;
+	private GraphPath path;
 	
 	public EntityAIPlayer(String name, Map map, int x, int y) {
 		super(8, map, x, y);
@@ -27,7 +28,6 @@ public class EntityAIPlayer extends EntityLiving {
 		this.setName(name);
 		this.graph = new DefaultDirectedGraph<String, DefaultEdge>(DefaultEdge.class);
 		initGraph();
-		this.path = new HashSet<Vec2D>();
 		new Timer().scheduleAtFixedRate(calculatePath(), 0, 500);
 	}
 
@@ -94,23 +94,35 @@ public class EntityAIPlayer extends EntityLiving {
 		}
 	}
 	
+	private void moveWithPath() {
+		for (Object point : path.getEdgeList()) {
+			String[] args = point.toString().replace("(", "").replace(")", "").split(" : ");
+			String[] coord = args[0].split("-");
+			Vec2D pt = new Vec2D(Integer.parseInt(coord[0]), Integer.parseInt(coord[1]));
+			moveToPoint(pt);
+		}
+	}
+	
 	private void initGraph() {
 		graph.addVertex("1-1");
 		for(int y = 1; y < map.MAP_HEIGHT-1; y++) {
 			for (int x = 1; x < map.MAP_WIDTH-1; x++) {
 				String currentPoint = x + "-" + y;
-				Vec2D rightTile = new Vec2D(x,  y+1);
-				Vec2D bottomTile = new Vec2D(x+1,  y);
-				System.out.println(map);
-				if (map.getTileTypeAt(bottomTile.getX(), bottomTile.getY()) != Map.ROCK_TILE) {
-					String point = bottomTile.getX() + "-" + bottomTile.getY();
-					graph.addVertex(point);
-					graph.addEdge(currentPoint, point);
-				}
-				if (map.getTileTypeAt(rightTile.getX(), rightTile.getY()) != Map.ROCK_TILE) {
-					String point = rightTile.getX() + "-" + rightTile.getY();
-					graph.addVertex(point);
-					graph.addEdge(currentPoint, point);
+				if(map.getTileTypeAt(x, y) != map.ROCK_TILE) {
+					Vec2D rightTile = new Vec2D(x,  y+1);
+					Vec2D bottomTile = new Vec2D(x+1,  y);
+					if (map.getTileTypeAt(bottomTile.getX(), bottomTile.getY()) != Map.ROCK_TILE) {
+						String point = (bottomTile.getX() + "-" + bottomTile.getY()).replace(".0",  "");
+						graph.addVertex(point);
+						graph.addEdge(currentPoint, point);
+						graph.addEdge(point, currentPoint);
+					}
+					if (map.getTileTypeAt(rightTile.getX(), rightTile.getY()) != Map.ROCK_TILE) {
+						String point = (rightTile.getX() + "-" + rightTile.getY()).replace(".0",  "");
+						graph.addVertex(point);
+						graph.addEdge(currentPoint, point);
+						graph.addEdge(point, currentPoint);
+					}
 				}
 			}
 		}
@@ -121,10 +133,13 @@ public class EntityAIPlayer extends EntityLiving {
 
 			@Override
 			public void run() {
-				Vec2D dest = getNearestEnnemy();
-				DijkstraShortestPath<String, DefaultEdge> dijkstraAlg = new DijkstraShortestPath<>(graph);
-				SingleSourcePaths<String, DefaultEdge> iPaths = dijkstraAlg.getPaths(dest.getX() + "-" + dest.getY());
-		        System.out.println(iPaths.getPath(dest.getX() + "-" + dest.getY()) + "\n");
+				if(path == null) {
+					Vec2D dest = getNearestEnnemy();
+					DijkstraShortestPath<String, DefaultEdge> dijkstraAlg = new DijkstraShortestPath<>(graph);
+					SingleSourcePaths<String, DefaultEdge> iPaths = dijkstraAlg.getPaths((position.getX() + "-" + position.getY()).replace(".0", ""));
+					path = (iPaths.getPath((dest.getX() + "-" + dest.getY()).replace(".0", "")));
+					moveWithPath();
+				}
 			}
 			
 		};
