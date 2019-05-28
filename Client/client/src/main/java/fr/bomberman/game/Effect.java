@@ -10,8 +10,8 @@ import fr.bomberman.utils.Vec2D;
 public class Effect extends TimerTask {
 
 	private static final int MAX_FRAME = 1;
-	public static final int SPRITE_WIDTH = 32;
-	public static final int SPRITE_HEIGHT = 48;
+	public static final int SPRITE_WIDTH = 64;
+	public static final int SPRITE_HEIGHT = 96;
 
 	protected int x, y;
 	
@@ -60,7 +60,7 @@ public class Effect extends TimerTask {
 	}
 
 	public BufferedImage getSprite() {
-		return Assets.getTile(String.format("skins/trail_%d.png", skin_id), SPRITE_WIDTH, SPRITE_HEIGHT, this.frame,
+		return Assets.getTile(String.format("skins/trail_%d.png", skin_id), SPRITE_WIDTH/2, SPRITE_HEIGHT/2, this.frame,
 				0);
 	
 	}

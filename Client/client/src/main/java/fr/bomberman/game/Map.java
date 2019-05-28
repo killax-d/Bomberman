@@ -11,8 +11,8 @@ public class Map {
 	public static final int BOMB_TILE = 4;
 
 	public static final int MAP_WIDTH = 25;
-	public static final int MAP_HEIGHT = 19;
-	public static final int TILE_SCALE = 32;
+	public static final int MAP_HEIGHT = 15;
+	public static final int TILE_SCALE = 64;
 
 	private int[][] map;
 

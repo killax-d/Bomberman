@@ -5,13 +5,14 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import fr.bomberman.assets.Assets;
+import fr.bomberman.gui.GuiIngame;
 import fr.bomberman.utils.Vec2D;
 
 public abstract class Entity extends TimerTask {
 
 	private static final int MAX_FRAME = 4;
-	public static final int SPRITE_WIDTH = 32;
-	public static final int SPRITE_HEIGHT = 48;
+	public static final int SPRITE_WIDTH = 64;
+	public static final int SPRITE_HEIGHT = 96;
 
 	protected Map map;
 	protected Timer clock;
@@ -20,6 +21,7 @@ public abstract class Entity extends TimerTask {
 	protected int skin_id = 0;
 	protected Vec2D position;
 	protected Vec2D next_position;
+	protected boolean dead;
 
 	public Entity(Vec2D position) {
 		this.position = position;
@@ -27,6 +29,7 @@ public abstract class Entity extends TimerTask {
 		this.direction = EnumDirection.SOUTH;
 		this.frame = 0;
 		this.skin_id = 1;
+		this.dead = false;
 		new Timer().scheduleAtFixedRate(this, 0, 20);
 	}
 
@@ -86,7 +89,7 @@ public abstract class Entity extends TimerTask {
 	}
 
 	public BufferedImage getSprite() {
-		return Assets.getTile(String.format("skins/player_%d.png", skin_id), SPRITE_WIDTH, SPRITE_HEIGHT, this.frame,
+		return Assets.getTile(String.format("skins/player_%d.png", skin_id), SPRITE_WIDTH/2, SPRITE_HEIGHT/2, this.frame,
 				direction.getID());
 	}
 
@@ -130,6 +133,11 @@ public abstract class Entity extends TimerTask {
 			next_position.addX(+1F);
 			break;
 		}
+	}
+	
+	public void die() {
+		this.dead = true;
+		GuiIngame.instance.getEntities().remove(this);
 	}
 
 	public Vec2D getPosition() {

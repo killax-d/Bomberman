@@ -64,7 +64,8 @@ public class GuiButton implements MouseMotionListener {
 
 	@Override
 	public void mouseMoved(MouseEvent event) {
-		if (event.getX() >= x && event.getX() <= x + width && event.getY() >= y && event.getY() <= y + height) {
+		int bar = 40;
+		if (event.getX() >= x && event.getX() <= x + width && event.getY() >= y + bar && event.getY() <= y + bar + height) {
 			hovered = true;
 		} else {
 			hovered = false;
@@ -73,6 +74,7 @@ public class GuiButton implements MouseMotionListener {
 
 	@Override
 	public void mouseDragged(MouseEvent event) {
+		
 	}
 
 }

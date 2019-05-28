@@ -91,6 +91,14 @@ public class Bomb extends Entity {
 		return Assets.getTile(String.format("skins/bomb_%d.png", skin_id), SPRITE_WIDTH, SPRITE_HEIGHT, this.frame, this.state);
 	}
 
+	private void killIfEntity(int x, int y) {
+		for (Entity entity : GuiIngame.instance.getEntities()) {
+			if (x == entity.getPosition().getX()
+					&& y == entity.getPosition().getY())
+				entity.die();
+		}
+	}
+	
 	private void explode() {
 		int power = player.getPower() + 1;
 
@@ -104,6 +112,7 @@ public class Bomb extends Entity {
 					blockedDir.add(EnumDirection.EST);
 				map.setTileTypeAt(x+i, y, Map.TILE_FREE);
 				effectToAdd.add(new EffectTrail(x+i, y));
+				killIfEntity(x+i, y);
 			} else {
 				blockedDir.add(EnumDirection.EST);
 			}
@@ -113,6 +122,7 @@ public class Bomb extends Entity {
 					blockedDir.add(EnumDirection.WEST);
 				map.setTileTypeAt(x-i, y, Map.TILE_FREE);
 				effectToAdd.add(new EffectTrail(x-i, y));
+				killIfEntity(x-i, y);
 			} else {
 				blockedDir.add(EnumDirection.WEST);
 			}
@@ -122,6 +132,7 @@ public class Bomb extends Entity {
 					blockedDir.add(EnumDirection.SOUTH);
 				map.setTileTypeAt(x, y+i, Map.TILE_FREE);
 				effectToAdd.add(new EffectTrail(x, y+i));
+				killIfEntity(x, y+i);
 			} else {
 				blockedDir.add(EnumDirection.SOUTH);
 			}
@@ -131,6 +142,7 @@ public class Bomb extends Entity {
 					blockedDir.add(EnumDirection.NORTH);
 				map.setTileTypeAt(x, y-i, Map.TILE_FREE);
 				effectToAdd.add(new EffectTrail(x, y-i));
+				killIfEntity(x, y-i);
 			} else {
 				blockedDir.add(EnumDirection.NORTH);
 			}
