@@ -18,6 +18,10 @@ public abstract class EntityLiving extends Entity {
 		this.bombPlaced++;
 	}
 	
+	public void removeBombPlaced() {
+		this.bombPlaced--;
+	}
+	
 	private void setPower(int power) {
 		this.power = power <= 0 || power > 8 ? 1 : power;
 	}

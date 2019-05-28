@@ -99,28 +99,36 @@ public class Bomb extends Entity {
 
 		for (int i = 0; i < power; i++) {
 			if(!blockedDir.contains(EnumDirection.EST) && x+i < Map.MAP_WIDTH
-						&& (map.getTileTypeAt(x+i, y) == Map.TILE_FREE || map.getTileTypeAt(x+i, y) == Map.PLANT_TILE)) {
+						&& (map.getTileTypeAt(x+i, y) == Map.TILE_FREE || map.getTileTypeAt(x+i, y) == Map.PLANT_TILE || map.getTileTypeAt(x+i, y) == Map.FLOWER_TILE)) {
+				if (map.getTileTypeAt(x+i, y) == Map.PLANT_TILE)
+					blockedDir.add(EnumDirection.EST);
 				map.setTileTypeAt(x+i, y, Map.TILE_FREE);
 				effectToAdd.add(new EffectTrail(x+i, y));
 			} else {
 				blockedDir.add(EnumDirection.EST);
 			}
 			if(!blockedDir.contains(EnumDirection.WEST) && x-i > 0
-						&& (map.getTileTypeAt(x-i, y) == Map.TILE_FREE || map.getTileTypeAt(x-i, y) == Map.PLANT_TILE)) {
+						&& (map.getTileTypeAt(x-i, y) == Map.TILE_FREE || map.getTileTypeAt(x-i, y) == Map.PLANT_TILE || map.getTileTypeAt(x-i, y) == Map.FLOWER_TILE)) {
+				if (map.getTileTypeAt(x-i, y) == Map.PLANT_TILE)
+					blockedDir.add(EnumDirection.WEST);
 				map.setTileTypeAt(x-i, y, Map.TILE_FREE);
 				effectToAdd.add(new EffectTrail(x-i, y));
 			} else {
 				blockedDir.add(EnumDirection.WEST);
 			}
 			if(!blockedDir.contains(EnumDirection.SOUTH) && y+i < Map.MAP_HEIGHT
-						&& (map.getTileTypeAt(x, y+i) == Map.TILE_FREE || map.getTileTypeAt(x, y+i) == Map.PLANT_TILE)) {
+						&& (map.getTileTypeAt(x, y+i) == Map.TILE_FREE || map.getTileTypeAt(x, y+i) == Map.PLANT_TILE || map.getTileTypeAt(x, y+i) == Map.FLOWER_TILE)) {
+				if (map.getTileTypeAt(x, y+i) == Map.PLANT_TILE)
+					blockedDir.add(EnumDirection.SOUTH);
 				map.setTileTypeAt(x, y+i, Map.TILE_FREE);
 				effectToAdd.add(new EffectTrail(x, y+i));
 			} else {
 				blockedDir.add(EnumDirection.SOUTH);
 			}
 			if(!blockedDir.contains(EnumDirection.NORTH) && y-i > 0
-						&& (map.getTileTypeAt(x, y-i) == Map.TILE_FREE || map.getTileTypeAt(x, y-i) == Map.PLANT_TILE)) {
+						&& (map.getTileTypeAt(x, y-i) == Map.TILE_FREE || map.getTileTypeAt(x, y-i) == Map.PLANT_TILE || map.getTileTypeAt(x, y-i) == Map.FLOWER_TILE)) {
+				if (map.getTileTypeAt(x, y-i) == Map.PLANT_TILE)
+					blockedDir.add(EnumDirection.NORTH);
 				map.setTileTypeAt(x, y-i, Map.TILE_FREE);
 				effectToAdd.add(new EffectTrail(x, y-i));
 			} else {
@@ -168,6 +176,7 @@ public class Bomb extends Entity {
 					public void run() {
 						map.setTileTypeAt(x, y, Map.TILE_FREE);
 						explode();
+						player.removeBombPlaced();
 						state = BOMB_EXPLODED;
 					}
 

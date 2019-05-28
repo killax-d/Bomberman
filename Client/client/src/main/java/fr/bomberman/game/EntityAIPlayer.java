@@ -16,7 +16,7 @@ public class EntityAIPlayer extends EntityLiving {
 		super(8, x, y);
 		game = GuiIngame.instance;
 		this.setName(name);
-		new Timer().scheduleAtFixedRate(play(), 0, 50);
+		new Timer().scheduleAtFixedRate(play(), 0, 500);
 	}
 
 	public String getName() {
