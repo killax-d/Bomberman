@@ -33,7 +33,7 @@ public class Bomb extends Entity {
 	private Timer animClock;
 
 	public Bomb(EntityLiving player, Map map, Set<Effect> effects) {
-		super(player.getPosition());
+		super(player.getPosition(), map);
 		this.player = player;
 		this.effects = effects;
 		animClock = new Timer();
@@ -44,7 +44,6 @@ public class Bomb extends Entity {
 		this.skin_id = 0;
 		this.position = player.getPosition();
 		setPosition((int) position.getX(), (int) position.getY());
-		setMap(map);
 		map.setTileTypeAt(x, y, Map.BOMB_TILE);
 	}
 
@@ -92,7 +91,8 @@ public class Bomb extends Entity {
 	}
 
 	private void killIfEntity(int x, int y) {
-		for (Entity entity : GuiIngame.instance.getEntities()) {
+		Set<Entity> entities = GuiIngame.instance.getEntities();
+		for (Entity entity : entities) {
 			if (x == entity.getPosition().getX()
 					&& y == entity.getPosition().getY())
 				entity.die();

@@ -23,12 +23,13 @@ public abstract class Entity extends TimerTask {
 	protected Vec2D next_position;
 	protected boolean dead;
 
-	public Entity(Vec2D position) {
+	public Entity(Vec2D position, Map map) {
 		this.position = position;
 		this.next_position = new Vec2D(position.getX(), position.getY());
 		this.direction = EnumDirection.SOUTH;
 		this.frame = 0;
 		this.skin_id = 1;
+		setMap(map);
 		this.dead = false;
 		new Timer().scheduleAtFixedRate(this, 0, 20);
 	}
@@ -133,6 +134,10 @@ public abstract class Entity extends TimerTask {
 			next_position.addX(+1F);
 			break;
 		}
+	}
+	
+	public boolean isDead() {
+		return this.dead;
 	}
 	
 	public void die() {

@@ -8,8 +8,8 @@ public abstract class EntityLiving extends Entity {
 	private int bombCount;
 	private int bombPlaced;
 
-	public EntityLiving(int power, int x, int y) {
-		super(new Vec2D(x, y));
+	public EntityLiving(int power, Map map, int x, int y) {
+		super(new Vec2D(x, y), map);
 		setPower(power);
 		setBombCount(2);
 	}

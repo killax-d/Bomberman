@@ -40,14 +40,12 @@ public class GuiIngame extends Container implements KeyListener {
 		this.map = new Map();
 		this.entities = new HashSet<Entity>();
 		this.effects = new HashSet<Effect>();
-		this.player = new EntityPlayer("Player", 1, 1);
-		this.AIplayer = new EntityAIPlayer("AI", Map.MAP_WIDTH - 2, 1);
+		this.player = new EntityPlayer("Player", map, 1, 1);
+		this.AIplayer = new EntityAIPlayer("AI", map, Map.MAP_WIDTH - 2, 1);
 		this.entities.add(player);
 		this.entities.add(AIplayer);
 		map.setTileTypeAt(1, 1, Map.TILE_FREE);
 		map.setTileTypeAt(Map.MAP_WIDTH - 2, 1, Map.TILE_FREE);
-		player.setMap(map);
-		AIplayer.setMap(map);
 	}
 
 	@Override
@@ -110,17 +108,21 @@ public class GuiIngame extends Container implements KeyListener {
 	}
 
 	private void drawEntities(Graphics g) {
-		Set<Bomb> bombToRemove = new HashSet<Bomb>();
-		for (Entity entity : entities) {
+		Set<Entity> entityToDraw = entities;
+		Set<Entity> entityToRemove = new HashSet<Entity>();
+		for (Entity entity : entityToDraw) {
 			if (entity instanceof Bomb && ((Bomb) entity).getState() == Bomb.BOMB_EXPLODED) {
-				bombToRemove.add((Bomb) entity);
+				entityToRemove.add((Bomb) entity);
+			}
+			else if(!(entity instanceof Bomb) && entity.isDead()) {
+				entityToRemove.add((Bomb) entity);
 			}
 			else
 				g.drawImage(entity.getSprite(), entity.getDisplayX(), entity.getDisplayY(), Entity.SPRITE_WIDTH,
 						Entity.SPRITE_HEIGHT, null);
 		}
-		for (Bomb bomb : bombToRemove) {
-			entities.remove(bomb);
+		for (Entity entity : entityToRemove) {
+			entities.remove(entity);
 		}
 	}
 

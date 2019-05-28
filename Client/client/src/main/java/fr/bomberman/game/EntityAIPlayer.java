@@ -1,9 +1,16 @@
 package fr.bomberman.game;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import fr.bomberman.gui.GameWindow;
+import org.jgrapht.alg.interfaces.ShortestPathAlgorithm.SingleSourcePaths;
+import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
+import org.jgrapht.graph.DefaultDirectedGraph;
+import org.jgrapht.graph.DefaultEdge;
+
 import fr.bomberman.gui.GuiIngame;
 import fr.bomberman.utils.Vec2D;
 
@@ -11,12 +18,17 @@ public class EntityAIPlayer extends EntityLiving {
 
 	private String name;
 	private GuiIngame game;
+	private DefaultDirectedGraph<String, DefaultEdge> graph;
+	private Set<Vec2D> path;
 	
-	public EntityAIPlayer(String name, int x, int y) {
-		super(8, x, y);
+	public EntityAIPlayer(String name, Map map, int x, int y) {
+		super(8, map, x, y);
 		game = GuiIngame.instance;
 		this.setName(name);
-		new Timer().scheduleAtFixedRate(play(), 0, 500);
+		this.graph = new DefaultDirectedGraph<String, DefaultEdge>(DefaultEdge.class);
+		initGraph();
+		this.path = new HashSet<Vec2D>();
+		new Timer().scheduleAtFixedRate(calculatePath(), 0, 500);
 	}
 
 	public String getName() {
@@ -82,13 +94,37 @@ public class EntityAIPlayer extends EntityLiving {
 		}
 	}
 	
-	public TimerTask play() {
+	private void initGraph() {
+		graph.addVertex("1-1");
+		for(int y = 1; y < map.MAP_HEIGHT-1; y++) {
+			for (int x = 1; x < map.MAP_WIDTH-1; x++) {
+				String currentPoint = x + "-" + y;
+				Vec2D rightTile = new Vec2D(x,  y+1);
+				Vec2D bottomTile = new Vec2D(x+1,  y);
+				System.out.println(map);
+				if (map.getTileTypeAt(bottomTile.getX(), bottomTile.getY()) != Map.ROCK_TILE) {
+					String point = bottomTile.getX() + "-" + bottomTile.getY();
+					graph.addVertex(point);
+					graph.addEdge(currentPoint, point);
+				}
+				if (map.getTileTypeAt(rightTile.getX(), rightTile.getY()) != Map.ROCK_TILE) {
+					String point = rightTile.getX() + "-" + rightTile.getY();
+					graph.addVertex(point);
+					graph.addEdge(currentPoint, point);
+				}
+			}
+		}
+	}
+	
+	public TimerTask calculatePath() {
 		TimerTask task = new TimerTask() {
 
 			@Override
 			public void run() {
 				Vec2D dest = getNearestEnnemy();
-				moveToPoint(dest);
+				DijkstraShortestPath<String, DefaultEdge> dijkstraAlg = new DijkstraShortestPath<>(graph);
+				SingleSourcePaths<String, DefaultEdge> iPaths = dijkstraAlg.getPaths(dest.getX() + "-" + dest.getY());
+		        System.out.println(iPaths.getPath(dest.getX() + "-" + dest.getY()) + "\n");
 			}
 			
 		};
