@@ -8,10 +8,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class Assets {
 
 	private static Map<String, BufferedImage> assets = new HashMap<String, BufferedImage>();
+	private static Map<String, BufferedSound> sounds = new HashMap<String, BufferedSound>();
 
 	// The fail-safe default texture for missing assets
 	private static BufferedImage NO_TEXTURE = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
@@ -33,6 +37,22 @@ public class Assets {
 			e.printStackTrace();
 		}
 		return NO_TEXTURE;
+	}
+	
+	public static BufferedSound getSound(String path) {
+		if (sounds.containsKey(path)) {
+			return sounds.get(path);
+		}
+		try (AudioInputStream ais = AudioSystem.getAudioInputStream(Assets.class.getResourceAsStream(path))) {
+			if (ais != null) {
+				BufferedSound sound = new BufferedSound(ais);
+				sounds.putIfAbsent(path, sound);
+				return sound;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public static BufferedImage getTile(String path, int width, int height, int x, int y) {

@@ -5,6 +5,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import fr.bomberman.assets.Assets;
+import fr.bomberman.assets.BufferedSound;
 import fr.bomberman.gui.GuiIngame;
 import fr.bomberman.utils.Vec2D;
 
@@ -14,6 +15,8 @@ public abstract class Entity extends TimerTask {
 	public static final int SPRITE_WIDTH = 64;
 	public static final int SPRITE_HEIGHT = 96;
 
+	private static final BufferedSound SFX_Bump = Assets.getSound("sounds/bumpintowall.wav");
+	
 	protected Map map;
 	protected Timer clock;
 	protected EnumDirection direction;
@@ -120,6 +123,8 @@ public abstract class Entity extends TimerTask {
 		}
 		this.direction = direction;
 		if (!canMove(direction)) {
+			if (this instanceof EntityPlayer) // REMIX without this
+				SFX_Bump.play();
 			return;
 		}
 		switch (direction) {
@@ -142,7 +147,10 @@ public abstract class Entity extends TimerTask {
 					&& next_position.getY() == item.getPosition().getY()) {
 					item.pick();
 					EntityLiving entity = (EntityLiving) this;
-					entity.addPower();
+					if(item instanceof ItemBomb)
+						entity.addMaxBomb();
+					if(item instanceof ItemPower)
+						entity.addPower();
 				}
 			}
 		}

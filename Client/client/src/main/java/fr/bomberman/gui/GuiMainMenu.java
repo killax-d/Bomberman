@@ -8,19 +8,25 @@ import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 
 import fr.bomberman.assets.Assets;
+import fr.bomberman.assets.BufferedSound;
 
 public class GuiMainMenu extends Container implements MouseListener, MouseMotionListener {
 
-	private BufferedImage background = Assets.getImage("title_background.jpg");
+	// Image
+	private BufferedImage background = Assets.getImage("title_background.png");
 	private BufferedImage title = Assets.getImage("title_titletext.png");
 	private BufferedImage one_player = Assets.getImage("one_player.png");
 	private BufferedImage close_texture = Assets.getImage("close.jpg");
+	
+	// Sound
+	private BufferedSound music = Assets.getSound("sounds/menu.wav");
 
-	private GuiButton play = new GuiButton(one_player, 50, 50, 100, 20);
+	private GuiButton play = new GuiButton(one_player, 50, 50, 128, 64);
 	private GuiButton close = new GuiButton(close_texture, 0, 0, 64, 32);
 
 	public GuiMainMenu() {
-
+		music.setLoop(true);
+		music.play();
 	}
 
 	@Override
@@ -35,6 +41,7 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 	@Override
 	public void mouseClicked(MouseEvent event) {
 		if (play.isHovered()) {
+			music.stop();
 			GameWindow.instance().setCurrentGui(new GuiIngame());
 		}
 		if (close.isHovered()) {

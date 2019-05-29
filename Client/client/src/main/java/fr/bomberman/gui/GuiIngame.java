@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import fr.bomberman.assets.Assets;
+import fr.bomberman.assets.BufferedSound;
 import fr.bomberman.game.Bomb;
 import fr.bomberman.game.Effect;
 import fr.bomberman.game.EffectTrail;
@@ -30,6 +31,9 @@ public class GuiIngame extends Container implements KeyListener {
 	private Set<Entity> entities;
 	private Set<Effect> effects;
 	private Set<Item> powerups;
+	// Sound
+	private static final BufferedSound SFX_BackgroundMusic = Assets.getSound("sounds/background_music.wav");
+	private static final BufferedSound SFX_ImpossibleAction = Assets.getSound("sounds/impossible_action.wav");
 
 	public static GuiIngame instance;
 	
@@ -38,6 +42,9 @@ public class GuiIngame extends Container implements KeyListener {
 	private EntityAIPlayer AIplayer;
 
 	public GuiIngame() {
+		SFX_BackgroundMusic.setLoop(true);
+		SFX_BackgroundMusic.setVolume(0.025F);
+		SFX_BackgroundMusic.play();
 		instance = this;
 		this.map = new Map();
 		this.entities = new HashSet<Entity>();
@@ -104,8 +111,18 @@ public class GuiIngame extends Container implements KeyListener {
 			break;
 		case KeyEvent.VK_SPACE:
 			int mapTile = map.getTileTypeAt(player.getPosition().getX(), player.getPosition().getY());
-			if(mapTile == Map.TILE_FREE || mapTile == Map.FLOWER_TILE)
-				entities.add(new Bomb(player, map, effects));
+			if((mapTile == Map.TILE_FREE || mapTile == Map.FLOWER_TILE) && !player.isDead())
+				if(player.getBombPlaced() >= player.getBombCount()) {
+					SFX_ImpossibleAction.play();
+				}
+				else {
+					entities.add(new Bomb(player, map, effects));
+					player.addBombPlaced();
+				}
+			break;
+		case KeyEvent.VK_ESCAPE:
+			stopMusic();
+			GameWindow.instance().setCurrentGui(new GuiMainMenu());
 			break;
 		}
 	}
@@ -135,6 +152,10 @@ public class GuiIngame extends Container implements KeyListener {
 		for (Entity entity : entityToRemove) {
 			entities.remove(entity);
 		}
+	}
+	
+	public void stopMusic() {
+		SFX_BackgroundMusic.stop();
 	}
 	
 	private void drawPowerups(Graphics g) {

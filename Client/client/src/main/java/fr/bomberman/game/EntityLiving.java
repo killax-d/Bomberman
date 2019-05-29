@@ -12,7 +12,7 @@ public abstract class EntityLiving extends Entity {
 	public EntityLiving(int power, int maxBomb, Map map, int x, int y) {
 		super(new Vec2D(x, y), map);
 		setPower(power);
-		setBombCount(2);
+		setBombCount(1);
 	}
 
 	public void addBombPlaced() {
@@ -28,15 +28,15 @@ public abstract class EntityLiving extends Entity {
 	}
 	
 	private void setPower(int power) {
-		this.power = power <= 0 || power > 8 ? 1 : power;
+		this.power = power <= 1 || power > 8 ? 1 : power;
 	}
-	
-	private void setMaxBomb(int bombMax) {
-		this.bombMax = bombMax <= 0 || bombMax > 8 ? 1 : bombMax;
+
+	public void addMaxBomb() {
+		setBombCount(++bombCount);
 	}
 	
 	private void setBombCount(int count) {
-		this.bombCount = count <= 0 || count > 8 ? 1 : count;
+		this.bombCount = count <= 1 || count > 8 ? 1 : count;
 	}
 	
 	public int getBombPlaced() {

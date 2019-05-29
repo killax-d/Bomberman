@@ -3,6 +3,7 @@ package fr.bomberman.game;
 import java.awt.image.BufferedImage;
 
 import fr.bomberman.assets.Assets;
+import fr.bomberman.assets.BufferedSound;
 import fr.bomberman.utils.Vec2D;
 
 public class Item extends Entity {
@@ -11,6 +12,8 @@ public class Item extends Entity {
 	public final static int SPRITE_WIDTH = 64;
 	public final static int WAITING = 0;
 	public final static int PICKED = 1;
+	
+	private static BufferedSound SFX_Pick = Assets.getSound("sounds/item_picked.wav");
 	
 	private int state;
 	
@@ -24,6 +27,7 @@ public class Item extends Entity {
 	
 	public void pick() {
 		this.state = PICKED;
+		SFX_Pick.play();
 	}
 	
 	public int getState() {
