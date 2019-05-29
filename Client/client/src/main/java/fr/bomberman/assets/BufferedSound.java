@@ -1,5 +1,8 @@
 package fr.bomberman.assets;
 
+import java.io.BufferedInputStream;
+import java.io.InputStream;
+
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -9,13 +12,15 @@ import javax.sound.sampled.LineUnavailableException;
 public class BufferedSound {
 	
 	private Clip clip;
-	private AudioInputStream ais;
+	private AudioInputStream audioStream;
 
-	public BufferedSound(AudioInputStream ais) {
-		this.ais = ais;
+	public BufferedSound(InputStream is) {
 		try {
+			InputStream bufferedIn = new BufferedInputStream(is);
+			AudioInputStream audioStream = AudioSystem.getAudioInputStream(bufferedIn);
+			this.audioStream = audioStream;
 			clip = AudioSystem.getClip();
-		} catch (LineUnavailableException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		open();
@@ -24,7 +29,7 @@ public class BufferedSound {
 	
 	public void open() {
 		try {
-			clip.open(ais);
+			clip.open(audioStream);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -43,9 +43,9 @@ public class Assets {
 		if (sounds.containsKey(path)) {
 			return sounds.get(path);
 		}
-		try (AudioInputStream ais = AudioSystem.getAudioInputStream(Assets.class.getResourceAsStream(path))) {
-			if (ais != null) {
-				BufferedSound sound = new BufferedSound(ais);
+		try (InputStream is = Assets.class.getResourceAsStream(path)) {
+			if (is != null) {
+				BufferedSound sound = new BufferedSound(is);
 				sounds.putIfAbsent(path, sound);
 				return sound;
 			}
