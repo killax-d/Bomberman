@@ -2,12 +2,15 @@ package fr.bomberman.game;
 
 import java.awt.image.BufferedImage;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import fr.bomberman.assets.Assets;
+import fr.bomberman.gui.GameWindow;
 import fr.bomberman.gui.GuiIngame;
+import fr.bomberman.gui.GuiMainMenu;
 import fr.bomberman.utils.Vec2D;
 
 public class Bomb extends Entity {
@@ -100,9 +103,26 @@ public class Bomb extends Entity {
 		
 		for (Entity entity : entities) {
 			if (x == entity.getPosition().getX()
-					&& y == entity.getPosition().getY())
+					&& y == entity.getPosition().getY()) {
 				entity.die();
+				if(entity instanceof EntityPlayer) 
+					new Timer().schedule(new TimerTask() {
+
+						@Override
+						public void run() {
+							GameWindow.instance().setCurrentGui(new GuiMainMenu());
+						}
+						
+					}, 3000);
+			}
+				
 		}
+	}
+	
+	private void spawnItem(int x, int y) {
+		Random rand = new Random();
+		if (rand.nextInt(100) < 20)
+			GuiIngame.instance.getPowerups().add(new ItemPower(new Vec2D(x, y), map));
 	}
 	
 	private void explode() {
@@ -110,12 +130,14 @@ public class Bomb extends Entity {
 
 		Set<EnumDirection> blockedDir = new HashSet<EnumDirection>();
 		Set<Effect> effectToAdd = new HashSet<Effect>();
-
+		
 		for (int i = 0; i < power; i++) {
 			if(!blockedDir.contains(EnumDirection.EST) && x+i < Map.MAP_WIDTH
 						&& (map.getTileTypeAt(x+i, y) == Map.TILE_FREE || map.getTileTypeAt(x+i, y) == Map.PLANT_TILE || map.getTileTypeAt(x+i, y) == Map.FLOWER_TILE)) {
-				if (map.getTileTypeAt(x+i, y) == Map.PLANT_TILE)
+				if (map.getTileTypeAt(x+i, y) == Map.PLANT_TILE) {
 					blockedDir.add(EnumDirection.EST);
+					spawnItem(x+i, y);
+				}
 				map.setTileTypeAt(x+i, y, Map.TILE_FREE);
 				effectToAdd.add(new EffectTrail(x+i, y));
 				killIfEntity(x+i, y);
@@ -124,8 +146,10 @@ public class Bomb extends Entity {
 			}
 			if(!blockedDir.contains(EnumDirection.WEST) && x-i > 0
 						&& (map.getTileTypeAt(x-i, y) == Map.TILE_FREE || map.getTileTypeAt(x-i, y) == Map.PLANT_TILE || map.getTileTypeAt(x-i, y) == Map.FLOWER_TILE)) {
-				if (map.getTileTypeAt(x-i, y) == Map.PLANT_TILE)
+				if (map.getTileTypeAt(x-i, y) == Map.PLANT_TILE) {
 					blockedDir.add(EnumDirection.WEST);
+					spawnItem(x-i, y);
+				}
 				map.setTileTypeAt(x-i, y, Map.TILE_FREE);
 				effectToAdd.add(new EffectTrail(x-i, y));
 				killIfEntity(x-i, y);
@@ -134,8 +158,10 @@ public class Bomb extends Entity {
 			}
 			if(!blockedDir.contains(EnumDirection.SOUTH) && y+i < Map.MAP_HEIGHT
 						&& (map.getTileTypeAt(x, y+i) == Map.TILE_FREE || map.getTileTypeAt(x, y+i) == Map.PLANT_TILE || map.getTileTypeAt(x, y+i) == Map.FLOWER_TILE)) {
-				if (map.getTileTypeAt(x, y+i) == Map.PLANT_TILE)
+				if (map.getTileTypeAt(x, y+i) == Map.PLANT_TILE) {
 					blockedDir.add(EnumDirection.SOUTH);
+					spawnItem(x, y+i);
+				}
 				map.setTileTypeAt(x, y+i, Map.TILE_FREE);
 				effectToAdd.add(new EffectTrail(x, y+i));
 				killIfEntity(x, y+i);
@@ -144,8 +170,10 @@ public class Bomb extends Entity {
 			}
 			if(!blockedDir.contains(EnumDirection.NORTH) && y-i > 0
 						&& (map.getTileTypeAt(x, y-i) == Map.TILE_FREE || map.getTileTypeAt(x, y-i) == Map.PLANT_TILE || map.getTileTypeAt(x, y-i) == Map.FLOWER_TILE)) {
-				if (map.getTileTypeAt(x, y-i) == Map.PLANT_TILE)
+				if (map.getTileTypeAt(x, y-i) == Map.PLANT_TILE) {
 					blockedDir.add(EnumDirection.NORTH);
+					spawnItem(x, y-i);
+				}
 				map.setTileTypeAt(x, y-i, Map.TILE_FREE);
 				effectToAdd.add(new EffectTrail(x, y-i));
 				killIfEntity(x, y-i);

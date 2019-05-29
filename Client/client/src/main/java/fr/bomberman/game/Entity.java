@@ -31,7 +31,9 @@ public abstract class Entity extends TimerTask {
 		this.skin_id = 1;
 		setMap(map);
 		this.dead = false;
-		new Timer().scheduleAtFixedRate(this, 0, 20);
+		if (this instanceof EntityLiving) {
+			new Timer().scheduleAtFixedRate(this, 0, 20);
+		}
 	}
 
 	public int getDisplayX() {
@@ -133,6 +135,16 @@ public abstract class Entity extends TimerTask {
 		case EST:
 			next_position.addX(+1F);
 			break;
+		}
+		if (this instanceof EntityLiving) {
+			for(Item item : GuiIngame.instance.getPowerups()) {
+				if (next_position.getX() == item.getPosition().getX()
+					&& next_position.getY() == item.getPosition().getY()) {
+					item.pick();
+					EntityLiving entity = (EntityLiving) this;
+					entity.addPower();
+				}
+			}
 		}
 	}
 	

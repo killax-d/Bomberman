@@ -16,6 +16,7 @@ import fr.bomberman.game.Entity;
 import fr.bomberman.game.EntityAIPlayer;
 import fr.bomberman.game.EntityPlayer;
 import fr.bomberman.game.EnumDirection;
+import fr.bomberman.game.Item;
 import fr.bomberman.game.Map;
 
 public class GuiIngame extends Container implements KeyListener {
@@ -28,6 +29,7 @@ public class GuiIngame extends Container implements KeyListener {
 	// Entities on the map
 	private Set<Entity> entities;
 	private Set<Effect> effects;
+	private Set<Item> powerups;
 
 	public static GuiIngame instance;
 	
@@ -40,6 +42,7 @@ public class GuiIngame extends Container implements KeyListener {
 		this.map = new Map();
 		this.entities = new HashSet<Entity>();
 		this.effects = new HashSet<Effect>();
+		this.powerups = new HashSet<Item>();
 		this.player = new EntityPlayer("Player", map, 1, 1);
 		this.AIplayer = new EntityAIPlayer("AI", map, Map.MAP_WIDTH - 2, 1);
 		this.entities.add(player);
@@ -54,6 +57,7 @@ public class GuiIngame extends Container implements KeyListener {
 		drawMap(g);
 		drawEntities(g);
 		drawEffects(g);
+		drawPowerups(g);
 		super.paint(g);
 	}
 
@@ -78,6 +82,10 @@ public class GuiIngame extends Container implements KeyListener {
 	
 	public Set<Effect> getEffects(){
 		return effects;
+	}
+	
+	public Set<Item> getPowerups(){
+		return powerups;
 	}
 
 	private void movePlayer(int keyCode) {
@@ -128,7 +136,29 @@ public class GuiIngame extends Container implements KeyListener {
 			entities.remove(entity);
 		}
 	}
-
+	
+	private void drawPowerups(Graphics g) {
+		Set<Item> itemToDisplay = new HashSet<Item>();
+		Set<Item> itemToRemove = new HashSet<Item>();
+		for (Item item : powerups) {
+			if(item != null) {
+				if (item.getState() == Item.PICKED) {
+					itemToRemove.add(item);
+				}
+				else
+					itemToDisplay.add(item);
+			}
+		}
+		for (Item item : itemToDisplay) {
+			if(item != null) {
+				g.drawImage(item.getSprite(), item.getDisplayX(), item.getDisplayY(), Item.SPRITE_WIDTH,
+						Item.SPRITE_HEIGHT, null);
+			}
+		}
+		for (Item item : itemToRemove) {
+			powerups.remove(item);
+		}
+	}
 	private void drawEffects(Graphics g) {
 		Set<Effect> effectToDisplay = new HashSet<Effect>();
 		Set<Effect> effectToRemove = new HashSet<Effect>();

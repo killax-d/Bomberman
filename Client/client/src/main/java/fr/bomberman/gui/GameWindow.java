@@ -25,6 +25,7 @@ public class GameWindow extends JFrame implements KeyListener, MouseListener, Mo
 		setTitle(title);
 		setCurrentGui(new GuiMainMenu());
 		setSize(width, height);
+		setUndecorated(true);
 		setLocationRelativeTo(null);
 		setVisible(true);
 		registerClock();

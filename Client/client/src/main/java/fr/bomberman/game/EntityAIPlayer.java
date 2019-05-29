@@ -23,7 +23,7 @@ public class EntityAIPlayer extends EntityLiving {
 	private boolean customAction;
 	
 	public EntityAIPlayer(String name, Map map, int x, int y) {
-		super(8, 1, map, x, y);
+		super(1, 1, map, x, y);
 		game = GuiIngame.instance;
 		this.customAction = false;
 		this.setName(name);
@@ -56,6 +56,7 @@ public class EntityAIPlayer extends EntityLiving {
 	
 	public void moveToPoint(Vec2D point) {
 		if (position.getX() < point.getX()) {
+			/** NORMAL MODE
 			if(!canMove(EnumDirection.EST)) {
 				if(getBombCount() != getBombPlaced()) {
 					game.getEntities().add(new Bomb(this, map, game.getEffects()));
@@ -64,8 +65,11 @@ public class EntityAIPlayer extends EntityLiving {
 			}
 			else
 				move(EnumDirection.EST);
+			**/
+			move(EnumDirection.EST);
 		}
 		else if (position.getX() > point.getX()) {
+			/** NORMAL MODE
 			if(!canMove(EnumDirection.WEST)) {
 				if(getBombCount() != getBombPlaced()) {
 					game.getEntities().add(new Bomb(this, map, game.getEffects()));
@@ -74,8 +78,11 @@ public class EntityAIPlayer extends EntityLiving {
 			}
 			else
 				move(EnumDirection.WEST);
+			**/
+			move(EnumDirection.WEST);
 		}
 		else if (position.getY() < point.getY()) {
+			/** NORMAL MODE
 			if(!canMove(EnumDirection.SOUTH)) {
 				if(getBombCount() != getBombPlaced()) {
 					game.getEntities().add(new Bomb(this, map, game.getEffects()));
@@ -84,8 +91,11 @@ public class EntityAIPlayer extends EntityLiving {
 			}
 			else
 				move(EnumDirection.SOUTH);
+			**/
+			move(EnumDirection.SOUTH);
 		}
 		else if (position.getY() > point.getY()) {
+			/** NORMAL MODE
 			if(!canMove(EnumDirection.NORTH)) {
 				if(getBombCount() != getBombPlaced()) {
 					game.getEntities().add(new Bomb(this, map, game.getEffects()));
@@ -94,6 +104,8 @@ public class EntityAIPlayer extends EntityLiving {
 			}
 			else
 				move(EnumDirection.NORTH);
+			**/
+			move(EnumDirection.NORTH);
 		}
 	}
 	
@@ -108,6 +120,10 @@ public class EntityAIPlayer extends EntityLiving {
 				pathVector.add(new Vec2D(x, y));
 			}
 		}
+	}
+	
+	private void goAwayBomb(Vec2D location) {
+		
 	}
 	
 	private TimerTask moveWithPath() {
