@@ -30,7 +30,7 @@ public class GuiIngame extends Container implements KeyListener {
 	private BufferedImage grass = Assets.getTile("map_tileset.png", 16, 16, 7, 3);
 	private BufferedImage flower = Assets.getTile("map_tileset.png", 16, 16, 5, 2);
 	// Entities on the map
-	private Set<Entity> entities;
+	private CopyOnWriteArrayList<Entity> entities;
 	private CopyOnWriteArrayList<Effect> effects;
 	private Set<Item> powerups;
 	// Sound
@@ -53,7 +53,7 @@ public class GuiIngame extends Container implements KeyListener {
 		instance = this;
 		gamePause = false;
 		this.map = new Map();
-		this.entities = new HashSet<Entity>();
+		this.entities = new CopyOnWriteArrayList<Entity>();
 		this.effects = new CopyOnWriteArrayList<Effect>();
 		this.powerups = new HashSet<Item>();
 		this.player = new EntityPlayer("Player", map, 1, 1);
@@ -72,6 +72,7 @@ public class GuiIngame extends Container implements KeyListener {
 	
 	public void resume() {
 		gamePause = false;
+		SFX_BackgroundMusic.play();
 	}
 	
 	@Override
@@ -94,7 +95,7 @@ public class GuiIngame extends Container implements KeyListener {
 		movePlayer(event.getKeyCode());
 	}
 	
-	public Set<Entity> getEntities(){
+	public CopyOnWriteArrayList<Entity> getEntities(){
 		return entities;
 	}
 	
@@ -207,7 +208,7 @@ public class GuiIngame extends Container implements KeyListener {
 		Set<Item> itemToRemove = new HashSet<Item>();
 		for (Item item : powerups) {
 			if(item != null) {
-				if (item.getState() == Item.PICKED || item.isDead()) {
+				if (item.getState() >= Item.PICKED || item.isDead()) {
 					itemToRemove.add(item);
 				}
 				else

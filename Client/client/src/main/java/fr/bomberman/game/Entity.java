@@ -29,7 +29,7 @@ public abstract class Entity extends TimerTask {
 	protected Vec2D next_position;
 	protected boolean dead;
 	
-	protected float speed = 1;
+	protected float speed = 1F;
 
 	public Entity(Vec2D position, Map map) {
 		this.position = position;
