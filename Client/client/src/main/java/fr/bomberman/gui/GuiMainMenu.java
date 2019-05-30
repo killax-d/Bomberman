@@ -28,6 +28,7 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 
 	public GuiMainMenu() {
 		music.setLoop(true);
+		music.setLoopPoint(14, -1);
 		music.play();
 	}
 

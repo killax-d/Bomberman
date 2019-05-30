@@ -41,6 +41,10 @@ public class BufferedSound {
 			clip.loop(0);
 	}
 	
+	public void setLoopPoint(int start, int end) {
+		clip.setLoopPoints(start, end);
+	}
+	
 	public void play() {
 		clip.setFramePosition(0);
 		clip.start();
