@@ -1,5 +1,6 @@
 package fr.bomberman.game;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -10,6 +11,7 @@ import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
+import fr.bomberman.assets.Assets;
 import fr.bomberman.gui.GuiIngame;
 import fr.bomberman.utils.Vec2D;
 
@@ -29,6 +31,7 @@ public class EntityAIPlayer extends EntityLiving {
 		this.setName(name);
 		this.pathVector = new ArrayList<Vec2D>();
 		this.graph = new DefaultDirectedGraph<String, DefaultEdge>(DefaultEdge.class);
+		this.skin_id = 0;
 		initGraph();
 		new Timer().scheduleAtFixedRate(calculatePath(), 0, 500);
 		new Timer().scheduleAtFixedRate(moveWithPath(), 0, 150);
@@ -38,6 +41,11 @@ public class EntityAIPlayer extends EntityLiving {
 		return name;
 	}
 
+	public BufferedImage getSprite() {
+		return Assets.getTile(String.format("skins/player_%d.png", skin_id), SPRITE_WIDTH/2, SPRITE_HEIGHT/2, this.frame,
+				direction.getID());
+	}
+	
 	public void setName(String name) {
 		this.name = name;
 	}

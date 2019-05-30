@@ -84,10 +84,16 @@ public class GuiButton implements MouseMotionListener {
 			hovered = false;
 		}
 	}
-
+	
 	@Override
 	public void mouseDragged(MouseEvent event) {
-		
+		if (event.getX() >= x && event.getX() <= x + width && event.getY() >= y && event.getY() <= y + height) {
+			if(!hovered)
+				SFX_ButtonHover.play();
+			hovered = true;
+		} else {
+			hovered = false;
+		}
 	}
 
 }

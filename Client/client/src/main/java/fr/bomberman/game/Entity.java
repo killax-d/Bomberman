@@ -29,7 +29,7 @@ public abstract class Entity extends TimerTask {
 	protected Vec2D next_position;
 	protected boolean dead;
 	
-	protected float speed = 1F;
+	protected double speed = 1.0;
 
 	public Entity(Vec2D position, Map map) {
 		this.position = position;
@@ -110,23 +110,23 @@ public abstract class Entity extends TimerTask {
 				if((position.getX() + 0.1F*speed) > next_position.getX())
 					position.setX(next_position.getX());
 				else
-					position.addX(0.1F*speed);
+					position.addX(0.1F*(float)speed);
 			} else if (position.getX() > next_position.getX()) {
 				if((position.getX() - 0.1F*speed) < next_position.getX())
 					position.setX(next_position.getX());
 				else
-					position.addX(-(0.1F*speed));
+					position.addX(-(0.1F*(float)speed));
 			}
 			if (position.getY() < next_position.getY()) {
 				if((position.getY() + 0.1F*speed) > next_position.getY())
 					position.setY(next_position.getY());
 				else
-					position.addY(0.1F*speed);
+					position.addY(0.1F*(float)speed);
 			} else if (position.getY() > next_position.getY()) {
 				if((position.getY() + 0.1F*speed) < next_position.getY())
 					position.setY(next_position.getY());
 				else
-					position.addY(-(0.1F*speed));
+					position.addY(-(0.1F*(float)speed));
 			}
 		} else {
 			position.setX(next_position.getX());

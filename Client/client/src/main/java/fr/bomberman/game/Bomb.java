@@ -67,7 +67,7 @@ public class Bomb extends Entity {
 		this.y = (int) position.getY();
 		this.position = new Vec2D(x, y);
 		this.next_position = new Vec2D(x, y);
-		this.speed = 5.0F;
+		this.speed = 5.0;
 		map.setTileTypeAt(x, y, Map.BOMB_TILE);
 	}
 
@@ -87,23 +87,23 @@ public class Bomb extends Entity {
 				if((position.getX() + 0.1F*speed) > next_position.getX())
 					position.setX(next_position.getX());
 				else
-					position.addX(0.1F*speed);
+					position.addX(0.1F*(float)speed);
 			} else if (position.getX() > next_position.getX()) {
 				if((position.getX() - 0.1F*speed) < next_position.getX())
 					position.setX(next_position.getX());
 				else
-					position.addX(-(0.1F*speed));
+					position.addX(-(0.1F*(float)speed));
 			}
 			if (position.getY() < next_position.getY()) {
 				if((position.getY() + 0.1F*speed) > next_position.getY())
 					position.setY(next_position.getY());
 				else
-					position.addY(0.1F*speed);
+					position.addY(0.1F*(float)speed);
 			} else if (position.getY() > next_position.getY()) {
 				if((position.getY() + 0.1F*speed) < next_position.getY())
 					position.setY(next_position.getY());
 				else
-					position.addY(-(0.1F*speed));
+					position.addY(-(0.1F*(float)speed));
 			}
 		} else {
 			position.setX(next_position.getX());

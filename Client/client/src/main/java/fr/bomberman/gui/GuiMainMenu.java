@@ -65,23 +65,44 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 
 	@Override
 	public void mouseEntered(MouseEvent event) {
+		
 	}
 
 	@Override
 	public void mouseExited(MouseEvent event) {
+		
 	}
 
 	@Override
 	public void mousePressed(MouseEvent event) {
+		
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent event) {
+		if (play.isHovered()) {
+			music.stop();
+			GameWindow.instance().setCurrentGui(new GuiIngame());
+		}
+		if (resume.isHovered()) {
+			music.stop();
+			if(GuiIngame.instance != null) {
+				GameWindow.instance().setCurrentGui(GuiIngame.instance);
+				GuiIngame.instance.resume();
+			}
+			else
+				GameWindow.instance().setCurrentGui(new GuiIngame());
+		}
+		if (close.isHovered()) {
+			System.exit(0);
+		}
 	}
 
 	@Override
 	public void mouseDragged(MouseEvent event) {
-
+		play.mouseMoved(event);
+		close.mouseMoved(event);
+		resume.mouseMoved(event);
 	}
 
 	@Override

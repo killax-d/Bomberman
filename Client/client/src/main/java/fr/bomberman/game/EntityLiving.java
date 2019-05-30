@@ -55,17 +55,16 @@ public abstract class EntityLiving extends Entity {
 	}
 	
 	public void addSpeed() {
-		System.out.println(speed);
-		setSpeed((speed >= 2.0F ? 2.0F : speed+0.2F));
+		setSpeed((speed >= 2.0 ? 2.0 : speed+0.2));
 	}
 	
 	public void removeSpeed() {
 		System.out.println(speed);
-		setSpeed((speed == 1F ? 1F : speed-0.2F));
+		setSpeed((speed <= 1.0 ? 1.0 : speed-0.2));
 	}
 	
-	private void setSpeed(float speed) {
-		this.speed = speed <= 1F ? 1F : speed;
+	private void setSpeed(double speed) {
+		this.speed = (float) (speed <= 1.0 ? 1.0 : speed);
 	}
 
 	public void addBombPlaced() {
