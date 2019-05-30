@@ -155,10 +155,14 @@ public abstract class Entity extends TimerTask {
 					&& next_position.getY() == item.getPosition().getY()) {
 					item.pick(this);
 					EntityLiving entity = (EntityLiving) this;
-					if(item instanceof ItemBomb)
+					if(item instanceof ItemBombUp)
 						entity.addMaxBomb();
-					if(item instanceof ItemPower)
+					if(item instanceof ItemPowerUp)
 						entity.addPower();
+					if(item instanceof ItemBombDown)
+						entity.removeMaxBomb();
+					if(item instanceof ItemPowerDown)
+						entity.removePower();
 				}
 			}
 			for(Effect effect : GuiIngame.instance.getEffects()) {

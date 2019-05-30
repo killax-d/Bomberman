@@ -7,14 +7,14 @@ import java.util.TimerTask;
 import fr.bomberman.assets.Assets;
 import fr.bomberman.utils.Vec2D;
 
-public class ItemPower extends Item {
+public class ItemBombDown extends Item {
 
-	private final int SPRITE_HEIGHT = 64;
-	private final int SPRITE_WIDTH = 64;
+	private final int SPRITE_HEIGHT = 32;
+	private final int SPRITE_WIDTH = 32;
 	private final int MAX_FRAME = 3;
 	private Timer animClock;
 	
-	public ItemPower(Vec2D position, Map map) {
+	public ItemBombDown(Vec2D position, Map map) {
 		super(position, map);
 		this.frame = 0;
 		this.skin_id = 0;
@@ -26,7 +26,7 @@ public class ItemPower extends Item {
 
 	@Override
 	public BufferedImage getSprite() {
-		return Assets.getTile(String.format("skins/item_power_%d.png", skin_id), SPRITE_WIDTH, SPRITE_HEIGHT, this.frame, 0);
+		return Assets.getTile(String.format("skins/item_bomb_down_%d.png", skin_id), SPRITE_WIDTH, SPRITE_HEIGHT, this.frame, 0);
 	}
 	
 	public TimerTask animItem() {

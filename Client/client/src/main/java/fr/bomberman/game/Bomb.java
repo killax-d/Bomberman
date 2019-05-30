@@ -172,11 +172,26 @@ public class Bomb extends Entity {
 			return;
 		Random rand = new Random();
 		int r = rand.nextInt(100);
-		if (r < 20) {
-			GuiIngame.instance.getPowerups().add(new ItemPower(new Vec2D(x, y), map));
+		if (r < 15) {
+			GuiIngame.instance.getPowerups().add(new ItemPowerUp(new Vec2D(x, y), map));
 		}
-		else if (r < 40) {
-			GuiIngame.instance.getPowerups().add(new ItemBomb(new Vec2D(x, y), map));
+		else if (r < 30) {
+			GuiIngame.instance.getPowerups().add(new ItemBombUp(new Vec2D(x, y), map));
+		}
+		else if (r < 45) {
+			GuiIngame.instance.getPowerups().add(new ItemPowerDown(new Vec2D(x, y), map));
+		}
+		else if (r < 60) {
+			GuiIngame.instance.getPowerups().add(new ItemBombDown(new Vec2D(x, y), map));
+		}
+		else if (r <= 75) {
+			GuiIngame.instance.getPowerups().add(new ItemSpeedUp(new Vec2D(x, y), map));
+		}
+		else if (r <= 90) {
+			GuiIngame.instance.getPowerups().add(new ItemSpeedDown(new Vec2D(x, y), map));
+		}
+		else if (r <= 100) {
+			GuiIngame.instance.getPowerups().add(new ItemGloves(new Vec2D(x, y), map));
 		}
 	}
 	

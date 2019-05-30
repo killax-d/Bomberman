@@ -45,12 +45,20 @@ public abstract class EntityLiving extends Entity {
 		setPower((power == 8 ? 8 : ++power));
 	}
 	
+	public void removePower() {
+		setPower((power == 1 ? 1 : --power));
+	}
+	
 	private void setPower(int power) {
 		this.power = power <= 1 || power > 8 ? 1 : power;
 	}
 
 	public void addMaxBomb() {
 		setBombCount((bombCount == 8 ? 8 : ++bombCount));
+	}
+	
+	public void removeMaxBomb() {
+		setBombCount((bombCount == 1 ? 1 : --bombCount));
 	}
 	
 	private void setBombCount(int count) {
