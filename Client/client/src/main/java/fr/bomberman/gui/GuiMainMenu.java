@@ -15,6 +15,7 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 	// Image
 	private BufferedImage background = Assets.getImage("title_background.png");
 	private BufferedImage title = Assets.getImage("title_titletext.png");
+	private BufferedImage character = Assets.getImage("title_character.png");
 	private BufferedImage one_player = Assets.getImage("one_player.png");
 	private BufferedImage close_texture = Assets.getImage("close.jpg");
 	private BufferedImage resume_texture = Assets.getImage("resume.png");
@@ -36,6 +37,7 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 	public void paint(Graphics g) {
 		g.drawImage(background, 0, 0, getWidth(), getHeight(), null);
 		g.drawImage(title, 0, 0, getWidth(), getHeight(), null);
+		g.drawImage(character, 0, 0, getWidth(), getHeight(), null);
 		play.paint(g);
 		close.paint(g);
 		if(GuiIngame.instance != null)
