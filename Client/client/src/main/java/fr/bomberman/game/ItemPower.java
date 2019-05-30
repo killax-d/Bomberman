@@ -13,8 +13,6 @@ public class ItemPower extends Item {
 	private final int SPRITE_WIDTH = 64;
 	private final int MAX_FRAME = 3;
 	private Timer animClock;
-	private int x;
-	private int y;
 	
 	public ItemPower(Vec2D position, Map map) {
 		super(position, map);

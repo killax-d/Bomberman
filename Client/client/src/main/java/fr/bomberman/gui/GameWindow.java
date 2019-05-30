@@ -17,8 +17,13 @@ import fr.bomberman.game.Map;
 public class GameWindow extends JFrame implements KeyListener, MouseListener, MouseMotionListener {
 
 	private static GameWindow window;
-
+	public static int WIDTH;
+	public static int HEIGHT;
+	
 	private GameWindow(String title, int width, int height) {
+		WIDTH = width;
+		HEIGHT = height;
+		
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setBackground(Color.BLACK);
 		setForeground(Color.WHITE);

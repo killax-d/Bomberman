@@ -6,6 +6,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import fr.bomberman.assets.Assets;
 import fr.bomberman.assets.BufferedSound;
@@ -27,13 +28,15 @@ public class Bomb extends Entity {
 	private static BufferedSound SFX_Explosion = Assets.getSound("sounds/pokeball_explosion.wav");
 	private static BufferedSound SFX_BombDrop = Assets.getSound("sounds/pokeball.wav");
 	private static BufferedSound SFX_EntityDie = Assets.getSound("sounds/fainted.wav");
+	
+	private Set<Effect> effectToAdd;
+	private Set<EnumDirection> blockedDir;
 
 
 	private int x, y;
-	private Set<Effect> effects;
+	private CopyOnWriteArrayList<Effect> effects;
 
 	private EntityLiving player;
-	private String type; // Enum ?
 
 	private int frame;
 	private int state;
@@ -41,8 +44,9 @@ public class Bomb extends Entity {
 	private Map map;
 	
 	private Timer animClock;
+	private Timer exploClock;
 
-	public Bomb(EntityLiving player, Map map, Set<Effect> effects) {
+	public Bomb(EntityLiving player, Map map, CopyOnWriteArrayList<Effect> effects) {
 		super(player.getPosition(), map);
 		SFX_BombDrop.setVolume(0.01F);
 		SFX_BombDrop.play();
@@ -50,21 +54,37 @@ public class Bomb extends Entity {
 		this.effects = effects;
 		animClock = new Timer();
 		animClock.schedule(this.animBomb(), 0, 50);
-		new Timer().schedule(this.removeBomb(), 3000);
+		exploClock = new Timer();
+		exploClock.schedule(this.removeBomb(), 3000);
 		this.frame = 3;
 		this.state = BOMB_TIMING;
 		this.skin_id = 0;
 		this.position = player.getPosition();
-		setPosition((int) position.getX(), (int) position.getY());
+		this.x = (int) position.getX();
+		this.y = (int) position.getY();
+		this.position = new Vec2D(x, y);
 		map.setTileTypeAt(x, y, Map.BOMB_TILE);
 	}
 
 	@Override
 	public void setPosition(int x, int y) {
-		this.x = x;
-		this.y = y;
-		position.setXY(x, y);
+		
 	}
+
+	public void instantExplode() {
+		exploClock.cancel();
+		exploClock.purge();
+
+		state = BOMB_EXPLOSION;
+		frame = 0;
+		map.setTileTypeAt(x, y, Map.TILE_FREE);
+		if(!GuiIngame.instance.isPaused())
+			SFX_Explosion.play();
+		explode();
+		player.removeBombPlaced();
+		state = BOMB_EXPLODED;
+	}
+	
 	
 	@Override
 	public int getDisplayX() {
@@ -103,17 +123,32 @@ public class Bomb extends Entity {
 	}
 
 	private void killIfEntity(int x, int y) {
+		if(GuiIngame.instance == null)
+			return;
 		Set<Entity> entities = new HashSet<Entity>();
-		for (Entity entity : GuiIngame.instance.getEntities()) {
-			if(entity instanceof EntityLiving) {
-				entities.add(entity);
+		if(GuiIngame.instance.getEntities().size() > 1)
+			for (Entity entity : GuiIngame.instance.getEntities()) {
+				if(entity instanceof EntityLiving) {
+					entities.add(entity);
+				}
 			}
+		for (Item item : GuiIngame.instance.getPowerups()) {
+			if (x == item.getPosition().getX() && y == item.getPosition().getY())
+				item.die();
+		}
+		
+		for (Bomb bomb : GuiIngame.instance.getBombs()) {
+			if (x == bomb.getPosition().getX() && y == bomb.getPosition().getY())
+				if (bomb != this && bomb.getState() < BOMB_EXPLOSION)
+					bomb.instantExplode();
 		}
 		
 		for (Entity entity : entities) {
-			if (x == entity.getPosition().getX()
-					&& y == entity.getPosition().getY()) {
-				entity.die();
+			if (x == entity.getPosition().getX() && y == entity.getPosition().getY()) {
+				if (entity != player)
+					entity.die();
+				else if(entity == player && entity instanceof EntityPlayer)
+					entity.die();
 				SFX_EntityDie.play();
 				if(entity instanceof EntityPlayer) 
 					new Timer().schedule(new TimerTask() {
@@ -123,6 +158,7 @@ public class Bomb extends Entity {
 							GuiIngame game = (GuiIngame) GameWindow.instance().getCurrentGui();
 							game.stopMusic();
 							GameWindow.instance().setCurrentGui(new GuiMainMenu());
+							GuiIngame.instance = null;
 						}
 						
 					}, 3000);
@@ -132,71 +168,68 @@ public class Bomb extends Entity {
 	}
 	
 	private void spawnItem(int x, int y) {
+		if(GuiIngame.instance == null)
+			return;
 		Random rand = new Random();
 		int r = rand.nextInt(100);
-		if (r < 20)
+		if (r < 20) {
 			GuiIngame.instance.getPowerups().add(new ItemPower(new Vec2D(x, y), map));
-		else if (r < 40)
+		}
+		else if (r < 40) {
 			GuiIngame.instance.getPowerups().add(new ItemBomb(new Vec2D(x, y), map));
+		}
+	}
+	
+	private void bombCheck(EnumDirection direction, int x, int y) {
+		if (x < 0 || y < 0 || x > Map.MAP_WIDTH || y > Map.MAP_WIDTH)
+			return;
+		
+		if (direction == EnumDirection.EST || direction == EnumDirection.WEST)
+			if(!blockedDir.contains(direction) && x < Map.MAP_WIDTH && isExplosableTile(x, y)) {
+				effectToAdd.add(new EffectTrail(player, x, y));
+				killIfEntity(x, y);
+				if (map.getTileTypeAt(x, y) == Map.PLANT_TILE) {
+					blockedDir.add(direction);
+					spawnItem(x, y);
+				}
+				map.setTileTypeAt(x, y, Map.TILE_FREE);
+			} else {
+				blockedDir.add(direction);
+			}
+		else
+			if(!blockedDir.contains(direction) && y < Map.MAP_HEIGHT && isExplosableTile(x, y)) {
+				effectToAdd.add(new EffectTrail(player, x, y));
+				killIfEntity(x, y);
+				if (map.getTileTypeAt(x, y) == Map.PLANT_TILE) {
+					blockedDir.add(direction);
+					spawnItem(x, y);
+				}
+				map.setTileTypeAt(x, y, Map.TILE_FREE);
+			} else {
+				blockedDir.add(direction);
+			}
+	}
+	
+	private boolean isExplosableTile(int x, int y) {
+		return (map.getTileTypeAt(x, y) == Map.BOMB_TILE || map.getTileTypeAt(x, y) == Map.TILE_FREE || map.getTileTypeAt(x, y) == Map.PLANT_TILE || map.getTileTypeAt(x, y) == Map.FLOWER_TILE);
 	}
 	
 	private void explode() {
+		if(GuiIngame.instance == null)
+			return;
 		int power = player.getPower() + 1;
 
-		Set<EnumDirection> blockedDir = new HashSet<EnumDirection>();
-		Set<Effect> effectToAdd = new HashSet<Effect>();
-		
+		blockedDir = new HashSet<EnumDirection>();
+		effectToAdd = new HashSet<Effect>();
 		for (int i = 0; i < power; i++) {
-			if(!blockedDir.contains(EnumDirection.EST) && x+i < Map.MAP_WIDTH
-						&& (map.getTileTypeAt(x+i, y) == Map.BOMB_TILE || map.getTileTypeAt(x+i, y) == Map.TILE_FREE || map.getTileTypeAt(x+i, y) == Map.PLANT_TILE || map.getTileTypeAt(x+i, y) == Map.FLOWER_TILE)) {
-				if (map.getTileTypeAt(x+i, y) == Map.PLANT_TILE) {
-					blockedDir.add(EnumDirection.EST);
-					spawnItem(x+i, y);
-				}
-				map.setTileTypeAt(x+i, y, Map.TILE_FREE);
-				effectToAdd.add(new EffectTrail(x+i, y));
-				killIfEntity(x+i, y);
-			} else {
-				blockedDir.add(EnumDirection.EST);
-			}
-			if(!blockedDir.contains(EnumDirection.WEST) && x-i > 0
-						&& (map.getTileTypeAt(x-i, y) == Map.BOMB_TILE || map.getTileTypeAt(x-i, y) == Map.TILE_FREE || map.getTileTypeAt(x-i, y) == Map.PLANT_TILE || map.getTileTypeAt(x-i, y) == Map.FLOWER_TILE)) {
-				if (map.getTileTypeAt(x-i, y) == Map.PLANT_TILE) {
-					blockedDir.add(EnumDirection.WEST);
-					spawnItem(x-i, y);
-				}
-				map.setTileTypeAt(x-i, y, Map.TILE_FREE);
-				effectToAdd.add(new EffectTrail(x-i, y));
-				killIfEntity(x-i, y);
-			} else {
-				blockedDir.add(EnumDirection.WEST);
-			}
-			if(!blockedDir.contains(EnumDirection.SOUTH) && y+i < Map.MAP_HEIGHT
-						&& (map.getTileTypeAt(x, y+i) == Map.BOMB_TILE || map.getTileTypeAt(x, y+i) == Map.TILE_FREE || map.getTileTypeAt(x, y+i) == Map.PLANT_TILE || map.getTileTypeAt(x, y+i) == Map.FLOWER_TILE)) {
-				if (map.getTileTypeAt(x, y+i) == Map.PLANT_TILE) {
-					blockedDir.add(EnumDirection.SOUTH);
-					spawnItem(x, y+i);
-				}
-				map.setTileTypeAt(x, y+i, Map.TILE_FREE);
-				effectToAdd.add(new EffectTrail(x, y+i));
-				killIfEntity(x, y+i);
-			} else {
-				blockedDir.add(EnumDirection.SOUTH);
-			}
-			if(!blockedDir.contains(EnumDirection.NORTH) && y-i > 0
-						&& (map.getTileTypeAt(x, y-i) == Map.BOMB_TILE || map.getTileTypeAt(x, y-i) == Map.TILE_FREE || map.getTileTypeAt(x, y-i) == Map.PLANT_TILE || map.getTileTypeAt(x, y-i) == Map.FLOWER_TILE)) {
-				if (map.getTileTypeAt(x, y-i) == Map.PLANT_TILE) {
-					blockedDir.add(EnumDirection.NORTH);
-					spawnItem(x, y-i);
-				}
-				map.setTileTypeAt(x, y-i, Map.TILE_FREE);
-				effectToAdd.add(new EffectTrail(x, y-i));
-				killIfEntity(x, y-i);
-			} else {
-				blockedDir.add(EnumDirection.NORTH);
-			}
+			bombCheck(EnumDirection.EST, x+i, y);
+			bombCheck(EnumDirection.WEST, x-i, y);
+			bombCheck(EnumDirection.SOUTH, x, y+i);
+			bombCheck(EnumDirection.NORTH, x, y-i);
 		}
-		SFX_Trail.play();
+			
+		if(GuiIngame.instance != null && !GuiIngame.instance.isPaused())
+			SFX_Trail.play();
 		for (Effect effect : effectToAdd) {
 			effects.add(effect);
 		}
@@ -237,7 +270,8 @@ public class Bomb extends Entity {
 					@Override
 					public void run() {
 						map.setTileTypeAt(x, y, Map.TILE_FREE);
-						SFX_Explosion.play();
+						if(GuiIngame.instance != null && !GuiIngame.instance.isPaused())
+							SFX_Explosion.play();
 						explode();
 						player.removeBombPlaced();
 						state = BOMB_EXPLODED;

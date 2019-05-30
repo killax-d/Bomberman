@@ -58,6 +58,14 @@ public class GuiButton implements MouseMotionListener {
 
 	}
 
+	public void setText(String text) {
+		this.text = text;
+	}
+	
+	public String getText() {
+		return this.text;
+	}
+	
 	public boolean isHovered() {
 		return hovered;
 	}

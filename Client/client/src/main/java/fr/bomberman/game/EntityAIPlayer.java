@@ -18,7 +18,7 @@ public class EntityAIPlayer extends EntityLiving {
 	private String name;
 	private GuiIngame game;
 	private DefaultDirectedGraph<String, DefaultEdge> graph;
-	private GraphPath path;
+	private GraphPath<String, DefaultEdge> path;
 	private ArrayList<Vec2D> pathVector;
 	private boolean customAction;
 	
@@ -54,59 +54,82 @@ public class EntityAIPlayer extends EntityLiving {
 		return nearest;
 	}
 	
+	private boolean ennemyAround() {
+		boolean ennemyPresent = false;
+		for (int x = -1; x < 2; x++) {
+			if (position.getX()+x >= 0 && position.getX()+x <= Map.MAP_WIDTH)
+				for(EntityLiving entity : game.getEntitiesLiving()) {
+					if (entity != this)
+						if (position.getX()+x == entity.getPosition().getX())
+							ennemyPresent = true;
+				}
+				
+		}
+		for (int y = -1; y < 2; y++) {
+			if (position.getY()+y >= 0 && position.getY()+y <= Map.MAP_HEIGHT)
+				for(EntityLiving entity : game.getEntitiesLiving()) {
+					if (entity != this)
+						if (position.getY()+y == entity.getPosition().getY() && entity != this)
+							ennemyPresent = true;
+				}
+					
+		}
+		return ennemyPresent;
+	}
+	
 	public void moveToPoint(Vec2D point) {
+		if (ennemyAround() && getBombCount() != getBombPlaced() && isFreeCell(position)) {
+			game.getEntities().add(new Bomb(this, map, game.getEffects()));
+			addBombPlaced();
+		}
 		if (position.getX() < point.getX()) {
-			/** NORMAL MODE
 			if(!canMove(EnumDirection.EST)) {
-				if(getBombCount() != getBombPlaced()) {
+				if(getBombCount() != getBombPlaced() && isFreeCell(position) && map.getTileTypeAt(point) != Map.ROCK_TILE) {
 					game.getEntities().add(new Bomb(this, map, game.getEffects()));
 					addBombPlaced();
 				}
 			}
 			else
 				move(EnumDirection.EST);
-			**/
 			move(EnumDirection.EST);
 		}
 		else if (position.getX() > point.getX()) {
-			/** NORMAL MODE
 			if(!canMove(EnumDirection.WEST)) {
-				if(getBombCount() != getBombPlaced()) {
+				if(getBombCount() != getBombPlaced() && isFreeCell(position) && map.getTileTypeAt(point) != Map.ROCK_TILE) {
 					game.getEntities().add(new Bomb(this, map, game.getEffects()));
 					addBombPlaced();
 				}
 			}
 			else
 				move(EnumDirection.WEST);
-			**/
 			move(EnumDirection.WEST);
 		}
 		else if (position.getY() < point.getY()) {
-			/** NORMAL MODE
 			if(!canMove(EnumDirection.SOUTH)) {
-				if(getBombCount() != getBombPlaced()) {
+				if(getBombCount() != getBombPlaced() && isFreeCell(position) && map.getTileTypeAt(point) != Map.ROCK_TILE) {
 					game.getEntities().add(new Bomb(this, map, game.getEffects()));
 					addBombPlaced();
 				}
 			}
 			else
 				move(EnumDirection.SOUTH);
-			**/
 			move(EnumDirection.SOUTH);
 		}
 		else if (position.getY() > point.getY()) {
-			/** NORMAL MODE
 			if(!canMove(EnumDirection.NORTH)) {
-				if(getBombCount() != getBombPlaced()) {
+				if(getBombCount() != getBombPlaced() && isFreeCell(position) && map.getTileTypeAt(point) != Map.ROCK_TILE) {
 					game.getEntities().add(new Bomb(this, map, game.getEffects()));
 					addBombPlaced();
 				}
 			}
 			else
 				move(EnumDirection.NORTH);
-			**/
 			move(EnumDirection.NORTH);
 		}
+	}
+	
+	private boolean isFreeCell(Vec2D point) {
+		return (map.getTileTypeAt(point.getX(), point.getY()) == Map.TILE_FREE || map.getTileTypeAt(point.getX(), point.getY()) == Map.FLOWER_TILE);
 	}
 	
 	private void cleanPath() {
@@ -122,17 +145,15 @@ public class EntityAIPlayer extends EntityLiving {
 		}
 	}
 	
-	private void goAwayBomb(Vec2D location) {
-		
-	}
-	
 	private TimerTask moveWithPath() {
 		TimerTask task = new TimerTask() {
 			@Override
 			public void run() {
-				if (dead) {
+				if (GuiIngame.instance == null || dead) {
 					this.cancel();
 				}
+				if(GuiIngame.instance != null && GuiIngame.instance.isPaused())
+					return;
 				boolean moved = false;
 				if (pathVector.size() > 1) {
 					for(int i = 0; i < pathVector.size() && !moved; i++) {
@@ -153,10 +174,10 @@ public class EntityAIPlayer extends EntityLiving {
 	
 	private void initGraph() {
 		graph.addVertex("1-1");
-		for(int y = 1; y < map.MAP_HEIGHT-1; y++) {
-			for (int x = 1; x < map.MAP_WIDTH-1; x++) {
+		for(int y = 1; y < Map.MAP_HEIGHT-1; y++) {
+			for (int x = 1; x < Map.MAP_WIDTH-1; x++) {
 				String currentPoint = x + "-" + y;
-				if(map.getTileTypeAt(x, y) != map.ROCK_TILE) {
+				if(map.getTileTypeAt(x, y) != Map.ROCK_TILE) {
 					Vec2D rightTile = new Vec2D(x+1,  y);
 					Vec2D bottomTile = new Vec2D(x,  y+1);
 					if (map.getTileTypeAt(bottomTile.getX(), bottomTile.getY()) != Map.ROCK_TILE) {
@@ -194,9 +215,11 @@ public class EntityAIPlayer extends EntityLiving {
 
 			@Override
 			public void run() {
-				if (dead) {
+				if (GuiIngame.instance == null || dead) {
 					this.cancel();
 				}
+				if(GuiIngame.instance != null && GuiIngame.instance.isPaused())
+					return;
 				if (!customAction) {
 					Vec2D dest = getNearestEnnemy();
 					generateShortPathToPoint(dest);

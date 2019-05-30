@@ -6,7 +6,9 @@ import java.util.TimerTask;
 
 import fr.bomberman.assets.Assets;
 import fr.bomberman.assets.BufferedSound;
+import fr.bomberman.gui.GameWindow;
 import fr.bomberman.gui.GuiIngame;
+import fr.bomberman.gui.GuiMainMenu;
 import fr.bomberman.utils.Vec2D;
 
 public abstract class Entity extends TimerTask {
@@ -16,6 +18,7 @@ public abstract class Entity extends TimerTask {
 	public static final int SPRITE_HEIGHT = 96;
 
 	private static final BufferedSound SFX_Bump = Assets.getSound("sounds/bumpintowall.wav");
+	private static BufferedSound SFX_EntityDie = Assets.getSound("sounds/fainted.wav");
 	
 	protected Map map;
 	protected Timer clock;
@@ -118,6 +121,9 @@ public abstract class Entity extends TimerTask {
 	}
 
 	public void move(EnumDirection direction) {
+		if(isDead()) {
+			return;
+		}
 		if (isMoving()) {
 			return;
 		}
@@ -142,16 +148,53 @@ public abstract class Entity extends TimerTask {
 			break;
 		}
 		if (this instanceof EntityLiving) {
+			if(GuiIngame.instance == null)
+				return;
 			for(Item item : GuiIngame.instance.getPowerups()) {
 				if (next_position.getX() == item.getPosition().getX()
 					&& next_position.getY() == item.getPosition().getY()) {
-					item.pick();
+					item.pick(this);
 					EntityLiving entity = (EntityLiving) this;
 					if(item instanceof ItemBomb)
 						entity.addMaxBomb();
 					if(item instanceof ItemPower)
 						entity.addPower();
 				}
+			}
+			for(Effect effect : GuiIngame.instance.getEffects()) {
+				if (next_position.getX() == effect.getPosition().getX()
+						&& next_position.getY() == effect.getPosition().getY()
+						&& effect instanceof EffectTrail) {
+						EntityLiving player = ((EffectTrail) effect).getOwnerPlayer();
+						
+						boolean deathCondition = false;
+						if(this instanceof EntityPlayer && player == this) {
+							deathCondition = true;
+						}
+						if(this instanceof EntityAIPlayer && player != this) {
+							deathCondition = true;
+						}
+						
+						if(deathCondition) {
+							this.die();
+							SFX_EntityDie.play();
+							if(this instanceof EntityPlayer) {
+								new Timer().schedule(new TimerTask() {
+
+									@Override
+									public void run() {
+										if(GameWindow.instance().getCurrentGui() instanceof GuiIngame) {
+											GuiIngame game = (GuiIngame) GameWindow.instance().getCurrentGui();
+											game.stopMusic();
+											GameWindow.instance().setCurrentGui(new GuiMainMenu());
+											GuiIngame.instance = null;
+										}
+									}
+									
+								}, 3000);
+							}
+						}
+					}
 			}
 		}
 	}

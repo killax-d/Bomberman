@@ -2,6 +2,8 @@ package fr.bomberman.game;
 
 import java.util.Random;
 
+import fr.bomberman.utils.Vec2D;
+
 public class Map {
 
 	public static final int TILE_FREE = 0;
@@ -50,11 +52,15 @@ public class Map {
 	public int getTileTypeAt(float x, float y) {
 		return getTileTypeAt((int) x, (int) y);
 	}
+	
+	public int getTileTypeAt(Vec2D point) {
+		return getTileTypeAt(point.getX(), point.getY());
+	}
 
 	public void setTileTypeAt(int x, int y, int type) {
 		map[x][y] = type;
 	}
-
+	
 	public void setTileTypeAt(float x, float y, int type) {
 		map[(int) x][(int) y] = type;
 	}

@@ -17,11 +17,13 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 	private BufferedImage title = Assets.getImage("title_titletext.png");
 	private BufferedImage one_player = Assets.getImage("one_player.png");
 	private BufferedImage close_texture = Assets.getImage("close.jpg");
+	private BufferedImage resume_texture = Assets.getImage("resume.png");
 	
 	// Sound
 	private BufferedSound music = Assets.getSound("sounds/menu.wav");
 
-	private GuiButton play = new GuiButton(one_player, 50, 50, 128, 64);
+	private GuiButton play = new GuiButton(one_player, GameWindow.WIDTH/2-64, GameWindow.HEIGHT/2-32, 128, 64);
+	private GuiButton resume = new GuiButton(resume_texture,  GameWindow.WIDTH/2-64, GameWindow.HEIGHT/2+32, 128, 64);
 	private GuiButton close = new GuiButton(close_texture, 0, 0, 64, 32);
 
 	public GuiMainMenu() {
@@ -35,6 +37,8 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 		g.drawImage(title, 0, 0, getWidth(), getHeight(), null);
 		play.paint(g);
 		close.paint(g);
+		if(GuiIngame.instance != null)
+			resume.paint(g);
 		super.paint(g);
 	}
 
@@ -43,6 +47,15 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 		if (play.isHovered()) {
 			music.stop();
 			GameWindow.instance().setCurrentGui(new GuiIngame());
+		}
+		if (resume.isHovered()) {
+			music.stop();
+			if(GuiIngame.instance != null) {
+				GameWindow.instance().setCurrentGui(GuiIngame.instance);
+				GuiIngame.instance.resume();
+			}
+			else
+				GameWindow.instance().setCurrentGui(new GuiIngame());
 		}
 		if (close.isHovered()) {
 			System.exit(0);
@@ -74,6 +87,7 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 	public void mouseMoved(MouseEvent event) {
 		play.mouseMoved(event);
 		close.mouseMoved(event);
+		resume.mouseMoved(event);
 	}
 
 }

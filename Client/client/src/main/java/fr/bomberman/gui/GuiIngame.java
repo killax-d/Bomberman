@@ -7,6 +7,7 @@ import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import fr.bomberman.assets.Assets;
 import fr.bomberman.assets.BufferedSound;
@@ -15,6 +16,7 @@ import fr.bomberman.game.Effect;
 import fr.bomberman.game.EffectTrail;
 import fr.bomberman.game.Entity;
 import fr.bomberman.game.EntityAIPlayer;
+import fr.bomberman.game.EntityLiving;
 import fr.bomberman.game.EntityPlayer;
 import fr.bomberman.game.EnumDirection;
 import fr.bomberman.game.Item;
@@ -29,7 +31,7 @@ public class GuiIngame extends Container implements KeyListener {
 	private BufferedImage flower = Assets.getTile("map_tileset.png", 16, 16, 5, 2);
 	// Entities on the map
 	private Set<Entity> entities;
-	private Set<Effect> effects;
+	private CopyOnWriteArrayList<Effect> effects;
 	private Set<Item> powerups;
 	// Sound
 	private static final BufferedSound SFX_BackgroundMusic = Assets.getSound("sounds/background_music.wav");
@@ -39,25 +41,39 @@ public class GuiIngame extends Container implements KeyListener {
 	
 	private Map map;
 	private EntityPlayer player;
-	private EntityAIPlayer AIplayer;
+	private EntityAIPlayer AIplayer1;
+	private EntityAIPlayer AIplayer2;
+	private EntityAIPlayer AIplayer3;
+	private boolean gamePause;
 
 	public GuiIngame() {
 		SFX_BackgroundMusic.setLoop(true);
 		SFX_BackgroundMusic.setVolume(0.025F);
 		SFX_BackgroundMusic.play();
 		instance = this;
+		gamePause = false;
 		this.map = new Map();
 		this.entities = new HashSet<Entity>();
-		this.effects = new HashSet<Effect>();
+		this.effects = new CopyOnWriteArrayList<Effect>();
 		this.powerups = new HashSet<Item>();
 		this.player = new EntityPlayer("Player", map, 1, 1);
-		this.AIplayer = new EntityAIPlayer("AI", map, Map.MAP_WIDTH - 2, 1);
+		this.AIplayer1 = new EntityAIPlayer("AI1", map, Map.MAP_WIDTH - 2, 1);
+		this.AIplayer2 = new EntityAIPlayer("AI2", map, 1, Map.MAP_HEIGHT - 2);
+		this.AIplayer3 = new EntityAIPlayer("AI3", map, Map.MAP_WIDTH - 2, Map.MAP_HEIGHT - 2);
 		this.entities.add(player);
-		this.entities.add(AIplayer);
-		map.setTileTypeAt(1, 1, Map.TILE_FREE);
-		map.setTileTypeAt(Map.MAP_WIDTH - 2, 1, Map.TILE_FREE);
+		this.entities.add(AIplayer1);
+		this.entities.add(AIplayer2);
+		this.entities.add(AIplayer3);
 	}
 
+	public boolean isPaused() {
+		return gamePause;
+	}
+	
+	public void resume() {
+		gamePause = false;
+	}
+	
 	@Override
 	public void paint(Graphics g) {
 		drawGrass(g);
@@ -75,19 +91,32 @@ public class GuiIngame extends Container implements KeyListener {
 
 	@Override
 	public void keyTyped(KeyEvent event) {
-//		System.out.println(event.getKeyCode() + " " + KeyEvent.VK_SPACE);
 		movePlayer(event.getKeyCode());
-//		if(event.getKeyCode() == KeyEvent.VK_F) {
-//			System.out.println("ché");
-//			entities.add(new Bomb(player, map));
-//		}
 	}
 	
 	public Set<Entity> getEntities(){
 		return entities;
 	}
 	
-	public Set<Effect> getEffects(){
+	public Set<EntityLiving> getEntitiesLiving(){
+		Set<EntityLiving> entitiesLiving = new HashSet<EntityLiving>();
+		for (Entity entity : entities) {
+			if(entity instanceof EntityLiving)
+				entitiesLiving.add((EntityLiving) entity);
+		}
+		return entitiesLiving;
+	}
+	
+	public Set<Bomb> getBombs(){
+		Set<Bomb> bombs = new HashSet<Bomb>();
+		for (Entity entity : entities) {
+			if(entity instanceof Bomb && ((Bomb) entity).getState() < Bomb.BOMB_EXPLOSION)
+				bombs.add((Bomb) entity);
+		}
+		return bombs;
+	}
+	
+	public CopyOnWriteArrayList<Effect> getEffects(){
 		return effects;
 	}
 	
@@ -121,8 +150,11 @@ public class GuiIngame extends Container implements KeyListener {
 				}
 			break;
 		case KeyEvent.VK_ESCAPE:
-			stopMusic();
-			GameWindow.instance().setCurrentGui(new GuiMainMenu());
+			if(!player.isDead()) {
+				gamePause = true;
+				stopMusic();
+				GameWindow.instance().setCurrentGui(new GuiMainMenu());
+			}
 			break;
 		}
 	}
@@ -163,7 +195,7 @@ public class GuiIngame extends Container implements KeyListener {
 		Set<Item> itemToRemove = new HashSet<Item>();
 		for (Item item : powerups) {
 			if(item != null) {
-				if (item.getState() == Item.PICKED) {
+				if (item.getState() == Item.PICKED || item.isDead()) {
 					itemToRemove.add(item);
 				}
 				else
@@ -180,6 +212,7 @@ public class GuiIngame extends Container implements KeyListener {
 			powerups.remove(item);
 		}
 	}
+
 	private void drawEffects(Graphics g) {
 		Set<Effect> effectToDisplay = new HashSet<Effect>();
 		Set<Effect> effectToRemove = new HashSet<Effect>();
