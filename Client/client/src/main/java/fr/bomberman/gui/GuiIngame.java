@@ -116,6 +116,18 @@ public class GuiIngame extends Container implements KeyListener {
 		return bombs;
 	}
 	
+	public Bomb getBombAt(int x, int y) {
+		for(Bomb bomb : getBombs()) {
+			if (bomb.getPosition().getX() == x && bomb.getPosition().getY() == y)
+				return bomb;
+		}
+		return null;
+	}
+	
+	public Bomb getBombAt(float x, float y) {
+		return getBombAt((int) x, (int) y);
+	}
+	
 	public CopyOnWriteArrayList<Effect> getEffects(){
 		return effects;
 	}
@@ -145,7 +157,7 @@ public class GuiIngame extends Container implements KeyListener {
 					SFX_ImpossibleAction.play();
 				}
 				else {
-					entities.add(new Bomb(player, map, effects));
+					entities.add(new Bomb(player, player.hasMasterBomb(), map, effects));
 					player.addBombPlaced();
 				}
 			break;

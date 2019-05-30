@@ -79,13 +79,13 @@ public class EntityAIPlayer extends EntityLiving {
 	
 	public void moveToPoint(Vec2D point) {
 		if (ennemyAround() && getBombCount() != getBombPlaced() && isFreeCell(position)) {
-			game.getEntities().add(new Bomb(this, map, game.getEffects()));
+			game.getEntities().add(new Bomb(this, this.hasMasterBomb(), map, game.getEffects()));
 			addBombPlaced();
 		}
 		if (position.getX() < point.getX()) {
 			if(!canMove(EnumDirection.EST)) {
 				if(getBombCount() != getBombPlaced() && isFreeCell(position) && map.getTileTypeAt(point) != Map.ROCK_TILE) {
-					game.getEntities().add(new Bomb(this, map, game.getEffects()));
+					game.getEntities().add(new Bomb(this, this.hasMasterBomb(), map, game.getEffects()));
 					addBombPlaced();
 				}
 			}
@@ -96,7 +96,7 @@ public class EntityAIPlayer extends EntityLiving {
 		else if (position.getX() > point.getX()) {
 			if(!canMove(EnumDirection.WEST)) {
 				if(getBombCount() != getBombPlaced() && isFreeCell(position) && map.getTileTypeAt(point) != Map.ROCK_TILE) {
-					game.getEntities().add(new Bomb(this, map, game.getEffects()));
+					game.getEntities().add(new Bomb(this, this.hasMasterBomb(), map, game.getEffects()));
 					addBombPlaced();
 				}
 			}
@@ -107,7 +107,7 @@ public class EntityAIPlayer extends EntityLiving {
 		else if (position.getY() < point.getY()) {
 			if(!canMove(EnumDirection.SOUTH)) {
 				if(getBombCount() != getBombPlaced() && isFreeCell(position) && map.getTileTypeAt(point) != Map.ROCK_TILE) {
-					game.getEntities().add(new Bomb(this, map, game.getEffects()));
+					game.getEntities().add(new Bomb(this, this.hasMasterBomb(), map, game.getEffects()));
 					addBombPlaced();
 				}
 			}
@@ -118,7 +118,7 @@ public class EntityAIPlayer extends EntityLiving {
 		else if (position.getY() > point.getY()) {
 			if(!canMove(EnumDirection.NORTH)) {
 				if(getBombCount() != getBombPlaced() && isFreeCell(position) && map.getTileTypeAt(point) != Map.ROCK_TILE) {
-					game.getEntities().add(new Bomb(this, map, game.getEffects()));
+					game.getEntities().add(new Bomb(this, this.hasMasterBomb(), map, game.getEffects()));
 					addBombPlaced();
 				}
 			}

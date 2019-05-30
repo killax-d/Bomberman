@@ -28,6 +28,8 @@ public abstract class Entity extends TimerTask {
 	protected Vec2D position;
 	protected Vec2D next_position;
 	protected boolean dead;
+	
+	protected float speed = 1;
 
 	public Entity(Vec2D position, Map map) {
 		this.position = position;
@@ -105,14 +107,26 @@ public abstract class Entity extends TimerTask {
 	public void update() {
 		if (isMoving()) {
 			if (position.getX() < next_position.getX()) {
-				position.addX(0.1F);
+				if((position.getX() + 0.1F*speed) > next_position.getX())
+					position.setX(next_position.getX());
+				else
+					position.addX(0.1F*speed);
 			} else if (position.getX() > next_position.getX()) {
-				position.addX(-0.1F);
+				if((position.getX() - 0.1F*speed) < next_position.getX())
+					position.setX(next_position.getX());
+				else
+					position.addX(-(0.1F*speed));
 			}
 			if (position.getY() < next_position.getY()) {
-				position.addY(0.1F);
+				if((position.getY() + 0.1F*speed) > next_position.getY())
+					position.setY(next_position.getY());
+				else
+					position.addY(0.1F*speed);
 			} else if (position.getY() > next_position.getY()) {
-				position.addY(-0.1F);
+				if((position.getY() + 0.1F*speed) < next_position.getY())
+					position.setY(next_position.getY());
+				else
+					position.addY(-(0.1F*speed));
 			}
 		} else {
 			position.setX(next_position.getX());
@@ -163,6 +177,14 @@ public abstract class Entity extends TimerTask {
 						entity.removeMaxBomb();
 					if(item instanceof ItemPowerDown)
 						entity.removePower();
+					if(item instanceof ItemSpeedUp)
+						entity.addSpeed();
+					if(item instanceof ItemSpeedDown)
+						entity.removeSpeed();
+					if(item instanceof ItemGloves)
+						entity.addGloves();
+					if(item instanceof ItemBombMine)
+						entity.addMasterBomb();
 				}
 			}
 			for(Effect effect : GuiIngame.instance.getEffects()) {

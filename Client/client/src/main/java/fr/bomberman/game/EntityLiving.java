@@ -1,5 +1,6 @@
 package fr.bomberman.game;
 
+import fr.bomberman.gui.GuiIngame;
 import fr.bomberman.utils.Vec2D;
 
 public abstract class EntityLiving extends Entity {
@@ -10,6 +11,8 @@ public abstract class EntityLiving extends Entity {
 	private int bombMax;
 	private int x;
 	private int y;
+	private boolean gloves;
+	private boolean master_bomb;
 
 	public EntityLiving(int power, int maxBomb, Map map, int x, int y) {
 		super(new Vec2D(x, y), map);
@@ -18,6 +21,8 @@ public abstract class EntityLiving extends Entity {
 		setPower(power);
 		setBombCount(1);
 		spawn();
+		gloves = false;
+		master_bomb = false;
 	}
 	
 	private void spawn() {
@@ -31,6 +36,34 @@ public abstract class EntityLiving extends Entity {
 				if(map.getTileTypeAt(x, this.y+y) == Map.PLANT_TILE)
 					map.setTileTypeAt(x, this.y+y, Map.TILE_FREE);
 		}
+	}
+
+	public void addGloves() {
+		gloves = true;
+	}
+
+	public void addMasterBomb() {
+		master_bomb = true;
+	}
+	
+	public boolean hasGloves() {
+		return gloves;
+	}
+	
+	public boolean hasMasterBomb() {
+		return master_bomb;
+	}
+	
+	public void addSpeed() {
+		setSpeed((speed == 2.0F ? 2.0F : speed+0.2F));
+	}
+	
+	public void removeSpeed() {
+		setSpeed((speed == 1F ? 1F : speed-0.2F));
+	}
+	
+	private void setSpeed(float speed) {
+		this.speed = speed <= 1F || speed > 2.0F ? 1F : speed;
 	}
 
 	public void addBombPlaced() {
@@ -80,6 +113,65 @@ public abstract class EntityLiving extends Entity {
 	
 	public int getBombCount() {
 		return bombCount;
+	}
+	
+	public boolean canMove(EnumDirection direction) {
+		int tileType = Map.TILE_FREE;
+		switch (direction) {
+		case NORTH:
+			tileType = map.getTileTypeAt(next_position.getX(), next_position.getY() - 1);
+			if(GuiIngame.instance != null && tileType == Map.BOMB_TILE && hasGloves()) {
+				Bomb bomb = GuiIngame.instance.getBombAt(next_position.getX(), next_position.getY() - 1);
+				if (bomb != null) {
+					while(bomb.canMove(direction)) {
+						map.setTileTypeAt(bomb.getPosition().getX(), bomb.getPosition().getY(), Map.TILE_FREE);
+						bomb.move(direction);
+						map.setTileTypeAt(bomb.getNextPosition().getX(), bomb.getNextPosition().getY(), Map.TILE_FREE);
+					}
+				}
+			}
+			break;
+		case SOUTH:
+			tileType = map.getTileTypeAt(next_position.getX(), next_position.getY() + 1);
+			if(GuiIngame.instance != null && tileType == Map.BOMB_TILE && hasGloves()) {
+				Bomb bomb = GuiIngame.instance.getBombAt(next_position.getX(), next_position.getY() + 1);
+				if (bomb != null) {
+					while(bomb.canMove(direction)) {
+						map.setTileTypeAt(bomb.getPosition().getX(), bomb.getPosition().getY(), Map.TILE_FREE);
+						bomb.move(direction);
+						map.setTileTypeAt(bomb.getNextPosition().getX(), bomb.getNextPosition().getY(), Map.TILE_FREE);
+					}
+				}
+			}
+			break;
+		case EST:
+			tileType = map.getTileTypeAt(next_position.getX() + 1, next_position.getY());
+			if(GuiIngame.instance != null && tileType == Map.BOMB_TILE && hasGloves()) {
+				Bomb bomb = GuiIngame.instance.getBombAt(next_position.getX() + 1, next_position.getY());
+				if (bomb != null) {
+					while(bomb.canMove(direction)) {
+						map.setTileTypeAt(bomb.getPosition().getX(), bomb.getPosition().getY(), Map.TILE_FREE);
+						bomb.move(direction);
+						map.setTileTypeAt(bomb.getNextPosition().getX(), bomb.getNextPosition().getY(), Map.TILE_FREE);
+					}
+				}
+			}
+			break;
+		case WEST:
+			tileType = map.getTileTypeAt(next_position.getX() - 1, next_position.getY());
+			if(GuiIngame.instance != null && tileType == Map.BOMB_TILE && hasGloves()) {
+				Bomb bomb = GuiIngame.instance.getBombAt(next_position.getX() - 1, next_position.getY());
+				if (bomb != null) {
+					while(bomb.canMove(direction)) {
+						map.setTileTypeAt(bomb.getPosition().getX(), bomb.getPosition().getY(), Map.TILE_FREE);
+						bomb.move(direction);
+						map.setTileTypeAt(bomb.getNextPosition().getX(), bomb.getNextPosition().getY(), Map.TILE_FREE);
+					}
+				}
+			}
+			break;
+		}
+		return (tileType == Map.TILE_FREE || tileType == Map.FLOWER_TILE);
 	}
 
 }

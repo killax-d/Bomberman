@@ -9,8 +9,8 @@ import fr.bomberman.utils.Vec2D;
 
 public class ItemGloves extends Item {
 
-	private final int SPRITE_HEIGHT = 32;
-	private final int SPRITE_WIDTH = 32;
+	private final int SPRITE_HEIGHT = 64;
+	private final int SPRITE_WIDTH = 64;
 	private final int MAX_FRAME = 3;
 	private Timer animClock;
 	

@@ -42,12 +42,14 @@ public class Bomb extends Entity {
 	private int state;
 	private int skin_id;
 	private Map map;
+	private boolean master_bomb;
 	
 	private Timer animClock;
 	private Timer exploClock;
 
-	public Bomb(EntityLiving player, Map map, CopyOnWriteArrayList<Effect> effects) {
+	public Bomb(EntityLiving player, boolean master, Map map, CopyOnWriteArrayList<Effect> effects) {
 		super(player.getPosition(), map);
+		master_bomb = master;
 		SFX_BombDrop.setVolume(0.01F);
 		SFX_BombDrop.play();
 		this.player = player;
@@ -55,20 +57,77 @@ public class Bomb extends Entity {
 		animClock = new Timer();
 		animClock.schedule(this.animBomb(), 0, 50);
 		exploClock = new Timer();
-		exploClock.schedule(this.removeBomb(), 3000);
+		exploClock.schedule(this.removeBomb(), 2000);
 		this.frame = 3;
 		this.state = BOMB_TIMING;
 		this.skin_id = 0;
+		this.map = map;
 		this.position = player.getPosition();
 		this.x = (int) position.getX();
 		this.y = (int) position.getY();
 		this.position = new Vec2D(x, y);
+		this.next_position = new Vec2D(x, y);
+		this.speed = 5.0F;
 		map.setTileTypeAt(x, y, Map.BOMB_TILE);
 	}
 
+	public void updatePosition() {
+		this.x = (int) position.getX();
+		this.y = (int) position.getY();
+	}
+
+	private boolean isMoving() {
+		return !position.equals(next_position, 0.1F);
+	}
+	
 	@Override
-	public void setPosition(int x, int y) {
-		
+	public void update() {
+		if (isMoving()) {
+			if (position.getX() < next_position.getX()) {
+				if((position.getX() + 0.1F*speed) > next_position.getX())
+					position.setX(next_position.getX());
+				else
+					position.addX(0.1F*speed);
+			} else if (position.getX() > next_position.getX()) {
+				if((position.getX() - 0.1F*speed) < next_position.getX())
+					position.setX(next_position.getX());
+				else
+					position.addX(-(0.1F*speed));
+			}
+			if (position.getY() < next_position.getY()) {
+				if((position.getY() + 0.1F*speed) > next_position.getY())
+					position.setY(next_position.getY());
+				else
+					position.addY(0.1F*speed);
+			} else if (position.getY() > next_position.getY()) {
+				if((position.getY() + 0.1F*speed) < next_position.getY())
+					position.setY(next_position.getY());
+				else
+					position.addY(-(0.1F*speed));
+			}
+		} else {
+			position.setX(next_position.getX());
+			position.setY(next_position.getY());
+		}
+		updatePosition();
+	}
+	
+	@Override
+	public void move(EnumDirection direction) {
+		switch (direction) {
+		case NORTH:
+			next_position.addY(-1F);
+			break;
+		case SOUTH:
+			next_position.addY(+1F);
+			break;
+		case WEST:
+			next_position.addX(-1F);
+			break;
+		case EST:
+			next_position.addX(+1F);
+			break;
+		}
 	}
 
 	public void instantExplode() {
@@ -88,23 +147,12 @@ public class Bomb extends Entity {
 	
 	@Override
 	public int getDisplayX() {
-		return (int) (x * Map.TILE_SCALE);
+		return (int) (position.getX() * Map.TILE_SCALE);
 	}
-	
+
 	@Override
 	public int getDisplayY() {
-		return (int) (y * Map.TILE_SCALE - (Entity.SPRITE_HEIGHT - Map.TILE_SCALE));
-	}
-
-	@Override
-	public void move(EnumDirection direction) {}
-
-	@Override
-	public void update() {}
-	
-	@Override
-	public void setMap(Map map) {
-		this.map = map;
+		return (int) (position.getY() * Map.TILE_SCALE - (Entity.SPRITE_HEIGHT - Map.TILE_SCALE));
 	}
 
 	@Override
@@ -119,6 +167,8 @@ public class Bomb extends Entity {
 
 	@Override
 	public BufferedImage getSprite() {
+		if (master_bomb)
+			return Assets.getTile(String.format("skins/bomb_master_%d.png", skin_id), SPRITE_WIDTH, SPRITE_HEIGHT, this.frame, (this.state <= 1 ? this.state : 1));
 		return Assets.getTile(String.format("skins/bomb_%d.png", skin_id), SPRITE_WIDTH, SPRITE_HEIGHT, this.frame, (this.state <= 1 ? this.state : 1));
 	}
 
@@ -190,7 +240,10 @@ public class Bomb extends Entity {
 		else if (r <= 90) {
 			GuiIngame.instance.getPowerups().add(new ItemSpeedDown(new Vec2D(x, y), map));
 		}
-		else if (r <= 100) {
+		else if (r < 95) {
+			GuiIngame.instance.getPowerups().add(new ItemBombMine(new Vec2D(x, y), map));
+		}
+		else {
 			GuiIngame.instance.getPowerups().add(new ItemGloves(new Vec2D(x, y), map));
 		}
 	}
@@ -204,7 +257,8 @@ public class Bomb extends Entity {
 				effectToAdd.add(new EffectTrail(player, x, y));
 				killIfEntity(x, y);
 				if (map.getTileTypeAt(x, y) == Map.PLANT_TILE) {
-					blockedDir.add(direction);
+					if(!master_bomb)
+						blockedDir.add(direction);
 					spawnItem(x, y);
 				}
 				map.setTileTypeAt(x, y, Map.TILE_FREE);
@@ -216,7 +270,8 @@ public class Bomb extends Entity {
 				effectToAdd.add(new EffectTrail(player, x, y));
 				killIfEntity(x, y);
 				if (map.getTileTypeAt(x, y) == Map.PLANT_TILE) {
-					blockedDir.add(direction);
+					if(!master_bomb)
+						blockedDir.add(direction);
 					spawnItem(x, y);
 				}
 				map.setTileTypeAt(x, y, Map.TILE_FREE);
@@ -261,6 +316,7 @@ public class Bomb extends Entity {
 			
 			@Override
 			public void run() {
+				update();
 				if(state == BOMB_TIMING) {
 					if (frame < MAX_FRAME) {
 						++frame;
