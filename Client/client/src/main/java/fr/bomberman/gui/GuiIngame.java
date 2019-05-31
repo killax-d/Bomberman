@@ -46,6 +46,14 @@ public class GuiIngame extends Container implements KeyListener {
 	private EntityAIPlayer AIplayer3;
 	private boolean gamePause;
 
+	// ENDSCREEN
+	public static final int UNKNOW = -1;
+	public static final int VICTORY = 0;
+	public static final int DEFEAT = 1;
+	private int typeWin;
+	private BufferedImage victory_screen = Assets.getImage("victory.png");
+	private BufferedImage defeat_screen = Assets.getImage("defeat.png");
+
 	public GuiIngame() {
 		SFX_BackgroundMusic.setLoop(true);
 		SFX_BackgroundMusic.setVolume(0.025F);
@@ -64,8 +72,10 @@ public class GuiIngame extends Container implements KeyListener {
 		this.entities.add(AIplayer1);
 		this.entities.add(AIplayer2);
 		this.entities.add(AIplayer3);
+		typeWin = UNKNOW;
 	}
 
+	
 	public boolean isPaused() {
 		return gamePause;
 	}
@@ -82,6 +92,7 @@ public class GuiIngame extends Container implements KeyListener {
 		drawEntities(g);
 		drawEffects(g);
 		drawPowerups(g);
+		displayEndScreen(g);
 		super.paint(g);
 	}
 
@@ -140,16 +151,20 @@ public class GuiIngame extends Container implements KeyListener {
 	private void movePlayer(int keyCode) {
 		switch (keyCode) {
 		case KeyEvent.VK_S:
-			player.move(EnumDirection.SOUTH);
+			if(!player.isDead())
+				player.move(EnumDirection.SOUTH);
 			break;
 		case KeyEvent.VK_Q:
-			player.move(EnumDirection.WEST);
+			if(!player.isDead())
+				player.move(EnumDirection.WEST);
 			break;
 		case KeyEvent.VK_D:
-			player.move(EnumDirection.EST);
+			if(!player.isDead())
+				player.move(EnumDirection.EST);
 			break;
 		case KeyEvent.VK_Z:
-			player.move(EnumDirection.NORTH);
+			if(!player.isDead())
+				player.move(EnumDirection.NORTH);
 			break;
 		case KeyEvent.VK_SPACE:
 			int mapTile = map.getTileTypeAt(player.getPosition().getX(), player.getPosition().getY());
@@ -175,6 +190,19 @@ public class GuiIngame extends Container implements KeyListener {
 	@Override
 	public void keyReleased(KeyEvent event) {
 
+	}
+	
+	public void setWinScreen(int type) {
+		typeWin = type;
+	}
+	
+	public void displayEndScreen(Graphics g) {
+		if (typeWin != UNKNOW)
+			if (typeWin == VICTORY)
+				g.drawImage(victory_screen, 0, 0, getWidth(), getHeight(), null);
+			else
+				g.drawImage(defeat_screen, 0, 0, getWidth(), getHeight(), null);
+			
 	}
 
 	private void drawEntities(Graphics g) {

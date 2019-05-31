@@ -17,6 +17,7 @@ import fr.bomberman.game.Map;
 public class GameWindow extends JFrame implements KeyListener, MouseListener, MouseMotionListener {
 
 	private static GameWindow window;
+	private static boolean demo = false;
 	public static int WIDTH;
 	public static int HEIGHT;
 	
@@ -39,6 +40,19 @@ public class GameWindow extends JFrame implements KeyListener, MouseListener, Mo
 		addMouseMotionListener(this);
 	}
 
+	// DEMO
+	public void switchDemo() {
+		if (demo)
+			demo = false;
+		else
+			demo = true;
+	}
+
+	// DEMO
+	public boolean isInDemoMode() {
+		return demo;
+	}
+	
 	public void setCurrentGui(Container gui) {
 		setContentPane(gui);
 		revalidate();
@@ -60,7 +74,7 @@ public class GameWindow extends JFrame implements KeyListener, MouseListener, Mo
 
 	public static GameWindow instance() {
 		if (window == null) {
-			window = new GameWindow("BomberMan", Map.MAP_WIDTH * Map.TILE_SCALE,
+			window = new GameWindow("PokeBomber", Map.MAP_WIDTH * Map.TILE_SCALE,
 					(Map.MAP_HEIGHT) * Map.TILE_SCALE - 2);
 		}
 		return window;

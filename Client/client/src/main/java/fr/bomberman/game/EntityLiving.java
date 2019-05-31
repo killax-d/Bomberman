@@ -1,5 +1,6 @@
 package fr.bomberman.game;
 
+import fr.bomberman.gui.GameWindow;
 import fr.bomberman.gui.GuiIngame;
 import fr.bomberman.utils.Vec2D;
 
@@ -21,7 +22,10 @@ public abstract class EntityLiving extends Entity {
 		setPower(power);
 		setBombCount(1);
 		spawn();
-		gloves = false;
+		if (this instanceof EntityPlayer && GameWindow.instance().isInDemoMode())
+			gloves = true;
+		else
+			gloves = false;
 		master_bomb = false;
 	}
 	
@@ -59,7 +63,6 @@ public abstract class EntityLiving extends Entity {
 	}
 	
 	public void removeSpeed() {
-		System.out.println(speed);
 		setSpeed((speed <= 1.0 ? 1.0 : speed-0.2));
 	}
 	
@@ -125,9 +128,7 @@ public abstract class EntityLiving extends Entity {
 				Bomb bomb = GuiIngame.instance.getBombAt(next_position.getX(), next_position.getY() - 1);
 				if (bomb != null) {
 					while(bomb.canMove(direction)) {
-						map.setTileTypeAt(bomb.getPosition().getX(), bomb.getPosition().getY(), Map.TILE_FREE);
 						bomb.move(direction);
-						map.setTileTypeAt(bomb.getNextPosition().getX(), bomb.getNextPosition().getY(), Map.TILE_FREE);
 					}
 				}
 			}
@@ -138,9 +139,7 @@ public abstract class EntityLiving extends Entity {
 				Bomb bomb = GuiIngame.instance.getBombAt(next_position.getX(), next_position.getY() + 1);
 				if (bomb != null) {
 					while(bomb.canMove(direction)) {
-						map.setTileTypeAt(bomb.getPosition().getX(), bomb.getPosition().getY(), Map.TILE_FREE);
 						bomb.move(direction);
-						map.setTileTypeAt(bomb.getNextPosition().getX(), bomb.getNextPosition().getY(), Map.TILE_FREE);
 					}
 				}
 			}
@@ -151,9 +150,7 @@ public abstract class EntityLiving extends Entity {
 				Bomb bomb = GuiIngame.instance.getBombAt(next_position.getX() + 1, next_position.getY());
 				if (bomb != null) {
 					while(bomb.canMove(direction)) {
-						map.setTileTypeAt(bomb.getPosition().getX(), bomb.getPosition().getY(), Map.TILE_FREE);
 						bomb.move(direction);
-						map.setTileTypeAt(bomb.getNextPosition().getX(), bomb.getNextPosition().getY(), Map.TILE_FREE);
 					}
 				}
 			}
@@ -164,9 +161,7 @@ public abstract class EntityLiving extends Entity {
 				Bomb bomb = GuiIngame.instance.getBombAt(next_position.getX() - 1, next_position.getY());
 				if (bomb != null) {
 					while(bomb.canMove(direction)) {
-						map.setTileTypeAt(bomb.getPosition().getX(), bomb.getPosition().getY(), Map.TILE_FREE);
 						bomb.move(direction);
-						map.setTileTypeAt(bomb.getNextPosition().getX(), bomb.getNextPosition().getY(), Map.TILE_FREE);
 					}
 				}
 			}

@@ -20,12 +20,17 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 	private BufferedImage close_texture = Assets.getImage("close.jpg");
 	private BufferedImage resume_texture = Assets.getImage("resume.png");
 	
+	// Demo Mode
+	private BufferedImage demo_on_texture = Assets.getImage("demo_on.png");
+	private BufferedImage demo_off_texture = Assets.getImage("demo_off.png");
+	
 	// Sound
 	private BufferedSound music = Assets.getSound("sounds/menu.wav");
 
 	private GuiButton play = new GuiButton(one_player, GameWindow.WIDTH/2-64, GameWindow.HEIGHT/2-32, 128, 64);
 	private GuiButton resume = new GuiButton(resume_texture,  GameWindow.WIDTH/2-64, GameWindow.HEIGHT/2+32, 128, 64);
 	private GuiButton close = new GuiButton(close_texture, 0, 0, 64, 32);
+	private GuiButton demo = new GuiButton(demo_off_texture, 50, GameWindow.HEIGHT-(640+50), 640, 640);
 
 	public GuiMainMenu() {
 		music.setLoop(true);
@@ -40,6 +45,7 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 		g.drawImage(character, 0, 0, getWidth(), getHeight(), null);
 		play.paint(g);
 		close.paint(g);
+		demo.paint(g);
 		if(GuiIngame.instance != null)
 			resume.paint(g);
 		super.paint(g);
@@ -59,6 +65,13 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 			}
 			else
 				GameWindow.instance().setCurrentGui(new GuiIngame());
+		}
+		if (demo.isHovered()) {
+			GameWindow.instance().switchDemo();
+			if (GameWindow.instance().isInDemoMode())
+				demo.setImage(demo_on_texture);
+			else
+				demo.setImage(demo_off_texture);
 		}
 		if (close.isHovered()) {
 			System.exit(0);
@@ -95,6 +108,13 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 			else
 				GameWindow.instance().setCurrentGui(new GuiIngame());
 		}
+		if (demo.isHovered()) {
+			GameWindow.instance().switchDemo();
+			if (GameWindow.instance().isInDemoMode())
+				demo.setImage(demo_on_texture);
+			else
+				demo.setImage(demo_off_texture);
+		}
 		if (close.isHovered()) {
 			System.exit(0);
 		}
@@ -105,6 +125,7 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 		play.mouseMoved(event);
 		close.mouseMoved(event);
 		resume.mouseMoved(event);
+		demo.mouseMoved(event);
 	}
 
 	@Override
@@ -112,6 +133,7 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 		play.mouseMoved(event);
 		close.mouseMoved(event);
 		resume.mouseMoved(event);
+		demo.mouseMoved(event);
 	}
 
 }

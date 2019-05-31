@@ -66,6 +66,10 @@ public class GuiButton implements MouseMotionListener {
 		this.text = text;
 	}
 	
+	public void setImage(BufferedImage image) {
+		this.image = image;
+	}
+	
 	public String getText() {
 		return this.text;
 	}

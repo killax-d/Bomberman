@@ -204,24 +204,36 @@ public abstract class Entity extends TimerTask {
 						if(deathCondition) {
 							this.die();
 							SFX_EntityDie.play();
-							if(this instanceof EntityPlayer) {
-								new Timer().schedule(new TimerTask() {
-
-									@Override
-									public void run() {
-										if(GameWindow.instance().getCurrentGui() instanceof GuiIngame) {
-											GuiIngame game = (GuiIngame) GameWindow.instance().getCurrentGui();
-											game.stopMusic();
-											GameWindow.instance().setCurrentGui(new GuiMainMenu());
-											GuiIngame.instance = null;
-										}
-									}
-									
-								}, 3000);
-							}
+							if(this instanceof EntityPlayer)
+								end();
+							if(GuiIngame.instance.getEntitiesLiving().size() == 1)
+								end();
 						}
 					}
 			}
+		}
+	}	
+	
+	private void end() {
+		if (!GameWindow.instance().isInDemoMode()) {
+			if (GuiIngame.instance.getEntitiesLiving().size() <= 1)
+				GuiIngame.instance.setWinScreen(GuiIngame.VICTORY);
+			else
+				GuiIngame.instance.setWinScreen(GuiIngame.DEFEAT);
+
+			new Timer().schedule(new TimerTask() {
+	
+				@Override
+				public void run() {
+					if (GameWindow.instance().getCurrentGui() instanceof GuiIngame) {
+						GuiIngame game = (GuiIngame) GameWindow.instance().getCurrentGui();
+						game.stopMusic();
+						GameWindow.instance().setCurrentGui(new GuiMainMenu());
+						GuiIngame.instance = null;
+					}
+				}
+				
+			}, 3000);
 		}
 	}
 	

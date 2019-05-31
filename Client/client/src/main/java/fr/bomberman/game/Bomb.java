@@ -114,6 +114,7 @@ public class Bomb extends Entity {
 	
 	@Override
 	public void move(EnumDirection direction) {
+		map.setTileTypeAt(next_position.getX(), next_position.getY(), Map.TILE_FREE);
 		switch (direction) {
 		case NORTH:
 			next_position.addY(-1F);
@@ -128,6 +129,7 @@ public class Bomb extends Entity {
 			next_position.addX(+1F);
 			break;
 		}
+		map.setTileTypeAt(next_position.getX(), next_position.getY(), Map.BOMB_TILE);
 	}
 
 	public void instantExplode() {
@@ -200,20 +202,35 @@ public class Bomb extends Entity {
 				else if(entity == player && entity instanceof EntityPlayer)
 					entity.die();
 				SFX_EntityDie.play();
-				if(entity instanceof EntityPlayer) 
-					new Timer().schedule(new TimerTask() {
-
-						@Override
-						public void run() {
-							GuiIngame game = (GuiIngame) GameWindow.instance().getCurrentGui();
-							game.stopMusic();
-							GameWindow.instance().setCurrentGui(new GuiMainMenu());
-							GuiIngame.instance = null;
-						}
-						
-					}, 3000);
+				if(entity instanceof EntityPlayer)
+					end();
+				if(GuiIngame.instance.getEntitiesLiving().size() == 1)
+					end();
 			}
 				
+		}
+	}
+	
+	private void end() {
+		if (!GameWindow.instance().isInDemoMode()) {
+			if (GuiIngame.instance.getEntitiesLiving().size() <= 1)
+				GuiIngame.instance.setWinScreen(GuiIngame.VICTORY);
+			else
+				GuiIngame.instance.setWinScreen(GuiIngame.DEFEAT);
+
+			new Timer().schedule(new TimerTask() {
+	
+				@Override
+				public void run() {
+					if (GameWindow.instance().getCurrentGui() instanceof GuiIngame) {
+						GuiIngame game = (GuiIngame) GameWindow.instance().getCurrentGui();
+						game.stopMusic();
+						GameWindow.instance().setCurrentGui(new GuiMainMenu());
+						GuiIngame.instance = null;
+					}
+				}
+				
+			}, 3000);
 		}
 	}
 	
