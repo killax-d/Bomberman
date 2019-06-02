@@ -8,11 +8,21 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
 
+/**
+ * 
+ * @author Donné Dylan
+ * Simple sound Class
+ */
+
 public class BufferedSound {
 	
 	private Clip clip;
 	private AudioInputStream audioStream;
 
+	/**
+	 * Create an Clip Object
+	 * @param is
+	 */
 	public BufferedSound(InputStream is) {
 		try {
 			InputStream bufferedIn = new BufferedInputStream(is);
@@ -25,7 +35,10 @@ public class BufferedSound {
 		open();
 		setVolume(0.1F);
 	}
-	
+
+	/**
+	 * Open the clip
+	 */
 	public void open() {
 		try {
 			clip.open(audioStream);
@@ -33,27 +46,48 @@ public class BufferedSound {
 			e.printStackTrace();
 		}
 	}
-	
+
+	/**
+	 * Set LOOP mode
+	 * (MainMenu and Background Music)
+	 * @param loop
+	 */
 	public void setLoop(boolean loop) {
 		if(loop)
 			clip.loop(Clip.LOOP_CONTINUOUSLY);
 		else
 			clip.loop(0);
 	}
-	
+
+	/**
+	 * Set loop points
+	 * @param start // point to start the loop in seconds
+	 * @param end // point to start the loop in seconds
+	 */
 	public void setLoopPoint(int start, int end) {
 		clip.setLoopPoints(start, end);
 	}
-	
+
+	/**
+	 * Play Music
+	 * Reset currentFrame to 0 to avoid glitch sound
+	 */
 	public void play() {
 		clip.setFramePosition(0);
 		clip.start();
 	}
-	
+
+	/**
+	 * Stop the Clip music
+	 */
 	public void stop() {
 		clip.stop();
 	}
-	
+
+	/**
+	 * Set gain Volume
+	 * @param volume // change the gain volume with a float (ex 0.05F)
+	 */
 	public void setVolume(float volume) {
 	    if (volume < 0f || volume > 1f)
 	        throw new IllegalArgumentException("Volume invalide: " + volume);

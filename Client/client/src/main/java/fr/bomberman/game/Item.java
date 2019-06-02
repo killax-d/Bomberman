@@ -43,6 +43,10 @@ public class Item extends Entity {
 	public int getState() {
 		return state;
 	}
+
+	public void setState(int state) {
+		this.state = state;
+	}
 	
 	@Override
 	public BufferedImage getSprite() {

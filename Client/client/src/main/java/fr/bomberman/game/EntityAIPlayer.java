@@ -16,7 +16,7 @@ import fr.bomberman.gui.GuiIngame;
 import fr.bomberman.utils.Vec2D;
 
 public class EntityAIPlayer extends EntityLiving {
-
+	
 	private String name;
 	private GuiIngame game;
 	private DefaultDirectedGraph<String, DefaultEdge> graph;
@@ -53,7 +53,7 @@ public class EntityAIPlayer extends EntityLiving {
 	public Vec2D getNearestEnnemy() {
 		Vec2D nearest = null;
 		Double near = null;
-		for (Entity entity : game.getEntities()) {
+		for (Entity entity : game.getEntitiesLiving()) {
 			if (entity != this && (near == null || near > position.dist(entity.getPosition()))) {
 				near = position.dist(entity.getPosition());
 				nearest = entity.getPosition();

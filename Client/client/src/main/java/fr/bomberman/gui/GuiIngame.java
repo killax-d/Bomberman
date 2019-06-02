@@ -32,7 +32,7 @@ public class GuiIngame extends Container implements KeyListener {
 	// Entities on the map
 	private CopyOnWriteArrayList<Entity> entities;
 	private CopyOnWriteArrayList<Effect> effects;
-	private Set<Item> powerups;
+	private CopyOnWriteArrayList<Item> powerups;
 	// Sound
 	private static final BufferedSound SFX_BackgroundMusic = Assets.getSound("sounds/background_music.wav");
 	private static final BufferedSound SFX_ImpossibleAction = Assets.getSound("sounds/impossible_action.wav");
@@ -55,6 +55,10 @@ public class GuiIngame extends Container implements KeyListener {
 	private BufferedImage defeat_screen = Assets.getImage("defeat.png");
 
 	public GuiIngame() {
+		if (instance != null)
+			for (Bomb bomb : GuiIngame.instance.getBombs())
+				if(!bomb.isDead())
+					bomb.cancelExplosion();
 		SFX_BackgroundMusic.setLoop(true);
 		SFX_BackgroundMusic.setVolume(0.025F);
 		SFX_BackgroundMusic.play();
@@ -63,7 +67,7 @@ public class GuiIngame extends Container implements KeyListener {
 		this.map = new Map();
 		this.entities = new CopyOnWriteArrayList<Entity>();
 		this.effects = new CopyOnWriteArrayList<Effect>();
-		this.powerups = new HashSet<Item>();
+		this.powerups = new CopyOnWriteArrayList<Item>();
 		this.player = new EntityPlayer("Player", map, 1, 1);
 		this.AIplayer1 = new EntityAIPlayer("AI1", map, Map.MAP_WIDTH - 2, 1);
 		this.AIplayer2 = new EntityAIPlayer("AI2", map, 1, Map.MAP_HEIGHT - 2);
@@ -75,6 +79,9 @@ public class GuiIngame extends Container implements KeyListener {
 		typeWin = UNKNOW;
 	}
 
+	public boolean playerIsAlive() {
+		return !player.isDead();
+	}
 	
 	public boolean isPaused() {
 		return gamePause;
@@ -106,6 +113,10 @@ public class GuiIngame extends Container implements KeyListener {
 		movePlayer(event.getKeyCode());
 	}
 	
+	public CopyOnWriteArrayList<Item> getItems(){
+		return powerups;
+	}
+	
 	public CopyOnWriteArrayList<Entity> getEntities(){
 		return entities;
 	}
@@ -119,6 +130,20 @@ public class GuiIngame extends Container implements KeyListener {
 		return entitiesLiving;
 	}
 	
+	private Set<EntityLiving> getAlivePlayer(){
+		Set<EntityLiving> entitiesLiving = new HashSet<EntityLiving>();
+		for (Entity entity : getEntitiesLiving()) {
+			if(entity instanceof EntityLiving)
+				if (!entity.isDead())
+					entitiesLiving.add((EntityLiving) entity);
+		}
+		return entitiesLiving;
+	}
+	
+	public int getAlivePlayerCount(){
+		return getAlivePlayer().size();
+	}
+		
 	public Set<Bomb> getBombs(){
 		Set<Bomb> bombs = new HashSet<Bomb>();
 		for (Entity entity : entities) {
@@ -144,7 +169,7 @@ public class GuiIngame extends Container implements KeyListener {
 		return effects;
 	}
 	
-	public Set<Item> getPowerups(){
+	public CopyOnWriteArrayList<Item> getPowerups(){
 		return powerups;
 	}
 

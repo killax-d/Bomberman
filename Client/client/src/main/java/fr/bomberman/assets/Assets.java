@@ -10,6 +10,11 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 
 public class Assets {
+	
+	/**
+	 * @author Donné Dylan
+	 * Simple assets loader
+	 */
 
 	private static Map<String, BufferedImage> assets = new HashMap<String, BufferedImage>();
 	private static Map<String, BufferedSound> sounds = new HashMap<String, BufferedSound>();
@@ -19,7 +24,13 @@ public class Assets {
 	static {
 		NO_TEXTURE.setRGB(0, 0, new Color(140, 87, 113).getRGB());
 	}
-
+	
+	
+	/**
+	 * Image finder and loader
+	 * @param path
+	 * @return BufferedImage
+	 */
 	public static BufferedImage getImage(String path) {
 		if (assets.containsKey(path)) {
 			return assets.get(path);
@@ -35,7 +46,13 @@ public class Assets {
 		}
 		return NO_TEXTURE;
 	}
+
 	
+	/**
+	 * Sound finder and loader
+	 * @param path
+	 * @return BufferedSound
+	 */
 	public static BufferedSound getSound(String path) {
 		if (sounds.containsKey(path)) {
 			return sounds.get(path);
@@ -52,6 +69,12 @@ public class Assets {
 		return null;
 	}
 
+	
+	/**
+	 * Sprite cropper
+	 * @param path
+	 * @return BufferedImage
+	 */
 	public static BufferedImage getTile(String path, int width, int height, int x, int y) {
 		BufferedImage tileset = getImage(path);
 		boolean validTexture = tileset.getWidth()>= width && tileset.getHeight() >= height;

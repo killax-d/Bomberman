@@ -44,6 +44,8 @@ public class Bomb extends Entity {
 	private Map map;
 	private boolean master_bomb;
 	
+	private final long clockExplosion = 2000;
+	
 	private Timer animClock;
 	private Timer exploClock;
 
@@ -57,7 +59,7 @@ public class Bomb extends Entity {
 		animClock = new Timer();
 		animClock.schedule(this.animBomb(), 0, 50);
 		exploClock = new Timer();
-		exploClock.schedule(this.removeBomb(), 2000);
+		exploClock.schedule(this.removeBomb(), clockExplosion);
 		this.frame = 3;
 		this.state = BOMB_TIMING;
 		this.skin_id = 0;
@@ -132,9 +134,13 @@ public class Bomb extends Entity {
 		map.setTileTypeAt(next_position.getX(), next_position.getY(), Map.BOMB_TILE);
 	}
 
-	public void instantExplode() {
+	public void cancelExplosion() {
 		exploClock.cancel();
 		exploClock.purge();
+	}
+	
+	public void instantExplode() {
+		cancelExplosion();
 
 		state = BOMB_EXPLOSION;
 		frame = 0;
@@ -199,21 +205,32 @@ public class Bomb extends Entity {
 			if (x == entity.getPosition().getX() && y == entity.getPosition().getY()) {
 				if (entity != player)
 					entity.die();
-				else if(entity == player && entity instanceof EntityPlayer)
+				else if(entity == player && entity instanceof EntityPlayer) {
 					entity.die();
+					end();
+				}
 				SFX_EntityDie.play();
-				if(entity instanceof EntityPlayer)
-					end();
-				if(GuiIngame.instance.getEntitiesLiving().size() == 1)
-					end();
+				if (GameWindow.instance().getCurrentGui() instanceof GuiIngame)
+					if (GuiIngame.instance.getAlivePlayerCount() == 1)
+						end();
+					
 			}
 				
 		}
 	}
 	
 	private void end() {
-		if (!GameWindow.instance().isInDemoMode()) {
-			if (GuiIngame.instance.getEntitiesLiving().size() <= 1)
+		if (!GameWindow.instance().isInDemoMode() || (GameWindow.instance().isInDemoMode() && player.isDead())) {
+			for(Bomb bomb : GuiIngame.instance.getBombs())
+				if(bomb != null)
+					bomb.cancelExplosion();
+			for(Item item : GuiIngame.instance.getItems())
+				if(item != null) {
+					item.die();
+					item.setState(Item.DISPAWNED);
+				}
+			
+			if (GuiIngame.instance.getAlivePlayerCount() == 1 && GuiIngame.instance.playerIsAlive())
 				GuiIngame.instance.setWinScreen(GuiIngame.VICTORY);
 			else
 				GuiIngame.instance.setWinScreen(GuiIngame.DEFEAT);
@@ -317,9 +334,8 @@ public class Bomb extends Entity {
 			
 		if(GuiIngame.instance != null && !GuiIngame.instance.isPaused())
 			SFX_Trail.play();
-		for (Effect effect : effectToAdd) {
-			effects.add(effect);
-		}
+		
+		effects.addAll(effectToAdd);
 
 	}
 	
@@ -358,6 +374,7 @@ public class Bomb extends Entity {
 					@Override
 					public void run() {
 						map.setTileTypeAt(x, y, Map.TILE_FREE);
+						map.setTileTypeAt(next_position.getX(), next_position.getY(), Map.TILE_FREE);
 						if(GuiIngame.instance != null && !GuiIngame.instance.isPaused())
 							SFX_Explosion.play();
 						explode();

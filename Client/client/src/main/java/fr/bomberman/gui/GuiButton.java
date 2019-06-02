@@ -23,6 +23,7 @@ public class GuiButton implements MouseMotionListener {
 	private Color colorHovered;
 	private boolean hovered;
 	private static BufferedSound SFX_ButtonHover = Assets.getSound("sounds/button.wav");
+	private boolean visible;
 
 	public GuiButton(BufferedImage image, int x, int y, int width, int height) {
 		this("", x, y, width, height);
@@ -36,6 +37,7 @@ public class GuiButton implements MouseMotionListener {
 	}
 
 	public GuiButton(String text, int x, int y, int width, int height) {
+		this.visible = false;
 		this.text = text;
 		this.x = x;
 		this.y = y;
@@ -48,6 +50,7 @@ public class GuiButton implements MouseMotionListener {
 	}
 
 	public void paint(Graphics g) {
+		this.visible = true;
 		Graphics2D g2d = (Graphics2D) g;
 		if (!hovered) {
 			g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.75F));
@@ -80,7 +83,7 @@ public class GuiButton implements MouseMotionListener {
 
 	@Override
 	public void mouseMoved(MouseEvent event) {
-		if (event.getX() >= x && event.getX() <= x + width && event.getY() >= y && event.getY() <= y + height) {
+		if (visible && event.getX() >= x && event.getX() <= x + width && event.getY() >= y && event.getY() <= y + height) {
 			if(!hovered)
 				SFX_ButtonHover.play();
 			hovered = true;
@@ -91,7 +94,7 @@ public class GuiButton implements MouseMotionListener {
 	
 	@Override
 	public void mouseDragged(MouseEvent event) {
-		if (event.getX() >= x && event.getX() <= x + width && event.getY() >= y && event.getY() <= y + height) {
+		if (visible && event.getX() >= x && event.getX() <= x + width && event.getY() >= y && event.getY() <= y + height) {
 			if(!hovered)
 				SFX_ButtonHover.play();
 			hovered = true;

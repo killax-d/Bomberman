@@ -193,21 +193,14 @@ public abstract class Entity extends TimerTask {
 						&& effect instanceof EffectTrail) {
 						EntityLiving player = ((EffectTrail) effect).getOwnerPlayer();
 						
-						boolean deathCondition = false;
-						if(this instanceof EntityPlayer && player == this) {
-							deathCondition = true;
-						}
-						if(this instanceof EntityAIPlayer && player != this) {
-							deathCondition = true;
-						}
-						
-						if(deathCondition) {
+						if((this instanceof EntityPlayer && player == this) || (this instanceof EntityAIPlayer && player != this)) {
 							this.die();
 							SFX_EntityDie.play();
 							if(this instanceof EntityPlayer)
 								end();
-							if(GuiIngame.instance.getEntitiesLiving().size() == 1)
-								end();
+							if (GameWindow.instance().getCurrentGui() instanceof GuiIngame)
+								if (GuiIngame.instance.getAlivePlayerCount() == 1)
+									end();
 						}
 					}
 			}
@@ -215,8 +208,17 @@ public abstract class Entity extends TimerTask {
 	}	
 	
 	private void end() {
-		if (!GameWindow.instance().isInDemoMode()) {
-			if (GuiIngame.instance.getEntitiesLiving().size() <= 1)
+		if (!GameWindow.instance().isInDemoMode() || (GameWindow.instance().isInDemoMode() && this instanceof EntityPlayer && this.isDead())) {
+			for(Bomb bomb : GuiIngame.instance.getBombs())
+				if(bomb != null)
+					bomb.cancelExplosion();
+			for(Item item : GuiIngame.instance.getItems())
+				if(item != null) {
+					item.die();
+					item.setState(Item.DISPAWNED);
+				}
+			
+			if (GuiIngame.instance.getAlivePlayerCount() == 1 && GuiIngame.instance.playerIsAlive())
 				GuiIngame.instance.setWinScreen(GuiIngame.VICTORY);
 			else
 				GuiIngame.instance.setWinScreen(GuiIngame.DEFEAT);
