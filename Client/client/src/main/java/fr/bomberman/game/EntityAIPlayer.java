@@ -155,7 +155,7 @@ public class EntityAIPlayer extends EntityLiving {
 						}
 					}
 					if (!moved)
-						if(pathVector.size() > 0)
+						if(pathVector.size() > 0 && pathVector.get(0) != null)
 							moveToPoint(pathVector.get(0));
 				}
 			}
@@ -202,7 +202,7 @@ public class EntityAIPlayer extends EntityLiving {
 	}
 	
 	private void placeBomb(Vec2D point) {
-		if(getBombCount() != getBombPlaced() && isFreeCell(position) && map.getTileTypeAt(point) != Map.ROCK_TILE) {
+		if(canPlaceBomb() && isFreeCell(position) && isFreeCell(point)) {
 			game.getEntities().add(new Bomb(this, this.hasMasterBomb(), map, game.getEffects()));
 			addBombPlaced();
 		}

@@ -44,6 +44,7 @@ public class Assets {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		assets.putIfAbsent(path, NO_TEXTURE);
 		return NO_TEXTURE;
 	}
 

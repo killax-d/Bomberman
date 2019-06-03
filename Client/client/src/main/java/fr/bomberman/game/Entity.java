@@ -193,22 +193,18 @@ public abstract class Entity extends TimerTask {
 						&& effect instanceof EffectTrail) {
 						EntityLiving player = ((EffectTrail) effect).getOwnerPlayer();
 						
-						if((this instanceof EntityPlayer && player == this) || (this instanceof EntityAIPlayer && player != this)) {
+						if((this instanceof EntityPlayer && player == this) || (this instanceof EntityLiving && player != this)) {
 							Entity entity = this;
 							new Timer().schedule(new TimerTask() {
 
 								@Override
 								public void run() {
 									entity.die();
+									end();
 								}
 								
 							}, 250);
 							SFX_EntityDie.play();
-							if(this instanceof EntityPlayer)
-								end();
-							if (GameWindow.instance().getCurrentGui() instanceof GuiIngame)
-								if (GuiIngame.instance.getAlivePlayerCount() == 1)
-									end();
 						}
 					}
 			}
@@ -216,7 +212,7 @@ public abstract class Entity extends TimerTask {
 	}	
 	
 	private void end() {
-		if (!GameWindow.instance().isInDemoMode() || (GameWindow.instance().isInDemoMode() && this instanceof EntityPlayer && this.isDead())) {
+		if (!GuiIngame.instance.playerIsAlive()) {
 			for(Bomb bomb : GuiIngame.instance.getBombs())
 				if(bomb != null)
 					bomb.cancelExplosion();

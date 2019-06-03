@@ -1,6 +1,7 @@
 package fr.bomberman.game;
 
 import java.awt.image.BufferedImage;
+import java.security.acl.Owner;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -44,6 +45,8 @@ public class Bomb extends Entity {
 	private Map map;
 	private boolean master_bomb;
 	
+	private long clockStart;
+	private long clockLeft;
 	private final long clockExplosion = 2000;
 	
 	private Timer animClock;
@@ -60,6 +63,7 @@ public class Bomb extends Entity {
 		animClock.schedule(this.animBomb(), 0, 50);
 		exploClock = new Timer();
 		exploClock.schedule(this.removeBomb(), clockExplosion);
+		clockStart = System.nanoTime();
 		this.frame = 3;
 		this.state = BOMB_TIMING;
 		this.skin_id = 0;
@@ -201,26 +205,20 @@ public class Bomb extends Entity {
 					bomb.instantExplode();
 		}
 		
-		for (Entity entity : entities) {
+		for (Entity entity : GuiIngame.instance.getEntitiesLiving()) {
 			if (x == entity.getPosition().getX() && y == entity.getPosition().getY()) {
-				if (entity != player)
+				if(player instanceof EntityPlayer)
 					entity.die();
-				else if(entity == player && entity instanceof EntityPlayer) {
+				if(player instanceof EntityAIPlayer && entity != player)
 					entity.die();
-					end();
-				}
-				SFX_EntityDie.play();
-				if (GameWindow.instance().getCurrentGui() instanceof GuiIngame)
-					if (GuiIngame.instance.getAlivePlayerCount() == 1)
-						end();
-					
+				end();
 			}
 				
 		}
 	}
 	
 	private void end() {
-		if (!GameWindow.instance().isInDemoMode() || (GameWindow.instance().isInDemoMode() && player.isDead())) {
+		if (!GuiIngame.instance.playerIsAlive()) {
 			for(Bomb bomb : GuiIngame.instance.getBombs())
 				if(bomb != null)
 					bomb.cancelExplosion();
@@ -230,7 +228,7 @@ public class Bomb extends Entity {
 					item.setState(Item.DISPAWNED);
 				}
 			
-			if (GuiIngame.instance.getAlivePlayerCount() == 1 && GuiIngame.instance.playerIsAlive())
+			if (GuiIngame.instance.getAlivePlayerCount() <= 1 && GuiIngame.instance.playerIsAlive())
 				GuiIngame.instance.setWinScreen(GuiIngame.VICTORY);
 			else
 				GuiIngame.instance.setWinScreen(GuiIngame.DEFEAT);
@@ -362,6 +360,17 @@ public class Bomb extends Entity {
 		return task;
 	}
 
+	public void pause() {
+		long time = System.nanoTime();
+		cancelExplosion();
+		clockLeft = (time - clockStart)/1000000;
+	}
+	
+	public void resume() {
+		exploClock = new Timer();
+		exploClock.schedule(this.removeBomb(), clockLeft);
+	}
+	
 	private TimerTask removeBomb() {
 		TimerTask task = new TimerTask() {
 
@@ -369,20 +378,18 @@ public class Bomb extends Entity {
 			public void run() {
 				state = BOMB_EXPLOSION;
 				frame = 0;
-				new Timer().schedule(new TimerTask() {
-
-					@Override
-					public void run() {
-						map.setTileTypeAt(x, y, Map.TILE_FREE);
-						map.setTileTypeAt(next_position.getX(), next_position.getY(), Map.TILE_FREE);
-						if(GuiIngame.instance != null && !GuiIngame.instance.isPaused())
-							SFX_Explosion.play();
-						explode();
-						player.removeBombPlaced();
-						state = BOMB_EXPLODED;
-					}
-
-				}, 150);
+				try {
+					Thread.sleep(150);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				map.setTileTypeAt(x, y, Map.TILE_FREE);
+				map.setTileTypeAt(next_position.getX(), next_position.getY(), Map.TILE_FREE);
+				if(GuiIngame.instance != null && !GuiIngame.instance.isPaused())
+					SFX_Explosion.play();
+				explode();
+				player.removeBombPlaced();
+				state = BOMB_EXPLODED;
 			}
 
 		};

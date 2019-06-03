@@ -11,14 +11,13 @@ import fr.bomberman.assets.Assets;
 import fr.bomberman.assets.BufferedSound;
 
 public class GuiMainMenu extends Container implements MouseListener, MouseMotionListener {
-
-	public static GuiMainMenu instance;
 	
 	// Image
 	private BufferedImage background = Assets.getImage("title_background.png");
 	private BufferedImage title = Assets.getImage("title_titletext.png");
 	private BufferedImage character = Assets.getImage("title_character.png");
 	private BufferedImage one_player = Assets.getImage("one_player.png");
+	private BufferedImage settings_texture = Assets.getImage("settings.png");
 	private BufferedImage close_texture = Assets.getImage("close.jpg");
 	private BufferedImage resume_texture = Assets.getImage("resume.png");
 	
@@ -30,13 +29,13 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 	private BufferedSound music = Assets.getSound("sounds/menu.wav");
 	private BufferedSound pikachu = Assets.getSound("sounds/pikachu.wav");
 
-	private GuiButton play = new GuiButton(one_player, GameWindow.WIDTH/2-64, GameWindow.HEIGHT/2-32, 128, 64);
-	private GuiButton resume = new GuiButton(resume_texture,  GameWindow.WIDTH/2-64, GameWindow.HEIGHT/2-32, 128, 64);
+	private GuiButton settings = new GuiButton(settings_texture, GameWindow.WIDTH/2-64, GameWindow.HEIGHT/2-32, 128, 64);
+	private GuiButton play = new GuiButton(one_player, GameWindow.WIDTH/2-64, GameWindow.HEIGHT/2+32, 128, 64);
+	private GuiButton resume = new GuiButton(resume_texture,  GameWindow.WIDTH/2-64, GameWindow.HEIGHT/2+96, 128, 64);
 	private GuiButton close = new GuiButton(close_texture, 0, 0, 64, 32);
 	private GuiButton demo = new GuiButton(demo_off_texture, 50, GameWindow.HEIGHT-(640+50), 640, 640);
 
 	public GuiMainMenu() {
-		instance = this;
 		music.setLoop(true);
 		music.setLoopPoint(14, -1);
 		music.play();
@@ -49,11 +48,13 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 		g.drawImage(title, 0, 0, getWidth(), getHeight(), null);
 		g.drawImage(character, 0, 0, getWidth(), getHeight(), null);
 		close.paint(g);
+		if (GameWindow.instance().isInDemoMode())
+			demo.setImage(demo_on_texture);
 		demo.paint(g);
-		if(GuiIngame.instance != null)
+		settings.paint(g);
+		if (GuiIngame.instance != null)
 			resume.paint(g);
-		else
-			play.paint(g);
+		play.paint(g);
 		super.paint(g);
 	}
 

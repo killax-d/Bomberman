@@ -83,12 +83,24 @@ public class GuiIngame extends Container implements KeyListener {
 		return !player.isDead();
 	}
 	
+	public void pause() {
+		for (Bomb bomb : getBombs())
+			if(bomb != null  && !bomb.isDead())
+				bomb.pause();
+		gamePause = true;
+		stopMusic();
+		GameWindow.instance().setCurrentGui(new GuiMainMenu());
+	}
+	
 	public boolean isPaused() {
 		return gamePause;
 	}
 	
 	public void resume() {
 		gamePause = false;
+		for (Bomb bomb : getBombs())
+			if(bomb != null  && !bomb.isDead())
+				bomb.resume();
 		SFX_BackgroundMusic.play();
 	}
 	
@@ -133,9 +145,8 @@ public class GuiIngame extends Container implements KeyListener {
 	private Set<EntityLiving> getAlivePlayer(){
 		Set<EntityLiving> entitiesLiving = new HashSet<EntityLiving>();
 		for (Entity entity : getEntitiesLiving()) {
-			if(entity instanceof EntityLiving)
-				if (!entity.isDead())
-					entitiesLiving.add((EntityLiving) entity);
+			if(entity instanceof EntityLiving && !entity.isDead())
+				entitiesLiving.add((EntityLiving) entity);
 		}
 		return entitiesLiving;
 	}
@@ -203,11 +214,9 @@ public class GuiIngame extends Container implements KeyListener {
 				}
 			break;
 		case KeyEvent.VK_ESCAPE:
-			if(!player.isDead()) {
-				gamePause = true;
-				stopMusic();
-				GameWindow.instance().setCurrentGui(GuiMainMenu.instance);
-			}
+			if(!player.isDead())
+				pause();
+			
 			break;
 		}
 	}

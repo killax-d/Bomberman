@@ -42,6 +42,10 @@ public abstract class EntityLiving extends Entity {
 		}
 	}
 
+	public boolean canPlaceBomb() {
+		return bombPlaced < bombCount;
+	}
+	
 	public void addGloves() {
 		gloves = true;
 	}
