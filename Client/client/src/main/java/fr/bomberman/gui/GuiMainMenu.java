@@ -26,6 +26,7 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 	
 	// Sound
 	private BufferedSound music = Assets.getSound("sounds/menu.wav");
+	private BufferedSound pikachu = Assets.getSound("sounds/pikachu.wav");
 
 	private GuiButton play = new GuiButton(one_player, GameWindow.WIDTH/2-64, GameWindow.HEIGHT/2-32, 128, 64);
 	private GuiButton resume = new GuiButton(resume_texture,  GameWindow.WIDTH/2-64, GameWindow.HEIGHT/2-32, 128, 64);
@@ -36,6 +37,7 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 		music.setLoop(true);
 		music.setLoopPoint(14, -1);
 		music.play();
+		pikachu.setVolume(0.40F);
 	}
 
 	@Override
@@ -69,6 +71,7 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 		}
 		if (demo.isHovered()) {
 			GameWindow.instance().switchDemo();
+			pikachu.play();
 			if (GameWindow.instance().isInDemoMode())
 				demo.setImage(demo_on_texture);
 			else

@@ -194,7 +194,15 @@ public abstract class Entity extends TimerTask {
 						EntityLiving player = ((EffectTrail) effect).getOwnerPlayer();
 						
 						if((this instanceof EntityPlayer && player == this) || (this instanceof EntityAIPlayer && player != this)) {
-							this.die();
+							Entity entity = this;
+							new Timer().schedule(new TimerTask() {
+
+								@Override
+								public void run() {
+									entity.die();
+								}
+								
+							}, 250);
 							SFX_EntityDie.play();
 							if(this instanceof EntityPlayer)
 								end();
