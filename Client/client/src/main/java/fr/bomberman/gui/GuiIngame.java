@@ -206,7 +206,7 @@ public class GuiIngame extends Container implements KeyListener {
 			if(!player.isDead()) {
 				gamePause = true;
 				stopMusic();
-				GameWindow.instance().setCurrentGui(new GuiMainMenu());
+				GameWindow.instance().setCurrentGui(GuiMainMenu.instance);
 			}
 			break;
 		}

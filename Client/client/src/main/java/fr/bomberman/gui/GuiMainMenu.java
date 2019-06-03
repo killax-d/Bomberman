@@ -12,6 +12,8 @@ import fr.bomberman.assets.BufferedSound;
 
 public class GuiMainMenu extends Container implements MouseListener, MouseMotionListener {
 
+	public static GuiMainMenu instance;
+	
 	// Image
 	private BufferedImage background = Assets.getImage("title_background.png");
 	private BufferedImage title = Assets.getImage("title_titletext.png");
@@ -34,6 +36,7 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 	private GuiButton demo = new GuiButton(demo_off_texture, 50, GameWindow.HEIGHT-(640+50), 640, 640);
 
 	public GuiMainMenu() {
+		instance = this;
 		music.setLoop(true);
 		music.setLoopPoint(14, -1);
 		music.play();

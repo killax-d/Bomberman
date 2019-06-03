@@ -86,50 +86,32 @@ public class EntityAIPlayer extends EntityLiving {
 	}
 	
 	public void moveToPoint(Vec2D point) {
-		if (ennemyAround() && getBombCount() != getBombPlaced() && isFreeCell(position)) {
-			game.getEntities().add(new Bomb(this, this.hasMasterBomb(), map, game.getEffects()));
-			addBombPlaced();
-		}
+		if (ennemyAround())
+			placeBomb(point);
 		if (position.getX() < point.getX()) {
-			if(!canMove(EnumDirection.EST)) {
-				if(getBombCount() != getBombPlaced() && isFreeCell(position) && map.getTileTypeAt(point) != Map.ROCK_TILE) {
-					game.getEntities().add(new Bomb(this, this.hasMasterBomb(), map, game.getEffects()));
-					addBombPlaced();
-				}
-			}
+			if(!canMove(EnumDirection.EST))
+				placeBomb(point);
 			else
 				move(EnumDirection.EST);
 			move(EnumDirection.EST);
 		}
 		else if (position.getX() > point.getX()) {
-			if(!canMove(EnumDirection.WEST)) {
-				if(getBombCount() != getBombPlaced() && isFreeCell(position) && map.getTileTypeAt(point) != Map.ROCK_TILE) {
-					game.getEntities().add(new Bomb(this, this.hasMasterBomb(), map, game.getEffects()));
-					addBombPlaced();
-				}
-			}
+			if(!canMove(EnumDirection.WEST))
+				placeBomb(point);
 			else
 				move(EnumDirection.WEST);
 			move(EnumDirection.WEST);
 		}
 		else if (position.getY() < point.getY()) {
-			if(!canMove(EnumDirection.SOUTH)) {
-				if(getBombCount() != getBombPlaced() && isFreeCell(position) && map.getTileTypeAt(point) != Map.ROCK_TILE) {
-					game.getEntities().add(new Bomb(this, this.hasMasterBomb(), map, game.getEffects()));
-					addBombPlaced();
-				}
-			}
+			if(!canMove(EnumDirection.SOUTH))
+				placeBomb(point);
 			else
 				move(EnumDirection.SOUTH);
 			move(EnumDirection.SOUTH);
 		}
 		else if (position.getY() > point.getY()) {
-			if(!canMove(EnumDirection.NORTH)) {
-				if(getBombCount() != getBombPlaced() && isFreeCell(position) && map.getTileTypeAt(point) != Map.ROCK_TILE) {
-					game.getEntities().add(new Bomb(this, this.hasMasterBomb(), map, game.getEffects()));
-					addBombPlaced();
-				}
-			}
+			if(!canMove(EnumDirection.NORTH)) 
+				placeBomb(point);
 			else
 				move(EnumDirection.NORTH);
 			move(EnumDirection.NORTH);
@@ -173,7 +155,8 @@ public class EntityAIPlayer extends EntityLiving {
 						}
 					}
 					if (!moved)
-						moveToPoint(pathVector.get(0));
+						if(pathVector.size() > 0)
+							moveToPoint(pathVector.get(0));
 				}
 			}
 		};
@@ -218,11 +201,23 @@ public class EntityAIPlayer extends EntityLiving {
 		}
 	}
 	
+	private void placeBomb(Vec2D point) {
+		if(getBombCount() != getBombPlaced() && isFreeCell(position) && map.getTileTypeAt(point) != Map.ROCK_TILE) {
+			game.getEntities().add(new Bomb(this, this.hasMasterBomb(), map, game.getEffects()));
+			addBombPlaced();
+		}
+		
+	}
+	
 	public TimerTask calculatePath() {
+		EntityLiving entity = this;
 		TimerTask task = new TimerTask() {
 
 			@Override
 			public void run() {
+				if (ennemyAround()) {
+					placeBomb(entity.getPosition());
+				}
 				if (GuiIngame.instance == null || dead) {
 					this.cancel();
 				}
