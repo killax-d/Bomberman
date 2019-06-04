@@ -26,8 +26,8 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 	private BufferedImage demo_off_texture = Assets.getImage("demo_off.png");
 	
 	// Sound
-	private BufferedSound music = Assets.getSound("sounds/menu.wav");
-	private BufferedSound pikachu = Assets.getSound("sounds/pikachu.wav");
+	private BufferedSound music = Assets.getSound("sounds/menu.wav", BufferedSound.MUSIC);
+	private BufferedSound pikachu = Assets.getSound("sounds/pikachu.wav", BufferedSound.SFX);
 
 	private GuiButton settings = new GuiButton(settings_texture, GameWindow.WIDTH/2-64, GameWindow.HEIGHT/2-32, 128, 64);
 	private GuiButton play = new GuiButton(one_player, GameWindow.WIDTH/2-64, GameWindow.HEIGHT/2+32, 128, 64);
@@ -39,7 +39,6 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 		music.setLoop(true);
 		music.setLoopPoint(14, -1);
 		music.play();
-		pikachu.setVolume(0.40F);
 	}
 
 	@Override
@@ -84,6 +83,9 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 		if (close.isHovered()) {
 			System.exit(0);
 		}
+		if (settings.isHovered()) {
+			SettingsWindow.instance();
+		}
 	}
 
 	@Override
@@ -108,10 +110,7 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 
 	@Override
 	public void mouseDragged(MouseEvent event) {
-		play.mouseMoved(event);
-		close.mouseMoved(event);
-		resume.mouseMoved(event);
-		demo.mouseMoved(event);
+		
 	}
 
 	@Override
@@ -120,6 +119,7 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 		close.mouseMoved(event);
 		resume.mouseMoved(event);
 		demo.mouseMoved(event);
+		settings.mouseMoved(event);
 	}
 
 }

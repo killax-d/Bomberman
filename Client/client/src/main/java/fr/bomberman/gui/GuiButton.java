@@ -13,17 +13,17 @@ import fr.bomberman.assets.BufferedSound;
 
 public class GuiButton implements MouseMotionListener {
 
-	private String text;
-	private int x;
-	private int y;
-	private int width;
-	private int height;
-	private BufferedImage image;
-	private Color color;
-	private Color colorHovered;
-	private boolean hovered;
-	private static BufferedSound SFX_ButtonHover = Assets.getSound("sounds/button.wav");
-	private boolean visible;
+	protected String text;
+	protected int x;
+	protected int y;
+	protected int width;
+	protected int height;
+	protected BufferedImage image;
+	protected Color color;
+	protected Color colorHovered;
+	protected boolean hovered;
+	protected static BufferedSound SFX_ButtonHover = Assets.getSound("sounds/button.wav", BufferedSound.SFX);
+	protected boolean visible;
 
 	public GuiButton(BufferedImage image, int x, int y, int width, int height) {
 		this("", x, y, width, height);

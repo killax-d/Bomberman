@@ -17,8 +17,8 @@ public abstract class Entity extends TimerTask {
 	public static final int SPRITE_WIDTH = 64;
 	public static final int SPRITE_HEIGHT = 96;
 
-	private static final BufferedSound SFX_Bump = Assets.getSound("sounds/bumpintowall.wav");
-	private static BufferedSound SFX_EntityDie = Assets.getSound("sounds/fainted.wav");
+	private static final BufferedSound SFX_Bump = Assets.getSound("sounds/bumpintowall.wav", BufferedSound.SFX);
+	private static BufferedSound SFX_EntityDie = Assets.getSound("sounds/fainted.wav", BufferedSound.SFX);
 	
 	protected Map map;
 	protected Timer clock;
@@ -212,7 +212,7 @@ public abstract class Entity extends TimerTask {
 	}	
 	
 	private void end() {
-		if (!GuiIngame.instance.playerIsAlive()) {
+		if (!GuiIngame.instance.playerIsAlive() || GuiIngame.instance.getAlivePlayerCount() <= 1) {
 			for(Bomb bomb : GuiIngame.instance.getBombs())
 				if(bomb != null)
 					bomb.cancelExplosion();
@@ -222,11 +222,11 @@ public abstract class Entity extends TimerTask {
 					item.setState(Item.DISPAWNED);
 				}
 			
-			if (GuiIngame.instance.getAlivePlayerCount() == 1 && GuiIngame.instance.playerIsAlive())
+			if ((GuiIngame.instance.getAlivePlayerCount() <= 1 && GuiIngame.instance.playerIsAlive()) || GuiIngame.instance.playerIsAlive())
 				GuiIngame.instance.setWinScreen(GuiIngame.VICTORY);
 			else
 				GuiIngame.instance.setWinScreen(GuiIngame.DEFEAT);
-
+			
 			new Timer().schedule(new TimerTask() {
 	
 				@Override

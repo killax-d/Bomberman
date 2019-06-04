@@ -18,7 +18,7 @@ public class Item extends Entity {
 	
 	private Timer dispawnClock;
 	
-	private static BufferedSound SFX_Pick = Assets.getSound("sounds/item_picked.wav");
+	private static BufferedSound SFX_Pick = Assets.getSound("sounds/item_picked.wav", BufferedSound.SFX);
 	
 	private int state;
 	

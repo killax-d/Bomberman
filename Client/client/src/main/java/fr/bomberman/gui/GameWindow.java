@@ -20,6 +20,8 @@ public class GameWindow extends JFrame implements KeyListener, MouseListener, Mo
 	private static boolean demo = false;
 	public static int WIDTH;
 	public static int HEIGHT;
+	public static float MUSIC_VOLUME = 0.05F;
+	public static float SFX_VOLUME = 0.1F;
 	
 	private GameWindow(String title, int width, int height) {
 		WIDTH = width;
@@ -39,7 +41,7 @@ public class GameWindow extends JFrame implements KeyListener, MouseListener, Mo
 		addKeyListener(this);
 		addMouseMotionListener(this);
 	}
-
+	
 	// DEMO
 	public void switchDemo() {
 		if (demo)

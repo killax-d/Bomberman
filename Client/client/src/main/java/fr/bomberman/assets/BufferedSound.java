@@ -8,6 +8,8 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
 
+import fr.bomberman.gui.GameWindow;
+
 /**
  * 
  * @author Donné Dylan
@@ -16,14 +18,19 @@ import javax.sound.sampled.FloatControl;
 
 public class BufferedSound {
 	
+	public static int MUSIC = 0;
+	public static int SFX = 1;
+	
 	private Clip clip;
 	private AudioInputStream audioStream;
+	private int type;
+	private boolean playing;
 
 	/**
 	 * Create an Clip Object
 	 * @param is
 	 */
-	public BufferedSound(InputStream is) {
+	public BufferedSound(InputStream is, int type) {
 		try {
 			InputStream bufferedIn = new BufferedInputStream(is);
 			AudioInputStream audioStream = AudioSystem.getAudioInputStream(bufferedIn);
@@ -33,9 +40,22 @@ public class BufferedSound {
 			e.printStackTrace();
 		}
 		open();
-		setVolume(0.1F);
+		playing = false;
+		if (type == MUSIC)
+			setVolume(GameWindow.MUSIC_VOLUME);
+		else if (type == SFX)
+			setVolume(GameWindow.SFX_VOLUME);
+		else
+			setVolume(0.1F);
 	}
 
+	/**
+	 * Get sound type
+	 */
+	public int getType() {
+		return type;
+	}
+	
 	/**
 	 * Open the clip
 	 */
@@ -72,15 +92,21 @@ public class BufferedSound {
 	 * Play Music
 	 * Reset currentFrame to 0 to avoid glitch sound
 	 */
-	public void play() {
-		clip.setFramePosition(0);
+	public void play(int frame) {
+		clip.setFramePosition(frame);
 		clip.start();
+		playing = true;
 	}
-
+	
+	public void play() {
+		play(0);
+	}
+	
 	/**
 	 * Stop the Clip music
 	 */
 	public void stop() {
+		playing = false;
 		clip.stop();
 	}
 
@@ -93,5 +119,11 @@ public class BufferedSound {
 	        throw new IllegalArgumentException("Volume invalide: " + volume);
 		FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);        
 	    gainControl.setValue(20f * (float) Math.log10(volume));
+	    if(playing) {
+		    int frame = clip.getFramePosition();
+		    stop();
+		    play(frame);
+	    }
+	    
 	}
 }

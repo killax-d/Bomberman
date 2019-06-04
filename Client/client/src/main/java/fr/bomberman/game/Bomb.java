@@ -1,7 +1,6 @@
 package fr.bomberman.game;
 
 import java.awt.image.BufferedImage;
-import java.security.acl.Owner;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -25,10 +24,10 @@ public class Bomb extends Entity {
 	public static final int BOMB_EXPLOSION = 1;
 	public static final int BOMB_EXPLODED = 2;
 
-	private static BufferedSound SFX_Trail = Assets.getSound("sounds/spark.wav");
-	private static BufferedSound SFX_Explosion = Assets.getSound("sounds/pokeball_explosion.wav");
-	private static BufferedSound SFX_BombDrop = Assets.getSound("sounds/pokeball.wav");
-	private static BufferedSound SFX_EntityDie = Assets.getSound("sounds/fainted.wav");
+	private static BufferedSound SFX_Trail = Assets.getSound("sounds/spark.wav", BufferedSound.SFX);
+	private static BufferedSound SFX_Explosion = Assets.getSound("sounds/pokeball_explosion.wav", BufferedSound.SFX);
+	private static BufferedSound SFX_BombDrop = Assets.getSound("sounds/pokeball.wav", BufferedSound.SFX);
+	private static BufferedSound SFX_EntityDie = Assets.getSound("sounds/fainted.wav", BufferedSound.SFX);
 	
 	private Set<Effect> effectToAdd;
 	private Set<EnumDirection> blockedDir;
@@ -55,7 +54,6 @@ public class Bomb extends Entity {
 	public Bomb(EntityLiving player, boolean master, Map map, CopyOnWriteArrayList<Effect> effects) {
 		super(player.getPosition(), map);
 		master_bomb = master;
-		SFX_BombDrop.setVolume(0.01F);
 		SFX_BombDrop.play();
 		this.player = player;
 		this.effects = effects;
@@ -211,6 +209,7 @@ public class Bomb extends Entity {
 					entity.die();
 				if(player instanceof EntityAIPlayer && entity != player)
 					entity.die();
+				SFX_EntityDie.play();
 				end();
 			}
 				
@@ -218,7 +217,7 @@ public class Bomb extends Entity {
 	}
 	
 	private void end() {
-		if (!GuiIngame.instance.playerIsAlive()) {
+		if (!GuiIngame.instance.playerIsAlive() || GuiIngame.instance.getAlivePlayerCount() <= 1) {
 			for(Bomb bomb : GuiIngame.instance.getBombs())
 				if(bomb != null)
 					bomb.cancelExplosion();
@@ -228,7 +227,7 @@ public class Bomb extends Entity {
 					item.setState(Item.DISPAWNED);
 				}
 			
-			if (GuiIngame.instance.getAlivePlayerCount() <= 1 && GuiIngame.instance.playerIsAlive())
+			if ((GuiIngame.instance.getAlivePlayerCount() <= 1 && GuiIngame.instance.playerIsAlive()) || GuiIngame.instance.playerIsAlive())
 				GuiIngame.instance.setWinScreen(GuiIngame.VICTORY);
 			else
 				GuiIngame.instance.setWinScreen(GuiIngame.DEFEAT);

@@ -34,8 +34,8 @@ public class GuiIngame extends Container implements KeyListener {
 	private CopyOnWriteArrayList<Effect> effects;
 	private CopyOnWriteArrayList<Item> powerups;
 	// Sound
-	private static final BufferedSound SFX_BackgroundMusic = Assets.getSound("sounds/background_music.wav");
-	private static final BufferedSound SFX_ImpossibleAction = Assets.getSound("sounds/impossible_action.wav");
+	private static final BufferedSound SFX_BackgroundMusic = Assets.getSound("sounds/background_music.wav", BufferedSound.MUSIC);
+	private static final BufferedSound SFX_ImpossibleAction = Assets.getSound("sounds/impossible_action.wav", BufferedSound.SFX);
 
 	public static GuiIngame instance;
 	
@@ -60,7 +60,6 @@ public class GuiIngame extends Container implements KeyListener {
 				if(!bomb.isDead())
 					bomb.cancelExplosion();
 		SFX_BackgroundMusic.setLoop(true);
-		SFX_BackgroundMusic.setVolume(0.025F);
 		SFX_BackgroundMusic.play();
 		instance = this;
 		gamePause = false;

@@ -1,77 +1,150 @@
 package fr.bomberman.gui;
 
+import java.awt.Color;
+import java.awt.Container;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import javax.swing.BorderFactory;
 import javax.swing.JFrame;
-import javax.swing.JSlider;
 
 public class SettingsWindow extends JFrame implements KeyListener, MouseListener, MouseMotionListener {
-
-	private JSlider music_volume;
-	private JSlider sfx_volume;
-	private JSlider FPS;
 	
-	public SettingsWindow() {
-		music_volume = new JSlider();
-		sfx_volume = new JSlider();
-		FPS = new JSlider();
-	}
+	public static SettingsWindow window;
+	public final static int WIDTH = 600;
+	public final static int HEIGHT = 600;
 	
-	@Override
-	public void mouseDragged(MouseEvent e) {
-		
-	}
-
-	@Override
-	public void mouseMoved(MouseEvent e) {
-		
-	}
-
-	@Override
-	public void mouseClicked(MouseEvent e) {
-		
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent e) {
-		
-	}
-
-	@Override
-	public void mouseExited(MouseEvent e) {
-		
-	}
-
-	@Override
-	public void mousePressed(MouseEvent e) {
-		
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {
-		
-	}
-
-	@Override
-	public void keyPressed(KeyEvent e) {
-		
-	}
-
-	@Override
-	public void keyReleased(KeyEvent e) {
-		
-	}
-
-	@Override
-	public void keyTyped(KeyEvent e) {
-		
-	}
-	
-	
+	private Timer clock;
 	
 
+	public SettingsWindow(String title) {
+		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+		setUndecorated(true);
+		setBackground(new Color(0, 0, 0, 0.75F));
+		setForeground(Color.WHITE);
+		getRootPane().setBorder(BorderFactory.createMatteBorder(4, 4, 4, 4, new Color(0.75F, 0.75F, 0.75F, 0.75F)));
+		setTitle(title);
+		setCurrentGui(new GuiSettings());
+		setSize(WIDTH, HEIGHT);
+		setLocationRelativeTo(null);
+		addMouseListener(this);
+		addKeyListener(this);
+		addMouseMotionListener(this);
+	}
+	
+	public void setCurrentGui(Container gui) {
+		setContentPane(gui);
+		revalidate();
+	}
+
+	public Container getCurrentGui() {
+		return getContentPane();
+	}
+	
+	public void close() {
+		GameWindow.instance().enable();
+		stopClock();
+		setVisible(false);
+	}
+	
+	public static SettingsWindow instance() {
+		if (window == null) {
+			window = new SettingsWindow("Settings");
+		}
+		GameWindow.instance().disable();
+		window.setVisible(true);
+		window.clock = new Timer();
+		window.registerClock();
+		return window;
+	}
+	
+	private void stopClock() {
+		clock.cancel();
+		clock.purge();
+	}
+	
+	private void registerClock() {
+		clock.scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				window.getCurrentGui().repaint();
+			}
+		}, 1000, 17);
+	}
+
+	@Override
+	public void mouseDragged(MouseEvent event) {
+		if (getCurrentGui() instanceof MouseMotionListener) {
+			((MouseMotionListener) getCurrentGui()).mouseDragged(event);
+		}
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent event) {
+		if (getCurrentGui() instanceof MouseMotionListener) {
+			((MouseMotionListener) getCurrentGui()).mouseMoved(event);
+		}
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent event) {
+		if (getCurrentGui() instanceof MouseListener) {
+			((MouseListener) getCurrentGui()).mouseClicked(event);
+		}
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent event) {
+		if (getCurrentGui() instanceof MouseListener) {
+			((MouseListener) getCurrentGui()).mouseEntered(event);
+		}
+	}
+
+	@Override
+	public void mouseExited(MouseEvent event) {
+		if (getCurrentGui() instanceof MouseListener) {
+			((MouseListener) getCurrentGui()).mouseExited(event);
+		}
+	}
+
+	@Override
+	public void mousePressed(MouseEvent event) {
+		if (getCurrentGui() instanceof MouseListener) {
+			((MouseListener) getCurrentGui()).mousePressed(event);
+		}
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent event) {
+		if (getCurrentGui() instanceof MouseListener) {
+			((MouseListener) getCurrentGui()).mouseReleased(event);
+		}
+	}
+
+	@Override
+	public void keyPressed(KeyEvent event) {
+		if (getCurrentGui() instanceof KeyListener) {
+			((KeyListener) getCurrentGui()).keyPressed(event);
+		}
+	}
+
+	@Override
+	public void keyReleased(KeyEvent event) {
+		if (getCurrentGui() instanceof KeyListener) {
+			((KeyListener) getCurrentGui()).keyReleased(event);
+		}
+	}
+
+	@Override
+	public void keyTyped(KeyEvent event) {
+		if (getCurrentGui() instanceof KeyListener) {
+			((KeyListener) getCurrentGui()).keyTyped(event);
+		}
+	}
+	
 }

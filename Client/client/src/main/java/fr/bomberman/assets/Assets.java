@@ -9,6 +9,8 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
+import fr.bomberman.gui.GameWindow;
+
 public class Assets {
 	
 	/**
@@ -54,13 +56,13 @@ public class Assets {
 	 * @param path
 	 * @return BufferedSound
 	 */
-	public static BufferedSound getSound(String path) {
+	public static BufferedSound getSound(String path, int type) {
 		if (sounds.containsKey(path)) {
 			return sounds.get(path);
 		}
 		try (InputStream is = Assets.class.getResourceAsStream(path)) {
 			if (is != null) {
-				BufferedSound sound = new BufferedSound(is);
+				BufferedSound sound = new BufferedSound(is, type);
 				sounds.putIfAbsent(path, sound);
 				return sound;
 			}
@@ -68,6 +70,17 @@ public class Assets {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	public static void adjustVolume() {
+		for (BufferedSound sound : sounds.values()) {
+			if(sound != null) {
+				if(sound.getType() == BufferedSound.MUSIC)
+					sound.setVolume(GameWindow.MUSIC_VOLUME);
+				if(sound.getType() == BufferedSound.SFX)
+					sound.setVolume(GameWindow.SFX_VOLUME);
+			}
+		}
 	}
 
 	
