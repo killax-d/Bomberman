@@ -15,7 +15,7 @@ public class GuiControlLabel extends GuiButton implements MouseMotionListener {
 	public final static int fontSize = 30;
 	private Controls control;
 
-	public GuiControlLabel(Object[] control, int x, int y, int width, int height) {
+	public GuiControlLabel(String control, int x, int y, int width, int height) {
 		super(Controls.getControl(control).getControlName(), x, y, width, height, Color.WHITE, Color.GRAY);
 		this.control = Controls.getControl(control);
 		visible = false;

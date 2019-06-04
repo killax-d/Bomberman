@@ -12,6 +12,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import fr.bomberman.assets.Assets;
 import fr.bomberman.assets.BufferedSound;
 import fr.bomberman.game.Bomb;
+import fr.bomberman.game.Controls;
 import fr.bomberman.game.Effect;
 import fr.bomberman.game.EffectTrail;
 import fr.bomberman.game.Entity;
@@ -184,24 +185,19 @@ public class GuiIngame extends Container implements KeyListener {
 	}
 
 	private void movePlayer(int keyCode) {
-		switch (keyCode) {
-		case KeyEvent.VK_S:
+		if(keyCode == Controls.getControl("DOWN").getKeyCode())
 			if(!player.isDead())
 				player.move(EnumDirection.SOUTH);
-			break;
-		case KeyEvent.VK_Q:
+		if(keyCode == Controls.getControl("LEFT").getKeyCode())
 			if(!player.isDead())
 				player.move(EnumDirection.WEST);
-			break;
-		case KeyEvent.VK_D:
+		if(keyCode == Controls.getControl("RIGHT").getKeyCode())
 			if(!player.isDead())
 				player.move(EnumDirection.EST);
-			break;
-		case KeyEvent.VK_Z:
+		if(keyCode == Controls.getControl("UP").getKeyCode())
 			if(!player.isDead())
 				player.move(EnumDirection.NORTH);
-			break;
-		case KeyEvent.VK_SPACE:
+		if(keyCode == Controls.getControl("BOMB").getKeyCode()) {
 			int mapTile = map.getTileTypeAt(player.getPosition().getX(), player.getPosition().getY());
 			if((mapTile == Map.TILE_FREE || mapTile == Map.FLOWER_TILE) && !player.isDead())
 				if(player.getBombPlaced() >= player.getBombCount()) {
@@ -211,13 +207,10 @@ public class GuiIngame extends Container implements KeyListener {
 					entities.add(new Bomb(player, player.hasMasterBomb(), map, effects));
 					player.addBombPlaced();
 				}
-			break;
-		case KeyEvent.VK_ESCAPE:
+		}
+		if(keyCode == KeyEvent.VK_ESCAPE)
 			if(!player.isDead())
 				pause();
-			
-			break;
-		}
 	}
 
 	@Override

@@ -7,6 +7,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
+import fr.bomberman.assets.Assets;
+import fr.bomberman.assets.BufferedSound;
+
 public class GuiSlider implements MouseListener, MouseMotionListener {
 
 	private final static int fontSize = 26;
@@ -51,10 +54,10 @@ public class GuiSlider implements MouseListener, MouseMotionListener {
 		visible = true;
 		g.setFont(new Font("Arial", Font.BOLD, fontSize));
 		int textWidth = g.getFontMetrics().stringWidth(text);
+
+		g.setColor(Color.WHITE);
 		
 		g.drawString(String.format(text, value).concat("%") , x+width/2-textWidth/2, y+height/2+fontSize/3+2);
-		
-		g.setColor(Color.WHITE);
 		g.drawRect(x, y, width, height);
 		g.fillRect(x, y, (width/100)*value, height);
 	}
@@ -85,8 +88,13 @@ public class GuiSlider implements MouseListener, MouseMotionListener {
 
 	@Override
 	public void mouseClicked(MouseEvent event) {
-		
-		
+		editing = true;
+		if (visible && event.getY() >= y && event.getY() <= y + height) {
+			int x = event.getX()-50;
+			float value = (float)x/(float)(width);
+			int percent = (int) (value*100);
+			setValue(percent);
+		}
 	}
 
 	@Override
@@ -109,8 +117,10 @@ public class GuiSlider implements MouseListener, MouseMotionListener {
 
 	@Override
 	public void mouseReleased(MouseEvent event) {
-		if(editing)
-			GuiSettings.setFields(type, (float) value/100);
+		if(editing) {
+			BufferedSound.setVolumeType(type, (float) value/100);
+			Assets.adjustVolume();
+		}
 		editing = false;
 	}
 

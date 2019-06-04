@@ -9,8 +9,6 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
-import fr.bomberman.gui.GameWindow;
-
 public class Assets {
 	
 	/**
@@ -71,14 +69,15 @@ public class Assets {
 		}
 		return null;
 	}
+
 	
+	/**
+	 * adjust the game volume
+	 */
 	public static void adjustVolume() {
 		for (BufferedSound sound : sounds.values()) {
 			if(sound != null) {
-				if(sound.getType() == BufferedSound.MUSIC)
-					sound.setVolume(GameWindow.MUSIC_VOLUME);
-				if(sound.getType() == BufferedSound.SFX)
-					sound.setVolume(GameWindow.SFX_VOLUME);
+				sound.adjustVolume();
 			}
 		}
 	}

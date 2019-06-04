@@ -9,16 +9,14 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 
-import javax.swing.JSlider;
-
 import fr.bomberman.assets.Assets;
 import fr.bomberman.assets.BufferedSound;
 import fr.bomberman.game.Controls;
 
 public class GuiSettings extends Container implements MouseListener, MouseMotionListener, KeyListener {
 
-	private GuiSlider music_volume = new GuiSlider("Music Volume : %d", 50, 50+(int) (GuiControlLabel.caseHeight * 7.5), SettingsWindow.window.WIDTH - 100, GuiControlLabel.caseHeight, 0, 100, (int) (GameWindow.MUSIC_VOLUME*100), BufferedSound.MUSIC);
-	private GuiSlider sfx_volume = new GuiSlider("SFX Volume : %d", 50, 50+(int) (GuiControlLabel.caseHeight * 9), SettingsWindow.window.WIDTH - 100, GuiControlLabel.caseHeight, 0, 100, (int) (GameWindow.SFX_VOLUME*100), BufferedSound.SFX);
+	private GuiSlider music_volume = new GuiSlider("Music Volume : %d", 50, 50+(int) (GuiControlLabel.caseHeight * 7.5), SettingsWindow.WIDTH - 100, GuiControlLabel.caseHeight, 0, 100, (int) (BufferedSound.MUSIC_VOLUME*100), BufferedSound.MUSIC);
+	private GuiSlider sfx_volume = new GuiSlider("SFX Volume : %d", 50, 50+(int) (GuiControlLabel.caseHeight * 9), SettingsWindow.WIDTH - 100, GuiControlLabel.caseHeight, 0, 100, (int) (BufferedSound.SFX_VOLUME*100), BufferedSound.SFX);
 	
 	private boolean waitingForKey;
 	private GuiControlLabel ControlWaiting;
@@ -58,15 +56,6 @@ public class GuiSettings extends Container implements MouseListener, MouseMotion
 		sfx_volume.paint(g);
 	}
 	
-	public static void setFields(int id, float value) {
-		System.out.println(id + " : " + value);
-		if(id == BufferedSound.MUSIC)
-	    	GameWindow.MUSIC_VOLUME = value;
-		if(id == BufferedSound.SFX)
-			GameWindow.SFX_VOLUME = value;
-		Assets.adjustVolume();
-	}
-	
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		if (close.isHovered()) {
@@ -90,6 +79,8 @@ public class GuiSettings extends Container implements MouseListener, MouseMotion
 				tmpKeyCode = ControlWaiting.getControlCode().getKeyCode();
 				ControlWaiting.setControleCode(-1);
 		}
+		music_volume.mouseClicked(e);
+		sfx_volume.mouseClicked(e);
 	}
 
 	@Override

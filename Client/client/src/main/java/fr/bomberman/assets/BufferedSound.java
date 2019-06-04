@@ -8,8 +8,6 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
 
-import fr.bomberman.gui.GameWindow;
-
 /**
  * 
  * @author Donné Dylan
@@ -20,6 +18,9 @@ public class BufferedSound {
 	
 	public static int MUSIC = 0;
 	public static int SFX = 1;
+	
+	public static float MUSIC_VOLUME = 0.05F;
+	public static float SFX_VOLUME = 0.1F;
 	
 	private Clip clip;
 	private AudioInputStream audioStream;
@@ -41,10 +42,11 @@ public class BufferedSound {
 		}
 		open();
 		playing = false;
+		this.type = type;
 		if (type == MUSIC)
-			setVolume(GameWindow.MUSIC_VOLUME);
+			setVolume(MUSIC_VOLUME);
 		else if (type == SFX)
-			setVolume(GameWindow.SFX_VOLUME);
+			setVolume(SFX_VOLUME);
 		else
 			setVolume(0.1F);
 	}
@@ -108,6 +110,25 @@ public class BufferedSound {
 	public void stop() {
 		playing = false;
 		clip.stop();
+	}
+	
+	/**
+	 * Set the volume for a sound type
+	 * @param type // sound type
+	 * @param value // value in float (ex 0.5F)
+	 */
+	public static void setVolumeType(int type, float value) {
+		if (type == MUSIC)
+			MUSIC_VOLUME = value;
+		if (type == SFX)
+			SFX_VOLUME = value;
+	}
+	
+	/**
+	 * adjust volume from new settings
+	 */
+	public void adjustVolume() {
+		setVolume((type == MUSIC ? MUSIC_VOLUME : SFX_VOLUME));
 	}
 
 	/**

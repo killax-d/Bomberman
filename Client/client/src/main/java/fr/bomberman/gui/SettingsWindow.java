@@ -13,6 +13,9 @@ import java.util.TimerTask;
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 
+import fr.bomberman.assets.Init;
+import fr.bomberman.game.Controls;
+
 public class SettingsWindow extends JFrame implements KeyListener, MouseListener, MouseMotionListener {
 	
 	public static SettingsWindow window;
@@ -47,16 +50,19 @@ public class SettingsWindow extends JFrame implements KeyListener, MouseListener
 	}
 	
 	public void close() {
-		GameWindow.instance().enable();
-		stopClock();
-		setVisible(false);
+		if(!Controls.hasInvalidKey()) {
+			Init.writeIniFile();
+			GameWindow.instance().setEnabled(true);
+			stopClock();
+			setVisible(false);
+		}
 	}
 	
 	public static SettingsWindow instance() {
 		if (window == null) {
 			window = new SettingsWindow("Settings");
 		}
-		GameWindow.instance().disable();
+		GameWindow.instance().setEnabled(false);
 		window.setVisible(true);
 		window.clock = new Timer();
 		window.registerClock();
