@@ -27,9 +27,6 @@ public class GuiSlider implements MouseListener, MouseMotionListener {
 	private int type;
 	private boolean editing;
 	
-	private int xText = -1;
-	private int yText = -1;
-	
 	public GuiSlider(String text, int x, int y, int width, int height, int min, int max, int value, int type) {
 		this.text = text;
 		this.x = x;
@@ -53,22 +50,14 @@ public class GuiSlider implements MouseListener, MouseMotionListener {
 			this.value = value;
 	}
 	
-	private void textPosition(Graphics g) {
-		if (xText == -1 && yText == -1) {
-			int textWidth = g.getFontMetrics().stringWidth(text);
-			xText = x+width/2-textWidth/2;
-			yText = y+height/2+fontSize/3+2;
-		}
-	}
-	
 	public void paint(Graphics g) {
 		visible = true;
-		textPosition(g);
-		
 		g.setFont(new Font("Arial", Font.BOLD, fontSize));
+		int textWidth = g.getFontMetrics().stringWidth(text);
+
+		g.drawString(String.format(text, value).concat("%") , x+width/2-textWidth/2, y+height/2+fontSize/3+2);
+
 		g.setColor(Color.WHITE);
-		
-		g.drawString(String.format(text, value).concat("%") , xText, yText);
 		g.drawRect(x, y, width, height);
 		g.fillRect(x, y, (width/100)*value, height);
 	}

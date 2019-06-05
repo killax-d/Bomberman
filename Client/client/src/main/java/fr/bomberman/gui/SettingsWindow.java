@@ -2,6 +2,7 @@ package fr.bomberman.gui;
 
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.GraphicsDevice.WindowTranslucency;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -13,6 +14,7 @@ import java.util.TimerTask;
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 
+import fr.bomberman.App;
 import fr.bomberman.assets.Assets;
 import fr.bomberman.assets.BufferedSound;
 import fr.bomberman.assets.Init;
@@ -33,7 +35,12 @@ public class SettingsWindow extends JFrame implements KeyListener, MouseListener
 	public SettingsWindow(String title) {
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		setUndecorated(true);
-		setBackground(new Color(0, 0, 0, 0.75F));
+		if (App.dg.isWindowTranslucencySupported(WindowTranslucency.TRANSLUCENT))
+			setBackground(new Color(0, 0, 0, 0.75F));
+		else {
+	    	System.err.println("Transparent background not supported, set Black background color instead");
+			setBackground(Color.BLACK);
+		}
 		setForeground(Color.WHITE);
 		getRootPane().setBorder(BorderFactory.createMatteBorder(4, 4, 4, 4, new Color(0.75F, 0.75F, 0.75F, 0.75F)));
 		setTitle(title);
@@ -61,8 +68,10 @@ public class SettingsWindow extends JFrame implements KeyListener, MouseListener
 			stopClock();
 			setVisible(false);
 		}
-		else
+		else {
 			SFX_ImpossibleAction.play();
+	    	System.err.println("Settings has invalid key");
+		}
 	}
 	
 	public static SettingsWindow instance() {
@@ -87,7 +96,7 @@ public class SettingsWindow extends JFrame implements KeyListener, MouseListener
 			public void run() {
 				window.getCurrentGui().repaint();
 			}
-		}, 1000, 17);
+		}, 1000, 34);
 	}
 
 	@Override

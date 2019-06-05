@@ -20,9 +20,8 @@ public class Controls {
 		if (controls.containsKey(control)) {
 			return controls.get(control);
 		}
-		Controls c = new Controls(control, 0);
-		controls.put(control, c);
-		return c;
+		initDefaultControl();
+		return getControl(control);
 	}
 	
 	public static HashMap<String, Controls> getControls(){
@@ -30,17 +29,17 @@ public class Controls {
 	}
 	
 	public static void initDefaultControl(){
-		controls.putIfAbsent("UP", new Controls("Forward", 90)); // Forward
-		controls.putIfAbsent("DOWN", new Controls("Backward", 83)); // Backward
-		controls.putIfAbsent("RIGHT", new Controls("Strafe Right", 68)); // Strafe Right
-		controls.putIfAbsent("LEFT", new Controls("Strafe Left", 81)); // Strafe Left
-		controls.putIfAbsent("BOMB", new Controls("Drop Bomb", 32)); // Bomb
+		new Controls("UP", "Forward", 90); // Forward
+		new Controls("DOWN", "Backward", 83); // Backward
+		new Controls("RIGHT", "Strafe Right", 68); // Strafe Right
+		new Controls("LEFT", "Strafe Left", 81); // Strafe Left
+		new Controls("BOMB", "Drop Bomb", 32); // Bomb
 	}
 	
-	public Controls(String control, int keyId){
+	public Controls(String controlName, String control, int keyId) {
 		this.name = control;
 		this.keyId = keyId;
-		controls.put(control, this);
+		controls.put(controlName, this);
 	}
 	
 	public int getKeyCode() {
@@ -60,7 +59,7 @@ public class Controls {
 	}
 	
 	public void setKeyCode(int id) {
-		if (id != 0)
+		if (id > 0)
 			for (String control : controls.keySet()) {
 				if (getControl(control) != this && getControl(control).getKeyCode() == id) {
 					controls.get(control).setKeyCode(0);
@@ -71,8 +70,10 @@ public class Controls {
 	
 	public static boolean hasInvalidKey() {
 		for (String control : controls.keySet()) {
-			if (getControl(control) != null && getControl(control).getKeyCode() <= 0)
+			if (getControl(control) != null && getControl(control).getKeyCode() <= 0) {
+				System.err.println(String.format("Invalid key : %s with %s | code : %d", getControl(control).getControlName(), getControl(control).getKeyText(), getControl(control).getKeyCode()));
 				return true;
+			}
 		}
 		return false;
 	}

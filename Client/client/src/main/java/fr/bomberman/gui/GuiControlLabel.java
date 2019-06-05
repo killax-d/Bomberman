@@ -14,11 +14,6 @@ public class GuiControlLabel extends GuiButton implements MouseMotionListener {
 	public final static int caseHeight = 50;
 	public final static int fontSize = 30;
 	private Controls control;
-	
-	private int xTextLabel = -1;
-	private int yTextLabel = -1;
-	private int xText = -1;
-	private int yText = -1;
 
 	public GuiControlLabel(String control, int x, int y, int width, int height) {
 		super(Controls.getControl(control).getControlName(), x, y, width, height, Color.WHITE, Color.GRAY);
@@ -31,29 +26,20 @@ public class GuiControlLabel extends GuiButton implements MouseMotionListener {
 	public void setText(String text) {
 		this.text = text;
 	}
-	
-	private void textPosition(Graphics g) {
-		if (xText == -1 && yText == -1) {
-			int textWidth = g.getFontMetrics().stringWidth(control.getKeyText());
-			xText = x+width/2-textWidth/2;
-			yText = y+height/2+fontSize/3+2;
-			xTextLabel = x+width+fontSize/2;
-			yTextLabel = y+height/2+fontSize/3+2;
-		}
-	}
 
 	@Override
 	public void paint(Graphics g) {
 		visible = true;
-		textPosition(g);
-		
+
 		g.setColor((isHovered() ? colorHovered : color));
 		g.drawRect(x, y, width, height);
-		
+
 		g.setFont(new Font("Arial", Font.BOLD, fontSize));
-		
-		g.drawString(control.getKeyText(), xText, yText);
-		g.drawString(control.getControlName(), xTextLabel, yTextLabel);
+		int textWidth = g.getFontMetrics().stringWidth(control.getKeyText());
+
+		g.drawString(control.getKeyText(), x+width/2-textWidth/2, y+height/2+fontSize/3+2);
+
+		g.drawString(control.getControlName(), x+width+fontSize/2, y+height/2+fontSize/3+2);
 	}
 
 	public Controls getControlCode() {

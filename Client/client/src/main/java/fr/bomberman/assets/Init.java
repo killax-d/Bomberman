@@ -42,15 +42,15 @@ public class Init {
 		try(BufferedWriter bf = new BufferedWriter(new FileWriter(file))){
 			if(bf != null) {
 				
-				bf.write(String.format("%s:%s", "MUSIC", BufferedSound.MUSIC_VOLUME));
+				bf.write(String.format("%s : %s", "MUSIC", BufferedSound.MUSIC_VOLUME));
 				bf.newLine();
-				bf.write(String.format("%s:%s", "SFX", BufferedSound.SFX_VOLUME));
+				bf.write(String.format("%s : %s", "SFX", BufferedSound.SFX_VOLUME));
 				
 				for (String control : Controls.getControls().keySet()) {
 					Controls c = Controls.getControl(control);
 					if (c != null) {
 						bf.newLine();
-						bf.write(String.format("%s:%s", control, c.getKeyCode()));
+						bf.write(String.format("%s : %s // %s", control, c.getKeyCode(), c.getControlName()));
 					}
 				}
 			}
@@ -64,16 +64,17 @@ public class Init {
 			if(br != null) {
 				String line = "";
 				while((line = br.readLine()) != null) {
-					String[] args = line.split(":");
-					if(args.length == 2)
+					String[] args = line.split(" : ");
+					if(args.length >= 2)
 						if (line.startsWith("MUSIC"))
 							BufferedSound.setVolumeType(BufferedSound.MUSIC, Float.parseFloat(args[1]));
 						else if (line.startsWith("SFX"))
 							BufferedSound.setVolumeType(BufferedSound.SFX, Float.parseFloat(args[1]));
 						else
-							new Controls(args[0], Integer.parseInt(args[1]));
-					else
-						throw new Exception();
+							new Controls(args[0], args[1].split(" // ")[1], Integer.parseInt(args[1].split(" // ")[0]));
+					else {
+						System.err.println(String.format("Error while parsing .ini file"));
+					}
 						
 				}
 			}

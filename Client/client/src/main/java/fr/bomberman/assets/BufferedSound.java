@@ -140,7 +140,11 @@ public class BufferedSound {
 	public void setVolume(float volume) {
 	    if (volume < 0f || volume > 1f)
 	        throw new IllegalArgumentException("Volume invalide: " + volume);
-		FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);        
-	    gainControl.setValue(20f * (float) Math.log10(volume));
+	    if (clip.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
+	    	FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);        
+	    	gainControl.setValue(20f * (float) Math.log10(volume));
+	    }
+	    else
+	    	System.err.println("setVolume() method not supported");
 	}
 }
