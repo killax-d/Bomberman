@@ -79,8 +79,6 @@ public class GuiSettings extends Container implements MouseListener, MouseMotion
 				tmpKeyCode = ControlWaiting.getControlCode().getKeyCode();
 				ControlWaiting.setControleCode(-1);
 		}
-		music_volume.mouseClicked(e);
-		sfx_volume.mouseClicked(e);
 	}
 
 	@Override
@@ -111,7 +109,8 @@ public class GuiSettings extends Container implements MouseListener, MouseMotion
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		
+		music_volume.mousePressed(e);
+		sfx_volume.mousePressed(e);
 	}
 
 	@Override

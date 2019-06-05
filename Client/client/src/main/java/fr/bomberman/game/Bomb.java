@@ -217,7 +217,7 @@ public class Bomb extends Entity {
 	}
 	
 	private void end() {
-		if (!GuiIngame.instance.playerIsAlive() || GuiIngame.instance.getAlivePlayerCount() <= 1) {
+		if ((!GuiIngame.instance.playerIsAlive() || GuiIngame.instance.getAlivePlayerCount() <= 1) && !GameWindow.instance().isInDemoMode()) {
 			for(Bomb bomb : GuiIngame.instance.getBombs())
 				if(bomb != null)
 					bomb.cancelExplosion();
@@ -322,6 +322,7 @@ public class Bomb extends Entity {
 
 		blockedDir = new HashSet<EnumDirection>();
 		effectToAdd = new HashSet<Effect>();
+		
 		for (int i = 0; i < power; i++) {
 			bombCheck(EnumDirection.EST, x+i, y);
 			bombCheck(EnumDirection.WEST, x-i, y);
@@ -384,6 +385,7 @@ public class Bomb extends Entity {
 				}
 				map.setTileTypeAt(x, y, Map.TILE_FREE);
 				map.setTileTypeAt(next_position.getX(), next_position.getY(), Map.TILE_FREE);
+				killIfEntity(x, y);
 				if(GuiIngame.instance != null && !GuiIngame.instance.isPaused())
 					SFX_Explosion.play();
 				explode();

@@ -25,7 +25,7 @@ public class Item extends Entity {
 	public Item(Vec2D position, Map map) {
 		super(position, map);
 		dispawnClock = new Timer();
-		dispawnClock.schedule(dispawn(), 15000);
+		dispawnClock.schedule(dispawn(), 20000);
 	}
 	
 	protected void boostPlayer(EntityPlayer player) {

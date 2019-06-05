@@ -1,16 +1,23 @@
 package fr.bomberman.gui;
 
+import java.awt.Color;
 import java.awt.Container;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 
+import fr.bomberman.App;
 import fr.bomberman.assets.Assets;
 import fr.bomberman.assets.BufferedSound;
 
 public class GuiMainMenu extends Container implements MouseListener, MouseMotionListener {
+	
+	// Credit
+	private final String author = "Donné Dylan";
+	private String credit;
 	
 	// Image
 	private BufferedImage background = Assets.getImage("title_background.png");
@@ -39,6 +46,9 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 		music.setLoop(true);
 		music.setLoopPoint(14, -1);
 		music.play();
+		credit = String.format("Developed by %s\n"
+				+ "Version : %s",
+				author, App.version);
 	}
 
 	@Override
@@ -46,6 +56,18 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 		g.drawImage(background, 0, 0, getWidth(), getHeight(), null);
 		g.drawImage(title, 0, 0, getWidth(), getHeight(), null);
 		g.drawImage(character, 0, 0, getWidth(), getHeight(), null);
+
+
+		g.setColor(Color.WHITE);
+		g.setFont(new Font("Arial", Font.ITALIC, 25));
+		int i = 0;
+		for(String line : credit.split("\n")) {
+			if(line != null) {
+				int textWidth = g.getFontMetrics().stringWidth(line);
+				g.drawString(line, getWidth()-textWidth-15, getHeight()-i++*25-15);
+			}
+		}
+		
 		close.paint(g);
 		if (GameWindow.instance().isInDemoMode())
 			demo.setImage(demo_on_texture);

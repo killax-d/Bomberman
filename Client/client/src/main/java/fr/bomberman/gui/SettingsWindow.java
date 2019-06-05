@@ -13,6 +13,8 @@ import java.util.TimerTask;
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 
+import fr.bomberman.assets.Assets;
+import fr.bomberman.assets.BufferedSound;
 import fr.bomberman.assets.Init;
 import fr.bomberman.game.Controls;
 
@@ -21,6 +23,9 @@ public class SettingsWindow extends JFrame implements KeyListener, MouseListener
 	public static SettingsWindow window;
 	public final static int WIDTH = 600;
 	public final static int HEIGHT = 600;
+	
+	// Sound
+	private static final BufferedSound SFX_ImpossibleAction = Assets.getSound("sounds/impossible_action.wav", BufferedSound.SFX);
 	
 	private Timer clock;
 	
@@ -56,6 +61,8 @@ public class SettingsWindow extends JFrame implements KeyListener, MouseListener
 			stopClock();
 			setVisible(false);
 		}
+		else
+			SFX_ImpossibleAction.play();
 	}
 	
 	public static SettingsWindow instance() {

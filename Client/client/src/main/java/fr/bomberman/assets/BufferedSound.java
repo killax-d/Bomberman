@@ -95,6 +95,8 @@ public class BufferedSound {
 	 * Reset currentFrame to 0 to avoid glitch sound
 	 */
 	public void play(int frame) {
+		if(playing)
+			stop();
 		clip.setFramePosition(frame);
 		clip.start();
 		playing = true;
@@ -140,11 +142,5 @@ public class BufferedSound {
 	        throw new IllegalArgumentException("Volume invalide: " + volume);
 		FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);        
 	    gainControl.setValue(20f * (float) Math.log10(volume));
-	    if(playing) {
-		    int frame = clip.getFramePosition();
-		    stop();
-		    play(frame);
-	    }
-	    
 	}
 }

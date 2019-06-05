@@ -82,37 +82,41 @@ public class GuiSlider implements MouseListener, MouseMotionListener {
 			int x = event.getX()-50;
 			float value = (float)x/(float)(width);
 			int percent = (int) (value*100);
-			setValue(percent);
+			if(value >= 0.0 && value <= 1.0) {
+				setValue(percent);
+				BufferedSound.setVolumeType(type, value);
+				Assets.adjustVolume();
+			}
 		}
 	}
 
 	@Override
 	public void mouseClicked(MouseEvent event) {
-		editing = true;
-		if (visible && event.getY() >= y && event.getY() <= y + height) {
-			int x = event.getX()-50;
-			float value = (float)x/(float)(width);
-			int percent = (int) (value*100);
-			setValue(percent);
-		}
+		
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent event) {
-		
 		
 	}
 
 	@Override
 	public void mouseExited(MouseEvent event) {
 		
-		
 	}
 
 	@Override
 	public void mousePressed(MouseEvent event) {
-		
-		
+		if (visible && event.getX() >= x && event.getX() <= x + width && event.getY() >= y && event.getY() <= y + height) {
+			int x = event.getX()-50;
+			float value = (float)x/(float)(width);
+			int percent = (int) (value*100);
+			if(value >= 0.0 && value <= 1.0) {
+				setValue(percent);
+				BufferedSound.setVolumeType(type, value);
+				Assets.adjustVolume();
+			}
+		}
 	}
 
 	@Override

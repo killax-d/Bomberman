@@ -212,7 +212,7 @@ public abstract class Entity extends TimerTask {
 	}	
 	
 	private void end() {
-		if (!GuiIngame.instance.playerIsAlive() || GuiIngame.instance.getAlivePlayerCount() <= 1) {
+		if ((!GuiIngame.instance.playerIsAlive() || GuiIngame.instance.getAlivePlayerCount() <= 1) && !GameWindow.instance().isInDemoMode()) {
 			for(Bomb bomb : GuiIngame.instance.getBombs())
 				if(bomb != null)
 					bomb.cancelExplosion();

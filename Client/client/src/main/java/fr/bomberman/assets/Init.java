@@ -10,12 +10,15 @@ import java.io.IOException;
 import fr.bomberman.game.Controls;
 
 public class Init {
-
+	
+	private static String OS = System.getProperty("os.name").toLowerCase();
 	private static String path;
 	private static File file;
 	
 	public Init() {
-		path = System.getProperty("user.home").concat("\\.pokebomber\\");
+		path = System.getProperty("user.home").concat("/.pokebomber/");
+		if(OS.indexOf("win") >= 0)
+			path.replace("/", "\\");
 		file = new File(path.concat("pokebomber.ini"));
 		checkFile();
 	}
