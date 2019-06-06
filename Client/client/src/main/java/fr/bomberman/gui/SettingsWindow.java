@@ -38,7 +38,7 @@ public class SettingsWindow extends JFrame implements KeyListener, MouseListener
 		if (App.dg.isWindowTranslucencySupported(WindowTranslucency.TRANSLUCENT))
 			setBackground(new Color(0, 0, 0, 0.75F));
 		else {
-	    	System.err.println("Transparent background not supported, set Black background color instead");
+	    	System.err.println("Transparent background not supported, set BLACK background color instead");
 			setBackground(Color.BLACK);
 		}
 		setForeground(Color.WHITE);

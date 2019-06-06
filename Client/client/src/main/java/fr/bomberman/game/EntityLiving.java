@@ -1,11 +1,14 @@
 package fr.bomberman.game;
 
-import fr.bomberman.gui.GameWindow;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import fr.bomberman.gui.GuiIngame;
 import fr.bomberman.utils.Vec2D;
 
 public abstract class EntityLiving extends Entity {
 
+	private String name;
 	private int power;
 	private int bombCount;
 	private int bombPlaced;
@@ -17,27 +20,57 @@ public abstract class EntityLiving extends Entity {
 	private int team;
 	private int lives;
 	private boolean dead;
+	
+	private boolean invulnerable;
+	private Timer protectionTimer;
 
-	public EntityLiving(int power, int maxBomb, Map map, int x, int y, int team) {
+	public EntityLiving(String name, int power, int maxBomb, Map map, int x, int y, int team) {
 		super(new Vec2D(x, y), map, team);
+		this.invulnerable = false;
+		this.name = name;
 		this.team = team;
 		this.x = x;
 		this.y = y;
-		this.lives = GameWindow.getFields(GameWindow.Fields.LIVES.ordinal());
+		this.lives = GuiIngame.instance().getTotalLives();
 		setPower(power);
 		setBombCount(1);
 		spawn();
-		if (this instanceof EntityPlayer && GameWindow.instance().isInDemoMode())
+		if (this instanceof EntityPlayer && GuiIngame.instance().isInDemoMode())
 			gloves = true;
 		else
 			gloves = false;
 		master_bomb = false;
 	}
 	
+	public String getName() {
+		return name;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public boolean isInvulnerable() {
+		return invulnerable;
+	}
+
 	@Override
 	public void die() {
+		if(invulnerable)
+			return;
+		invulnerable = true;
 		if(--lives <= 0)
 			dead = true;
+		
+		protectionTimer = new Timer();
+		protectionTimer.schedule(new TimerTask() {
+
+			@Override
+			public void run() {
+				invulnerable = false;
+			}
+			
+		}, 1250);
 	}
 	
 	@Override

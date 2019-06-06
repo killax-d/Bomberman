@@ -13,7 +13,6 @@ import fr.bomberman.assets.BufferedSound;
 import fr.bomberman.gui.GameWindow;
 import fr.bomberman.gui.GuiIngame;
 import fr.bomberman.gui.GuiMainMenu;
-import fr.bomberman.gui.GuiSpinner;
 import fr.bomberman.utils.Vec2D;
 
 public class Bomb extends Entity {
@@ -51,9 +50,12 @@ public class Bomb extends Entity {
 	
 	private Timer animClock;
 	private Timer exploClock;
+	
+	private boolean teamMode;
 
 	public Bomb(EntityLiving player, boolean master, Map map, int team, CopyOnWriteArrayList<Effect> effects) {
 		super(player.getPosition(), map, team);
+		teamMode = GuiIngame.instance().isTeamMode();
 		master_bomb = master;
 		SFX_BombDrop.play();
 		this.player = player;
@@ -186,13 +188,6 @@ public class Bomb extends Entity {
 	private void killIfEntity(int x, int y) {
 		if(GuiIngame.instance == null)
 			return;
-		Set<Entity> entities = new HashSet<Entity>();
-		if(GuiIngame.instance.getEntities().size() > 1)
-			for (Entity entity : GuiIngame.instance.getEntities()) {
-				if(entity instanceof EntityLiving) {
-					entities.add((EntityLiving) entity);
-				}
-			}
 		for (Item item : GuiIngame.instance.getPowerups()) {
 			if (x == item.getPosition().getX() && y == item.getPosition().getY())
 				item.die();
@@ -204,13 +199,13 @@ public class Bomb extends Entity {
 					bomb.instantExplode();
 		}
 
-		boolean teamMode = GameWindow.getFields(GameWindow.Fields.TEAM.ordinal()) == GuiSpinner.TRUE ? true : false;
 		for (Entity entity : GuiIngame.instance.getEntitiesLiving()) {
 			if (x == entity.getPosition().getX() && y == entity.getPosition().getY()) {
 				if(player instanceof EntityPlayer)
 					entity.die();
-				if(player instanceof EntityAIPlayer && entity != player & (teamMode && entity != this && entity.getTeam() != team))
-					entity.die();
+				else if(player instanceof EntityAIPlayer && entity != player)
+					if(!teamMode || (teamMode && player.getTeam() != entity.getTeam()))
+						entity.die();
 				SFX_EntityDie.play();
 				end();
 			}
@@ -219,8 +214,20 @@ public class Bomb extends Entity {
 	}
 	
 	private void end() {
-		boolean teamMode = GameWindow.getFields(GameWindow.Fields.TEAM.ordinal()) == GuiSpinner.TRUE ? true : false;
-		if ((GameWindow.instance().isInDemoMode() && !GuiIngame.instance.playerIsAlive()) || ((!GuiIngame.instance.playerIsAlive() || (GuiIngame.instance.getAlivePlayerCount() <= 1 || (teamMode && GuiIngame.instance.getTeamLeft() <= 1))) && !GameWindow.instance().isInDemoMode())) {
+		GuiIngame game = GuiIngame.instance();
+		
+		if (game.playerIsAlive() && !GuiIngame.instance().isInDemoMode())
+			if (GuiIngame.instance.getAlivePlayerCount() <= 1)
+				game.setWinScreen(GuiIngame.VICTORY);
+			else if (teamMode && game.getTeamLeft() <= 1)
+				game.setWinScreen(GuiIngame.VICTORY);
+		else if (!game.playerIsAlive())
+			game.setWinScreen(GuiIngame.DEFEAT);
+		else
+			game.setWinScreen(GuiIngame.UNKNOW);
+			
+			
+		if(game.getWinScreen() != GuiIngame.UNKNOW) {
 			for(Bomb bomb : GuiIngame.instance.getBombs())
 				if(bomb != null)
 					bomb.cancelExplosion();
@@ -229,14 +236,8 @@ public class Bomb extends Entity {
 					item.die();
 					item.setState(Item.DISPAWNED);
 				}
-
-			if (((GuiIngame.instance.getAlivePlayerCount() <= 1 || (teamMode && GuiIngame.instance.getTeamLeft() <= 1)) && GuiIngame.instance.playerIsAlive()) || GuiIngame.instance.playerIsAlive())
-				GuiIngame.instance.setWinScreen(GuiIngame.VICTORY);
-			else
-				GuiIngame.instance.setWinScreen(GuiIngame.DEFEAT);
-			
 			new Timer().schedule(new TimerTask() {
-	
+		
 				@Override
 				public void run() {
 					if (GameWindow.instance().getCurrentGui() instanceof GuiIngame) {
@@ -246,7 +247,7 @@ public class Bomb extends Entity {
 						GuiIngame.instance = null;
 					}
 				}
-				
+					
 			}, 3000);
 		}
 	}

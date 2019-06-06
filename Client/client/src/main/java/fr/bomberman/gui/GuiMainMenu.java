@@ -44,7 +44,7 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 	
 	// Game Parameters
 	private GuiSpinner lives = new GuiSpinner("%d Live", 50, 150, 300, 50, 1, 5, GameWindow.getFields(GameWindow.Fields.LIVES.ordinal()), GameWindow.Fields.LIVES.ordinal());
-	private GuiSpinner AIPlayer = new GuiSpinner("%d AIPlayer", 50, 200, 300, 50, 1, 3, GameWindow.getFields(GameWindow.Fields.AIPLAYER.ordinal()), GameWindow.Fields.AIPLAYER.ordinal());
+	private GuiSpinner AIPlayer = new GuiSpinner("%d Player", 50, 200, 300, 50, 2, 4, GameWindow.getFields(GameWindow.Fields.AIPLAYER.ordinal()), GameWindow.Fields.AIPLAYER.ordinal());
 	private GuiSpinner team = new GuiSpinner("Team : %s", 50, 250, 300, 50, GuiSpinner.FALSE, GuiSpinner.TRUE, GameWindow.getFields(GameWindow.Fields.TEAM.ordinal()), GameWindow.Fields.TEAM.ordinal());
 	
 	public GuiMainMenu() {

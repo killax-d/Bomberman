@@ -12,9 +12,7 @@ import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
 import fr.bomberman.assets.Assets;
-import fr.bomberman.gui.GameWindow;
 import fr.bomberman.gui.GuiIngame;
-import fr.bomberman.gui.GuiSpinner;
 import fr.bomberman.utils.Vec2D;
 
 public class EntityAIPlayer extends EntityLiving {
@@ -25,10 +23,12 @@ public class EntityAIPlayer extends EntityLiving {
 	private GraphPath<String, DefaultEdge> path;
 	private ArrayList<Vec2D> pathVector;
 	private boolean customAction;
+	private boolean teamMode;
 	
 	public EntityAIPlayer(String name, Map map, int x, int y, int team) {
-		super(1, 1, map, x, y, team);
-		game = GuiIngame.instance;
+		super(name, 1, 1, map, x, y, team);
+		game = GuiIngame.instance();
+		teamMode = game.isTeamMode();
 		this.customAction = false;
 		this.setName(name);
 		this.pathVector = new ArrayList<Vec2D>();
@@ -39,8 +39,14 @@ public class EntityAIPlayer extends EntityLiving {
 		new Timer().scheduleAtFixedRate(moveWithPath(), 0, 150);
 	}
 
+	@Override
 	public String getName() {
 		return name;
+	}
+
+	@Override
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public BufferedImage getSprite() {
@@ -48,14 +54,9 @@ public class EntityAIPlayer extends EntityLiving {
 				direction.getID());
 	}
 	
-	public void setName(String name) {
-		this.name = name;
-	}
-	
 	public Vec2D getNearestEnnemy() {
 		Vec2D nearest = null;
 		Double near = null;
-		boolean teamMode = GameWindow.getFields(GameWindow.Fields.TEAM.ordinal()) == GuiSpinner.TRUE ? true : false;
 		for (Entity entity : game.getEntitiesLiving()) {
 			if (entity != this && (near == null || near > position.dist(entity.getPosition())))
 				if (!teamMode | (teamMode && entity.getTeam() != getTeam())) {
@@ -68,7 +69,6 @@ public class EntityAIPlayer extends EntityLiving {
 	
 	private boolean ennemyAround() {
 		boolean ennemyPresent = false;
-		boolean teamMode = GameWindow.getFields(GameWindow.Fields.TEAM.ordinal()) == GuiSpinner.TRUE ? true : false;
 		for (int x = -1; x < 2; x++) {
 			if (position.getX()+x >= 0 && position.getX()+x <= Map.MAP_WIDTH)
 				for(EntityLiving entity : game.getEntitiesLiving()) {

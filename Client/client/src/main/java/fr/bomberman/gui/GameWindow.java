@@ -77,6 +77,18 @@ public class GameWindow extends JFrame implements KeyListener, MouseListener, Mo
 		
 	}
 	
+	public int getTotalLives() {
+		return getFields(GameWindow.Fields.LIVES.ordinal());
+	}
+	
+	public int getTotalAIPlayer() {
+		return getFields(GameWindow.Fields.AIPLAYER.ordinal());
+	}
+	
+	public boolean isTeamMode() {
+		return getFields(GameWindow.Fields.TEAM.ordinal()) == GuiSpinner.TRUE ? true : false;
+	}
+	
 	// DEMO
 	public void switchDemo() {
 		if (demo)

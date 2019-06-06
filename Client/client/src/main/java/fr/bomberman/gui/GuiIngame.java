@@ -2,6 +2,7 @@ package fr.bomberman.gui;
 
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -27,6 +28,12 @@ import fr.bomberman.game.Map;
 public class GuiIngame extends Container implements KeyListener {
 
 	private int[][] spawns = new int[][] {{1,1}, {Map.MAP_WIDTH - 2, 1}, {1, Map.MAP_HEIGHT - 2}, {Map.MAP_WIDTH - 2, Map.MAP_HEIGHT - 2}};
+	
+	// Parameters for party
+	private boolean demo;
+	private int lives;
+	private int AIPlayer;
+	private boolean teamMode;
 	
 	// Tile images
 	private BufferedImage rock = Assets.getTile("map_tileset.png", 16, 16, 5, 3);
@@ -63,31 +70,61 @@ public class GuiIngame extends Container implements KeyListener {
 		SFX_BackgroundMusic.setLoop(true);
 		SFX_BackgroundMusic.play();
 		instance = this;
+		// parameters
+		teamMode = GameWindow.instance().isTeamMode();
+		lives = GameWindow.instance().getTotalLives();
+		AIPlayer = GameWindow.instance().getTotalAIPlayer();
+		demo = GameWindow.instance().isInDemoMode();
+		
 		gamePause = false;
 		this.map = new Map();
 		this.entities = new CopyOnWriteArrayList<Entity>();
 		this.effects = new CopyOnWriteArrayList<Effect>();
 		this.powerups = new CopyOnWriteArrayList<Item>();
-		boolean teamMode = GameWindow.getFields(GameWindow.Fields.TEAM.ordinal()) == GuiSpinner.TRUE ? true : false;
-		int players = GameWindow.getFields(GameWindow.Fields.AIPLAYER.ordinal())+1;
+		int players = GameWindow.getFields(GameWindow.Fields.AIPLAYER.ordinal());
 		this.player = new EntityPlayer("Player", map, spawns[0][0], spawns[0][1], 1);
-		for(int i = 1; i < GameWindow.getFields(GameWindow.Fields.AIPLAYER.ordinal())+1; i++) {
-			this.entities.add(new EntityAIPlayer("AI".concat("i"), map, spawns[i][0], spawns[i][1], (teamMode ? (players == 4 && i == 1 ? 1 : 0) : 0)));
+		for(int i = 1; i < players; i++) {
+			this.entities.add(new EntityAIPlayer("AIplayer".concat(String.valueOf(i)), map, spawns[i][0], spawns[i][1], (teamMode ? (players == 4 && i == 1 ? 1 : 0) : 0)));
 		}
 		this.entities.add(player);
 		typeWin = UNKNOW;
 	}
+	
+	public static GuiIngame instance() {
+		return instance;
+	}
+	
+	public int getWinScreen() {
+		return typeWin;
+	}
 
+	public boolean isInDemoMode() {
+		return demo;
+	}
+	
+	public int getTotalLives() {
+		return lives;
+	}
+	
+	public int getTotalAIPlayer() {
+		return AIPlayer;
+	}
+	
+	public boolean isTeamMode() {
+		return teamMode;
+	}
+	
+	
 	public boolean playerIsAlive() {
 		return !player.isDead();
 	}
 	
 	public int getTeamLeft() {
 		int team = 0;
-		int tmp = -1;
+		Set<Integer> tmp = new HashSet<Integer>();
 		for(EntityLiving entity : getEntitiesLiving()) {
-			if(entity != null && !entity.isDead() && tmp != entity.getTeam()) {
-				tmp = entity.getTeam();
+			if(entity != null && !entity.isDead() && !tmp.contains(entity.getTeam())) {
+				tmp.add(entity.getTeam());
 				team++;
 			}
 		}
@@ -125,6 +162,7 @@ public class GuiIngame extends Container implements KeyListener {
 		displayEndScreen(g);
 		if(GameWindow.getFields(GameWindow.Fields.LIVES.ordinal()) > 1)
 			displayLivesBar(g);
+		displayPlayerName(g);
 		super.paint(g);
 	}
 
@@ -244,15 +282,22 @@ public class GuiIngame extends Container implements KeyListener {
 			
 	}
 	
+	public void displayPlayerName(Graphics g) {
+		g.setFont(new Font("Arial", Font.BOLD, 20));
+		for (EntityLiving entity : getAlivePlayer()) {
+			g.setColor(entity == player ? Color.GREEN : Color.WHITE);
+			g.drawString(entity.getName(), entity.getDisplayX(), entity.getDisplayY()-15);
+		}
+	}
+	
 	public void displayLivesBar(Graphics g) {
-		int totalLife = GameWindow.getFields(GameWindow.Fields.LIVES.ordinal());
 		for (EntityLiving entity : getAlivePlayer()) {
 			g.setColor(Color.RED);
-			g.fillRect(entity.getDisplayX(), entity.getDisplayY()-15, 64, 10);
+			g.fillRect(entity.getDisplayX(), entity.getDisplayY()-10, 64, 10);
 			g.setColor(Color.GREEN);
-			g.fillRect(entity.getDisplayX(), entity.getDisplayY()-15, (entity.getLives() == totalLife ? 64 : (int) ((float) 64.0/ totalLife * entity.getLives())), 10);
+			g.fillRect(entity.getDisplayX(), entity.getDisplayY()-10, (entity.getLives() == getTotalLives() ? 64 : (int) ((float) 64.0/ getTotalLives() * entity.getLives())), 10);
 			g.setColor(Color.BLACK);
-			g.drawRect(entity.getDisplayX(), entity.getDisplayY()-15, 64, 10);
+			g.drawRect(entity.getDisplayX(), entity.getDisplayY()-10, 64, 10);
 		}
 	}
 

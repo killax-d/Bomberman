@@ -27,6 +27,9 @@ public class GuiSpinner implements MouseListener, MouseMotionListener {
 	private int max;
 	private int value;
 	private int type;
+	private boolean teamModePossible;
+	
+	private static int teamModeId = GameWindow.Fields.TEAM.ordinal();
 	
 	public GuiSpinner(String text, int x, int y, int width, int height, int min, int max, int value, int type) {
 		this.text = text;
@@ -40,6 +43,8 @@ public class GuiSpinner implements MouseListener, MouseMotionListener {
 		this.type = type;
 		visible = false;
 		spinners.add(this);
+		if (type == teamModeId)
+			teamModePossible = true;
 	}
 	
 	public int getType() {
@@ -53,6 +58,10 @@ public class GuiSpinner implements MouseListener, MouseMotionListener {
 		}
 		return null;
 	}
+	
+	public void setTeamModePossible(boolean teamMode) {
+		teamModePossible = teamMode;
+	}
 
 	public void setValue(int value) {
 		if (value < min)
@@ -63,15 +72,12 @@ public class GuiSpinner implements MouseListener, MouseMotionListener {
 			this.value = value;
 		
 		GameWindow.setFields(type, value);
-		if (type == GameWindow.Fields.AIPLAYER.ordinal() && GameWindow.getFields(GameWindow.Fields.TEAM.ordinal()) == TRUE && GameWindow.getFields(GameWindow.Fields.AIPLAYER.ordinal()) % 2 == 0) {
+		if (type == GameWindow.Fields.AIPLAYER.ordinal()) {
 			GuiSpinner spinner = null;
-			if ((spinner = getSpinner(GameWindow.Fields.TEAM.ordinal())) != null)
+			if ((spinner = getSpinner(GameWindow.Fields.TEAM.ordinal())) != null) {
 				spinner.setValue(FALSE);
-		}
-		if (type == GameWindow.Fields.TEAM.ordinal() && value == TRUE && GameWindow.getFields(GameWindow.Fields.AIPLAYER.ordinal()) % 2 == 0) {
-			GuiSpinner spinner = null;
-			if ((spinner = getSpinner(GameWindow.Fields.AIPLAYER.ordinal())) != null)
-				spinner.setValue(GameWindow.getFields(GameWindow.Fields.AIPLAYER.ordinal())-1);
+				spinner.setTeamModePossible((int) (value+1) % 2 == 0);
+			}
 		}
 	}
 	
@@ -88,11 +94,18 @@ public class GuiSpinner implements MouseListener, MouseMotionListener {
 		g.setColor(value > min ? Color.WHITE : Color.LIGHT_GRAY);
 		g.drawString("<" , x+25-arrowWidth/2, y+height/2+fontSize/3+2);
 		
-		g.setColor(value < max ? Color.LIGHT_GRAY : Color.BLACK);
+		
+		if (type == teamModeId & !teamModePossible)
+			g.setColor(Color.BLACK);
+		else
+			g.setColor(value < max ? Color.LIGHT_GRAY : Color.BLACK);
 		g.fillRect(x+width-50, y, 50, height);
 		g.setColor(Color.BLACK);
 		g.drawRect(x+width-50, y, 50, height);
-		g.setColor(value < max ? Color.WHITE : Color.LIGHT_GRAY);
+		if (type == teamModeId & !teamModePossible)
+			g.setColor(Color.LIGHT_GRAY);
+		else
+			g.setColor(value < max ? Color.WHITE : Color.LIGHT_GRAY);
 		g.drawString(">" , x+25+(width-50)-arrowWidth/2, y+height/2+fontSize/3+2);
 		
 		String label = "";
@@ -135,7 +148,8 @@ public class GuiSpinner implements MouseListener, MouseMotionListener {
 			if(event.getX() >= x && event.getX() <= x+50 && value > min)
 				setValue(--value);
 			else if(event.getX() >= x+width-50 && event.getX() <= x+width && value < max)
-				setValue(++value);
+				if(type != teamModeId | (type == teamModeId && teamModePossible))
+					setValue(++value);
 	}
 
 	@Override
