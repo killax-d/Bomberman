@@ -12,6 +12,7 @@ import java.awt.image.BufferedImage;
 import fr.bomberman.App;
 import fr.bomberman.assets.Assets;
 import fr.bomberman.assets.BufferedSound;
+import fr.bomberman.assets.Init;
 
 public class GuiMainMenu extends Container implements MouseListener, MouseMotionListener {
 	
@@ -119,6 +120,7 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 		lives.mouseClicked(event);
 		AIPlayer.mouseClicked(event);
 		team.mouseClicked(event);
+		Init.writeIniFile();
 	}
 
 	@Override

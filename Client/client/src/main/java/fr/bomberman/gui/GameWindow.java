@@ -19,7 +19,7 @@ public class GameWindow extends JFrame implements KeyListener, MouseListener, Mo
 	private static GameWindow window;
 	private static boolean demo = false;
 	private static int lives = 3;
-	private static int AIPlayer = 1;
+	private static int AIPlayer = 2;
 	private static int team = GuiSpinner.FALSE;
 	public static int WIDTH;
 	public static int HEIGHT;

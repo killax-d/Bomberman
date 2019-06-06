@@ -51,7 +51,7 @@ public class GuiSpinner implements MouseListener, MouseMotionListener {
 		return type;
 	}
 	
-	private static GuiSpinner getSpinner(int type) {
+	public static GuiSpinner getSpinner(int type) {
 		for (GuiSpinner spinner : spinners) {
 			if(spinner != null && spinner.getType() == type)
 				return spinner;
@@ -61,6 +61,7 @@ public class GuiSpinner implements MouseListener, MouseMotionListener {
 	
 	public void setTeamModePossible(boolean teamMode) {
 		teamModePossible = teamMode;
+		setValue(FALSE);
 	}
 
 	public void setValue(int value) {
@@ -75,8 +76,7 @@ public class GuiSpinner implements MouseListener, MouseMotionListener {
 		if (type == GameWindow.Fields.AIPLAYER.ordinal()) {
 			GuiSpinner spinner = null;
 			if ((spinner = getSpinner(GameWindow.Fields.TEAM.ordinal())) != null) {
-				spinner.setValue(FALSE);
-				spinner.setTeamModePossible((int) (value+1) % 2 == 0);
+				spinner.setTeamModePossible(value % 2 == 0);
 			}
 		}
 	}
