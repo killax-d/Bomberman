@@ -42,7 +42,7 @@ public class SettingsWindow extends JFrame implements KeyListener, MouseListener
 			setBackground(Color.BLACK);
 		}
 		setForeground(Color.WHITE);
-		getRootPane().setBorder(BorderFactory.createMatteBorder(4, 4, 4, 4, new Color(0.75F, 0.75F, 0.75F, 0.75F)));
+		getRootPane().setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, new Color(0.75F, 0.75F, 0.75F, 0.75F)));
 		setTitle(title);
 		setCurrentGui(new GuiSettings());
 		setSize(WIDTH, HEIGHT);

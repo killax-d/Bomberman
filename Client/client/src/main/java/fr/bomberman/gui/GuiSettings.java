@@ -36,7 +36,7 @@ public class GuiSettings extends Container implements MouseListener, MouseMotion
 	private BufferedImage close_texture = Assets.getImage("close.jpg");
 	
 	// button
-	private GuiButton close = new GuiButton(close_texture, 0, 0, 64, 32);
+	private GuiButton close = new GuiButton(close_texture, SettingsWindow.WIDTH-64, 0, 64, 32);
 	
 	
 	public GuiSettings() {

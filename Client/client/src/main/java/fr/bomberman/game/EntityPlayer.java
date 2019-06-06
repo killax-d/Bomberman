@@ -4,8 +4,8 @@ public class EntityPlayer extends EntityLiving {
 
 	private String name;
 
-	public EntityPlayer(String name, Map map, int x, int y) {
-		super(1, 1, map, x, y);
+	public EntityPlayer(String name, Map map, int x, int y, int team) {
+		super(1, 1, map, x, y, team);
 		this.setName(name);
 	}
 

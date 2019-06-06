@@ -23,7 +23,7 @@ public class Item extends Entity {
 	private int state;
 	
 	public Item(Vec2D position, Map map) {
-		super(position, map);
+		super(position, map, -1);
 		dispawnClock = new Timer();
 		dispawnClock.schedule(dispawn(), 20000);
 	}

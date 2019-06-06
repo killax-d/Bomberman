@@ -12,7 +12,9 @@ import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
 import fr.bomberman.assets.Assets;
+import fr.bomberman.gui.GameWindow;
 import fr.bomberman.gui.GuiIngame;
+import fr.bomberman.gui.GuiSpinner;
 import fr.bomberman.utils.Vec2D;
 
 public class EntityAIPlayer extends EntityLiving {
@@ -24,8 +26,8 @@ public class EntityAIPlayer extends EntityLiving {
 	private ArrayList<Vec2D> pathVector;
 	private boolean customAction;
 	
-	public EntityAIPlayer(String name, Map map, int x, int y) {
-		super(1, 1, map, x, y);
+	public EntityAIPlayer(String name, Map map, int x, int y, int team) {
+		super(1, 1, map, x, y, team);
 		game = GuiIngame.instance;
 		this.customAction = false;
 		this.setName(name);
@@ -42,7 +44,7 @@ public class EntityAIPlayer extends EntityLiving {
 	}
 
 	public BufferedImage getSprite() {
-		return Assets.getTile(String.format("skins/player_%d.png", skin_id), SPRITE_WIDTH/2, SPRITE_HEIGHT/2, this.frame,
+		return Assets.getTile(String.format("skins/player_%d.png", getTeam()), SPRITE_WIDTH/2, SPRITE_HEIGHT/2, this.frame,
 				direction.getID());
 	}
 	
@@ -53,21 +55,24 @@ public class EntityAIPlayer extends EntityLiving {
 	public Vec2D getNearestEnnemy() {
 		Vec2D nearest = null;
 		Double near = null;
+		boolean teamMode = GameWindow.getFields(GameWindow.Fields.TEAM.ordinal()) == GuiSpinner.TRUE ? true : false;
 		for (Entity entity : game.getEntitiesLiving()) {
-			if (entity != this && (near == null || near > position.dist(entity.getPosition()))) {
-				near = position.dist(entity.getPosition());
-				nearest = entity.getPosition();
-			}
+			if (entity != this && (near == null || near > position.dist(entity.getPosition())))
+				if (!teamMode | (teamMode && entity.getTeam() != getTeam())) {
+					near = position.dist(entity.getPosition());
+					nearest = entity.getPosition();
+				}
 		}
 		return nearest;
 	}
 	
 	private boolean ennemyAround() {
 		boolean ennemyPresent = false;
+		boolean teamMode = GameWindow.getFields(GameWindow.Fields.TEAM.ordinal()) == GuiSpinner.TRUE ? true : false;
 		for (int x = -1; x < 2; x++) {
 			if (position.getX()+x >= 0 && position.getX()+x <= Map.MAP_WIDTH)
 				for(EntityLiving entity : game.getEntitiesLiving()) {
-					if (entity != this)
+					if ((entity != this && !teamMode) | (teamMode && entity != this && entity.getTeam() != getTeam()))
 						if (position.getX()+x == entity.getPosition().getX())
 							ennemyPresent = true;
 				}
@@ -76,7 +81,7 @@ public class EntityAIPlayer extends EntityLiving {
 		for (int y = -1; y < 2; y++) {
 			if (position.getY()+y >= 0 && position.getY()+y <= Map.MAP_HEIGHT)
 				for(EntityLiving entity : game.getEntitiesLiving()) {
-					if (entity != this)
+					if ((entity != this && !teamMode) | (teamMode && entity != this && entity.getTeam() != getTeam()))
 						if (position.getY()+y == entity.getPosition().getY() && entity != this)
 							ennemyPresent = true;
 				}
@@ -139,7 +144,7 @@ public class EntityAIPlayer extends EntityLiving {
 		TimerTask task = new TimerTask() {
 			@Override
 			public void run() {
-				if (GuiIngame.instance == null || dead) {
+				if (GuiIngame.instance == null || isDead()) {
 					this.cancel();
 				}
 				if(GuiIngame.instance != null && GuiIngame.instance.isPaused())
@@ -203,7 +208,7 @@ public class EntityAIPlayer extends EntityLiving {
 	
 	private void placeBomb(Vec2D point) {
 		if(canPlaceBomb() && isFreeCell(position) && isFreeCell(point)) {
-			game.getEntities().add(new Bomb(this, this.hasMasterBomb(), map, game.getEffects()));
+			game.getEntities().add(new Bomb(this, this.hasMasterBomb(), map, getTeam(), game.getEffects()));
 			addBombPlaced();
 		}
 		
@@ -218,7 +223,7 @@ public class EntityAIPlayer extends EntityLiving {
 				if (ennemyAround()) {
 					placeBomb(entity.getPosition());
 				}
-				if (GuiIngame.instance == null || dead) {
+				if (GuiIngame.instance == null || isDead()) {
 					this.cancel();
 				}
 				if(GuiIngame.instance != null && GuiIngame.instance.isPaused())

@@ -18,8 +18,15 @@ public class GameWindow extends JFrame implements KeyListener, MouseListener, Mo
 
 	private static GameWindow window;
 	private static boolean demo = false;
+	private static int lives = 3;
+	private static int AIPlayer = 1;
+	private static int team = GuiSpinner.FALSE;
 	public static int WIDTH;
 	public static int HEIGHT;
+	
+	public static enum Fields{
+		LIVES, AIPLAYER, TEAM;
+	}
 	
 	private GameWindow(String title, int width, int height) {
 		WIDTH = width;
@@ -38,6 +45,36 @@ public class GameWindow extends JFrame implements KeyListener, MouseListener, Mo
 		addMouseListener(this);
 		addKeyListener(this);
 		addMouseMotionListener(this);
+	}
+	
+	public static void setFields(int type, int value){
+	    switch (Fields.values()[type]) {
+	    	case LIVES:
+	    		lives = value;
+	    		break;
+	    	case AIPLAYER:
+	    		AIPlayer = value;
+	    		break;
+	    	case TEAM:
+	    		team = value;
+	    		break;
+	    	default:
+	    		break;
+	    }
+	}
+	
+	public static int getFields(int type){
+	    switch (Fields.values()[type]) {
+	    	case LIVES:
+	    		return lives;
+	    	case AIPLAYER:
+	    		return AIPlayer;
+	    	case TEAM:
+	    		return team;
+	    	default:
+	    		return 0;
+	    }
+		
 	}
 	
 	// DEMO

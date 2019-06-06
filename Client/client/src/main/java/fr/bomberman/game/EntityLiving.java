@@ -14,11 +14,16 @@ public abstract class EntityLiving extends Entity {
 	private int y;
 	private boolean gloves;
 	private boolean master_bomb;
+	private int team;
+	private int lives;
+	private boolean dead;
 
-	public EntityLiving(int power, int maxBomb, Map map, int x, int y) {
-		super(new Vec2D(x, y), map);
+	public EntityLiving(int power, int maxBomb, Map map, int x, int y, int team) {
+		super(new Vec2D(x, y), map, team);
+		this.team = team;
 		this.x = x;
 		this.y = y;
+		this.lives = GameWindow.getFields(GameWindow.Fields.LIVES.ordinal());
 		setPower(power);
 		setBombCount(1);
 		spawn();
@@ -27,6 +32,21 @@ public abstract class EntityLiving extends Entity {
 		else
 			gloves = false;
 		master_bomb = false;
+	}
+	
+	@Override
+	public void die() {
+		if(--lives <= 0)
+			dead = true;
+	}
+	
+	@Override
+	public boolean isDead() {
+		return dead;
+	}
+	
+	public int getLives() {
+		return lives;
 	}
 	
 	private void spawn() {
@@ -40,6 +60,11 @@ public abstract class EntityLiving extends Entity {
 				if(map.getTileTypeAt(x, this.y+y) == Map.PLANT_TILE)
 					map.setTileTypeAt(x, this.y+y, Map.TILE_FREE);
 		}
+	}
+	
+	@Override
+	public int getTeam() {
+		return team;
 	}
 
 	public boolean canPlaceBomb() {

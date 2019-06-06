@@ -9,6 +9,7 @@ import fr.bomberman.assets.BufferedSound;
 import fr.bomberman.gui.GameWindow;
 import fr.bomberman.gui.GuiIngame;
 import fr.bomberman.gui.GuiMainMenu;
+import fr.bomberman.gui.GuiSpinner;
 import fr.bomberman.utils.Vec2D;
 
 public abstract class Entity extends TimerTask {
@@ -27,23 +28,29 @@ public abstract class Entity extends TimerTask {
 	protected int skin_id = 0;
 	protected Vec2D position;
 	protected Vec2D next_position;
+	protected int team;
 	protected boolean dead;
 	
 	protected double speed = 1.0;
 
-	public Entity(Vec2D position, Map map) {
+	public Entity(Vec2D position, Map map, int team) {
 		this.position = position;
 		this.next_position = new Vec2D(position.getX(), position.getY());
 		this.direction = EnumDirection.SOUTH;
 		this.frame = 0;
 		this.skin_id = 1;
+		this.team = team;
 		setMap(map);
 		this.dead = false;
 		if (this instanceof EntityLiving) {
 			new Timer().scheduleAtFixedRate(this, 0, 20);
 		}
 	}
-
+	
+	public int getTeam() {
+		return team;
+	}
+	
 	public int getDisplayX() {
 		return (int) (position.getX() * Map.TILE_SCALE);
 	}
@@ -192,19 +199,22 @@ public abstract class Entity extends TimerTask {
 						&& next_position.getY() == effect.getPosition().getY()
 						&& effect instanceof EffectTrail) {
 						EntityLiving player = ((EffectTrail) effect).getOwnerPlayer();
-						
-						if((this instanceof EntityPlayer && player == this) || (this instanceof EntityLiving && player != this)) {
-							Entity entity = this;
-							new Timer().schedule(new TimerTask() {
 
-								@Override
-								public void run() {
-									entity.die();
-									end();
-								}
-								
-							}, 250);
-							SFX_EntityDie.play();
+						boolean teamMode = GameWindow.getFields(GameWindow.Fields.TEAM.ordinal()) == GuiSpinner.TRUE ? true : false;
+						if((this instanceof EntityPlayer && player == this) || (this instanceof EntityLiving && player != this)) {
+							EntityLiving entity = (EntityLiving) this;
+							if (teamMode && player != entity && player.getTeam() != entity.getTeam()) {
+								new Timer().schedule(new TimerTask() {
+	
+									@Override
+									public void run() {
+										entity.die();
+										end();
+									}
+									
+								}, 250);
+								SFX_EntityDie.play();
+							}
 						}
 					}
 			}
@@ -212,8 +222,9 @@ public abstract class Entity extends TimerTask {
 	}	
 	
 	private void end() {
-		if ((!GuiIngame.instance.playerIsAlive() || GuiIngame.instance.getAlivePlayerCount() <= 1) && !GameWindow.instance().isInDemoMode()) {
-			for(Bomb bomb : GuiIngame.instance.getBombs())
+		boolean teamMode = GameWindow.getFields(GameWindow.Fields.TEAM.ordinal()) == GuiSpinner.TRUE ? true : false;
+		if ((GameWindow.instance().isInDemoMode() && !GuiIngame.instance.playerIsAlive()) || ((!GuiIngame.instance.playerIsAlive() || (GuiIngame.instance.getAlivePlayerCount() <= 1 || (teamMode && GuiIngame.instance.getTeamLeft() <= 1))) && !GameWindow.instance().isInDemoMode())) {
+				for(Bomb bomb : GuiIngame.instance.getBombs())
 				if(bomb != null)
 					bomb.cancelExplosion();
 			for(Item item : GuiIngame.instance.getItems())
@@ -221,12 +232,11 @@ public abstract class Entity extends TimerTask {
 					item.die();
 					item.setState(Item.DISPAWNED);
 				}
-			
-			if ((GuiIngame.instance.getAlivePlayerCount() <= 1 && GuiIngame.instance.playerIsAlive()) || GuiIngame.instance.playerIsAlive())
+			if ((GuiIngame.instance.getAlivePlayerCount() <= 1 || (teamMode && GuiIngame.instance.getTeamLeft() <= 1)) && (GuiIngame.instance.getAlivePlayerCount() <= 1 && GuiIngame.instance.playerIsAlive()) || GuiIngame.instance.playerIsAlive())
 				GuiIngame.instance.setWinScreen(GuiIngame.VICTORY);
 			else
 				GuiIngame.instance.setWinScreen(GuiIngame.DEFEAT);
-			
+
 			new Timer().schedule(new TimerTask() {
 	
 				@Override

@@ -39,9 +39,14 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 	private GuiButton settings = new GuiButton(settings_texture, GameWindow.WIDTH/2-64, GameWindow.HEIGHT/2-32, 128, 64);
 	private GuiButton play = new GuiButton(one_player, GameWindow.WIDTH/2-64, GameWindow.HEIGHT/2+32, 128, 64);
 	private GuiButton resume = new GuiButton(resume_texture,  GameWindow.WIDTH/2-64, GameWindow.HEIGHT/2+96, 128, 64);
-	private GuiButton close = new GuiButton(close_texture, 0, 0, 64, 32);
-	private GuiButton demo = new GuiButton(demo_off_texture, 50, GameWindow.HEIGHT-(640+50), 640, 640);
-
+	private GuiButton close = new GuiButton(close_texture, GameWindow.WIDTH-64, 0, 64, 32);
+	private GuiButton demo = new GuiButton(demo_off_texture, 50, GameWindow.HEIGHT-(480+50), 480, 480);
+	
+	// Game Parameters
+	private GuiSpinner lives = new GuiSpinner("%d Live", 50, 150, 300, 50, 1, 5, GameWindow.getFields(GameWindow.Fields.LIVES.ordinal()), GameWindow.Fields.LIVES.ordinal());
+	private GuiSpinner AIPlayer = new GuiSpinner("%d AIPlayer", 50, 200, 300, 50, 1, 3, GameWindow.getFields(GameWindow.Fields.AIPLAYER.ordinal()), GameWindow.Fields.AIPLAYER.ordinal());
+	private GuiSpinner team = new GuiSpinner("Team : %s", 50, 250, 300, 50, GuiSpinner.FALSE, GuiSpinner.TRUE, GameWindow.getFields(GameWindow.Fields.TEAM.ordinal()), GameWindow.Fields.TEAM.ordinal());
+	
 	public GuiMainMenu() {
 		music.setLoop(true);
 		music.setLoopPoint(14, -1);
@@ -76,6 +81,9 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 		if (GuiIngame.instance != null)
 			resume.paint(g);
 		play.paint(g);
+		lives.paint(g);
+		AIPlayer.paint(g);
+		team.paint(g);
 		super.paint(g);
 	}
 
@@ -108,6 +116,9 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 		if (settings.isHovered()) {
 			SettingsWindow.instance();
 		}
+		lives.mouseClicked(event);
+		AIPlayer.mouseClicked(event);
+		team.mouseClicked(event);
 	}
 
 	@Override

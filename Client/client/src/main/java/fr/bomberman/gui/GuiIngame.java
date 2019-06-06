@@ -1,5 +1,6 @@
 package fr.bomberman.gui;
 
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
@@ -25,6 +26,8 @@ import fr.bomberman.game.Map;
 
 public class GuiIngame extends Container implements KeyListener {
 
+	private int[][] spawns = new int[][] {{1,1}, {Map.MAP_WIDTH - 2, 1}, {1, Map.MAP_HEIGHT - 2}, {Map.MAP_WIDTH - 2, Map.MAP_HEIGHT - 2}};
+	
 	// Tile images
 	private BufferedImage rock = Assets.getTile("map_tileset.png", 16, 16, 5, 3);
 	private BufferedImage plant = Assets.getTile("map_tileset.png", 16, 16, 6, 3);
@@ -42,9 +45,6 @@ public class GuiIngame extends Container implements KeyListener {
 	
 	private Map map;
 	private EntityPlayer player;
-	private EntityAIPlayer AIplayer1;
-	private EntityAIPlayer AIplayer2;
-	private EntityAIPlayer AIplayer3;
 	private boolean gamePause;
 
 	// ENDSCREEN
@@ -68,19 +68,30 @@ public class GuiIngame extends Container implements KeyListener {
 		this.entities = new CopyOnWriteArrayList<Entity>();
 		this.effects = new CopyOnWriteArrayList<Effect>();
 		this.powerups = new CopyOnWriteArrayList<Item>();
-		this.player = new EntityPlayer("Player", map, 1, 1);
-		this.AIplayer1 = new EntityAIPlayer("AI1", map, Map.MAP_WIDTH - 2, 1);
-		this.AIplayer2 = new EntityAIPlayer("AI2", map, 1, Map.MAP_HEIGHT - 2);
-		this.AIplayer3 = new EntityAIPlayer("AI3", map, Map.MAP_WIDTH - 2, Map.MAP_HEIGHT - 2);
+		boolean teamMode = GameWindow.getFields(GameWindow.Fields.TEAM.ordinal()) == GuiSpinner.TRUE ? true : false;
+		int players = GameWindow.getFields(GameWindow.Fields.AIPLAYER.ordinal())+1;
+		this.player = new EntityPlayer("Player", map, spawns[0][0], spawns[0][1], 1);
+		for(int i = 1; i < GameWindow.getFields(GameWindow.Fields.AIPLAYER.ordinal())+1; i++) {
+			this.entities.add(new EntityAIPlayer("AI".concat("i"), map, spawns[i][0], spawns[i][1], (teamMode ? (players == 4 && i == 1 ? 1 : 0) : 0)));
+		}
 		this.entities.add(player);
-		this.entities.add(AIplayer1);
-		this.entities.add(AIplayer2);
-		this.entities.add(AIplayer3);
 		typeWin = UNKNOW;
 	}
 
 	public boolean playerIsAlive() {
 		return !player.isDead();
+	}
+	
+	public int getTeamLeft() {
+		int team = 0;
+		int tmp = -1;
+		for(EntityLiving entity : getEntitiesLiving()) {
+			if(entity != null && !entity.isDead() && tmp != entity.getTeam()) {
+				tmp = entity.getTeam();
+				team++;
+			}
+		}
+		return team;
 	}
 	
 	public void pause() {
@@ -112,6 +123,8 @@ public class GuiIngame extends Container implements KeyListener {
 		drawEffects(g);
 		drawPowerups(g);
 		displayEndScreen(g);
+		if(GameWindow.getFields(GameWindow.Fields.LIVES.ordinal()) > 1)
+			displayLivesBar(g);
 		super.paint(g);
 	}
 
@@ -204,7 +217,7 @@ public class GuiIngame extends Container implements KeyListener {
 					SFX_ImpossibleAction.play();
 				}
 				else {
-					entities.add(new Bomb(player, player.hasMasterBomb(), map, effects));
+					entities.add(new Bomb(player, player.hasMasterBomb(), map, player.getTeam(), effects));
 					player.addBombPlaced();
 				}
 		}
@@ -230,6 +243,18 @@ public class GuiIngame extends Container implements KeyListener {
 				g.drawImage(defeat_screen, 0, 0, getWidth(), getHeight(), null);
 			
 	}
+	
+	public void displayLivesBar(Graphics g) {
+		int totalLife = GameWindow.getFields(GameWindow.Fields.LIVES.ordinal());
+		for (EntityLiving entity : getAlivePlayer()) {
+			g.setColor(Color.RED);
+			g.fillRect(entity.getDisplayX(), entity.getDisplayY()-15, 64, 10);
+			g.setColor(Color.GREEN);
+			g.fillRect(entity.getDisplayX(), entity.getDisplayY()-15, (entity.getLives() == totalLife ? 64 : (int) ((float) 64.0/ totalLife * entity.getLives())), 10);
+			g.setColor(Color.BLACK);
+			g.drawRect(entity.getDisplayX(), entity.getDisplayY()-15, 64, 10);
+		}
+	}
 
 	private void drawEntities(Graphics g) {
 		Set<Entity> entityToDisplay = new HashSet<Entity>();
@@ -239,7 +264,7 @@ public class GuiIngame extends Container implements KeyListener {
 				entityToRemove.add((Bomb) entity);
 			}
 			else if(!(entity instanceof Bomb) && entity.isDead()) {
-				entityToRemove.add((Bomb) entity);
+				entityToRemove.add((Entity) entity);
 			}
 			else
 				entityToDisplay.add(entity);

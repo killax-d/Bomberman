@@ -31,7 +31,7 @@ public class EffectTrail extends Effect {
 		this.frame = 0;
 		this.skin_id = 0;
 		this.state = EFFECT_WAITING;
-		new Timer().schedule(this.remove(), 1500);
+		new Timer().schedule(this.remove(), 1000);
 	}
 	
 	public EntityLiving getOwnerPlayer() {
