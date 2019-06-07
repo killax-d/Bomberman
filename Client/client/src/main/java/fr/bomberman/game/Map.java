@@ -2,6 +2,7 @@ package fr.bomberman.game;
 
 import java.util.Random;
 
+import fr.bomberman.gui.GuiIngame;
 import fr.bomberman.utils.Vec2D;
 
 public class Map {
@@ -15,10 +16,13 @@ public class Map {
 	public static final int MAP_WIDTH = 25;
 	public static final int MAP_HEIGHT = 15;
 	public static final int TILE_SCALE = 64;
+	
+	private int plantChance;
 
 	private int[][] map;
 
 	public Map() {
+		this.plantChance = GuiIngame.instance().getPlantChance();
 		this.map = new int[MAP_WIDTH][MAP_HEIGHT];
 		generateMap();
 	}
@@ -37,7 +41,7 @@ public class Map {
 					int r = rand.nextInt(100);
 					if (r < 5) {
 						map[i][j] = FLOWER_TILE;
-					} else if (r < 40) {
+					} else if (r < plantChance) {
 						map[i][j] = PLANT_TILE;
 					}
 				}

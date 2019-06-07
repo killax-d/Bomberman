@@ -9,6 +9,7 @@ import java.io.IOException;
 
 import fr.bomberman.game.Controls;
 import fr.bomberman.gui.GameWindow;
+import fr.bomberman.gui.GuiSlider;
 import fr.bomberman.gui.GuiSpinner;
 
 public class Init {
@@ -53,6 +54,10 @@ public class Init {
 				bf.write(String.format("%s : %s", "AIPLAYER", GameWindow.getFields(GameWindow.Fields.AIPLAYER.ordinal())));
 				bf.newLine();
 				bf.write(String.format("%s : %s", "TEAM", GameWindow.getFields(GameWindow.Fields.TEAM.ordinal())));
+				bf.newLine();
+				bf.write(String.format("%s : %s", "PLANT", GameWindow.getFields(GameWindow.Fields.PLANT_CHANCE.ordinal())));
+				bf.newLine();
+				bf.write(String.format("%s : %s", "ITEM", GameWindow.getFields(GameWindow.Fields.ITEM_CHANCE.ordinal())));
 				
 				for (String control : Controls.getControls().keySet()) {
 					Controls c = Controls.getControl(control);
@@ -84,6 +89,10 @@ public class Init {
 							GuiSpinner.getSpinner(GameWindow.Fields.AIPLAYER.ordinal()).setValue(Integer.valueOf(args[1]));
 						else if (line.startsWith("TEAM"))
 							GuiSpinner.getSpinner(GameWindow.Fields.TEAM.ordinal()).setValue(Integer.valueOf(args[1]));
+						else if (line.startsWith("PLANT"))
+							GuiSlider.getSlider(GameWindow.Fields.PLANT_CHANCE.ordinal()).setValue(Integer.valueOf(args[1]));
+						else if (line.startsWith("ITEM"))
+							GuiSlider.getSlider(GameWindow.Fields.ITEM_CHANCE.ordinal()).setValue(Integer.valueOf(args[1]));
 						else
 							new Controls(args[0], args[1].split(" // ")[1], Integer.parseInt(args[1].split(" // ")[0]));
 					else {

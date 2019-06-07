@@ -21,11 +21,13 @@ public class GameWindow extends JFrame implements KeyListener, MouseListener, Mo
 	private static int lives = 3;
 	private static int AIPlayer = 2;
 	private static int team = GuiSpinner.FALSE;
+	private static int plantChance = 70;
+	private static int itemChance = 50;
 	public static int WIDTH;
 	public static int HEIGHT;
 	
 	public static enum Fields{
-		LIVES, AIPLAYER, TEAM;
+		LIVES, AIPLAYER, TEAM, PLANT_CHANCE, ITEM_CHANCE;
 	}
 	
 	private GameWindow(String title, int width, int height) {
@@ -58,6 +60,12 @@ public class GameWindow extends JFrame implements KeyListener, MouseListener, Mo
 	    	case TEAM:
 	    		team = value;
 	    		break;
+	    	case PLANT_CHANCE:
+	    		plantChance = value;
+	    		break;
+	    	case ITEM_CHANCE:
+	    		itemChance = value;
+	    		break;
 	    	default:
 	    		break;
 	    }
@@ -71,6 +79,10 @@ public class GameWindow extends JFrame implements KeyListener, MouseListener, Mo
 	    		return AIPlayer;
 	    	case TEAM:
 	    		return team;
+	    	case PLANT_CHANCE:
+	    		return plantChance;
+	    	case ITEM_CHANCE:
+	    		return itemChance;
 	    	default:
 	    		return 0;
 	    }
@@ -87,6 +99,14 @@ public class GameWindow extends JFrame implements KeyListener, MouseListener, Mo
 	
 	public boolean isTeamMode() {
 		return getFields(GameWindow.Fields.TEAM.ordinal()) == GuiSpinner.TRUE ? true : false;
+	}
+	
+	public int getPlantChance() {
+		return getFields(GameWindow.Fields.PLANT_CHANCE.ordinal());
+	}
+	
+	public int getItemChance() {
+		return getFields(GameWindow.Fields.ITEM_CHANCE.ordinal());
 	}
 	
 	// DEMO

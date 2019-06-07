@@ -34,6 +34,8 @@ public class GuiIngame extends Container implements KeyListener {
 	private int lives;
 	private int AIPlayer;
 	private boolean teamMode;
+	private int plantChance;
+	private int itemChance;
 	
 	// Tile images
 	private BufferedImage rock = Assets.getTile("map_tileset.png", 16, 16, 5, 3);
@@ -75,6 +77,8 @@ public class GuiIngame extends Container implements KeyListener {
 		lives = GameWindow.instance().getTotalLives();
 		AIPlayer = GameWindow.instance().getTotalAIPlayer();
 		demo = GameWindow.instance().isInDemoMode();
+		plantChance = GameWindow.instance().getPlantChance();
+		itemChance = GameWindow.instance().getItemChance();
 		
 		gamePause = false;
 		this.map = new Map();
@@ -114,6 +118,13 @@ public class GuiIngame extends Container implements KeyListener {
 		return teamMode;
 	}
 	
+	public int getPlantChance() {
+		return plantChance;
+	}
+	
+	public int getItemChance() {
+		return itemChance;
+	}
 	
 	public boolean playerIsAlive() {
 		return !player.isDead();
@@ -285,6 +296,8 @@ public class GuiIngame extends Container implements KeyListener {
 	public void displayPlayerName(Graphics g) {
 		g.setFont(new Font("Arial", Font.BOLD, 20));
 		for (EntityLiving entity : getAlivePlayer()) {
+			g.setColor(Color.BLACK);
+			g.drawString(entity.getName(), entity.getDisplayX()-2, entity.getDisplayY()-15-2);
 			g.setColor(entity == player ? Color.GREEN : Color.WHITE);
 			g.drawString(entity.getName(), entity.getDisplayX(), entity.getDisplayY()-15);
 		}

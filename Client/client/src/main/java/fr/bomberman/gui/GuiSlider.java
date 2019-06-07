@@ -6,13 +6,20 @@ import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.HashSet;
+import java.util.Set;
 
 import fr.bomberman.assets.Assets;
 import fr.bomberman.assets.BufferedSound;
 
 public class GuiSlider implements MouseListener, MouseMotionListener {
 
+	private static Set<GuiSlider> sliders = new HashSet<GuiSlider>();
 	private final static int fontSize = 26;
+	
+	public static enum Theme {
+		LIGHT, DARK;
+	}
 	
 	private boolean visible;
 	private boolean hovered;
@@ -26,8 +33,9 @@ public class GuiSlider implements MouseListener, MouseMotionListener {
 	private int value;
 	private int type;
 	private boolean editing;
+	private int theme;
 	
-	public GuiSlider(String text, int x, int y, int width, int height, int min, int max, int value, int type) {
+	public GuiSlider(String text, int x, int y, int width, int height, int min, int max, int value, int type, int theme) {
 		this.text = text;
 		this.x = x;
 		this.y = y;
@@ -39,6 +47,39 @@ public class GuiSlider implements MouseListener, MouseMotionListener {
 		this.type = type;
 		editing = false;
 		visible = false;
+		this.theme = theme;
+		sliders.add(this);
+	}
+	
+	public GuiSlider(String text, int x, int y, int width, int height, int min, int max, int value, int type) {
+		this(text, x, y, width, height, min, max, value, type, 0);
+	}
+	
+	public static GuiSlider getSlider(int type) {
+		for (GuiSlider slider : sliders) {
+			if(slider != null && slider.getType() == type)
+				return slider;
+		}
+		return null;
+	}
+
+	public int getTheme(int id) {
+		return theme;
+	}
+	
+	public int getThemeType(int id) {
+	    switch (Theme.values()[id]) {
+	    	case LIGHT:
+	    		return 0;
+	    	case DARK:
+	    		return 1;
+	    	default:
+	    		return 0;
+	    }
+	}
+	
+	public int getType() {
+		return type;
 	}
 
 	public void setValue(int value) {
@@ -48,6 +89,8 @@ public class GuiSlider implements MouseListener, MouseMotionListener {
 			this.value = max;
 		else
 			this.value = value;
+		if(type == GameWindow.Fields.PLANT_CHANCE.ordinal() || type == GameWindow.Fields.ITEM_CHANCE.ordinal())
+			GameWindow.setFields(type, value);
 	}
 	
 	public void paint(Graphics g) {
@@ -55,11 +98,12 @@ public class GuiSlider implements MouseListener, MouseMotionListener {
 		g.setFont(new Font("Arial", Font.BOLD, fontSize));
 		int textWidth = g.getFontMetrics().stringWidth(text);
 
-		g.drawString(String.format(text, value).concat("%") , x+width/2-textWidth/2, y+height/2+fontSize/3+2);
-
-		g.setColor(Color.WHITE);
+		g.setColor(theme == getThemeType(Theme.LIGHT.ordinal()) ? Color.WHITE : Color.BLACK);
 		g.drawRect(x, y, width, height);
 		g.fillRect(x, y, (width/100)*value, height);
+
+		g.setColor(theme == getThemeType(Theme.LIGHT.ordinal()) ? Color.BLACK : Color.WHITE);
+		g.drawString(String.format(text, value).concat("%") , x+width/2-textWidth/2, y+height/2+fontSize/3+2);
 	}
 	
 	public boolean isHovered() {
@@ -84,8 +128,12 @@ public class GuiSlider implements MouseListener, MouseMotionListener {
 			int percent = (int) (value*100);
 			if(value >= 0.0 && value <= 1.0) {
 				setValue(percent);
-				BufferedSound.setVolumeType(type, value);
-				Assets.adjustVolume();
+				if(type == BufferedSound.MUSIC || type == BufferedSound.MUSIC) {
+					BufferedSound.setVolumeType(type, value);
+					Assets.adjustVolume();
+				}
+				else
+					GameWindow.setFields(type, percent);
 			}
 		}
 	}
@@ -113,8 +161,12 @@ public class GuiSlider implements MouseListener, MouseMotionListener {
 			int percent = (int) (value*100);
 			if(value >= 0.0 && value <= 1.0) {
 				setValue(percent);
-				BufferedSound.setVolumeType(type, value);
-				Assets.adjustVolume();
+				if(type == BufferedSound.MUSIC || type == BufferedSound.MUSIC) {
+					BufferedSound.setVolumeType(type, value);
+					Assets.adjustVolume();
+				}
+				else
+					GameWindow.setFields(type, percent);
 			}
 		}
 	}
@@ -122,8 +174,12 @@ public class GuiSlider implements MouseListener, MouseMotionListener {
 	@Override
 	public void mouseReleased(MouseEvent event) {
 		if(editing) {
-			BufferedSound.setVolumeType(type, (float) value/100);
-			Assets.adjustVolume();
+			if(type == BufferedSound.MUSIC || type == BufferedSound.MUSIC) {
+				BufferedSound.setVolumeType(type, (float) value/100);
+				Assets.adjustVolume();
+			}
+			else
+				GameWindow.setFields(type, value);
 		}
 		editing = false;
 	}
