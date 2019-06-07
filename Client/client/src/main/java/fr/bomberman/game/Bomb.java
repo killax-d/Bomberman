@@ -150,7 +150,7 @@ public class Bomb extends Entity {
 		state = BOMB_EXPLOSION;
 		frame = 0;
 		map.setTileTypeAt(x, y, Map.TILE_FREE);
-		if(!GuiIngame.instance.isPaused())
+		if(!GuiIngame.instance().isPaused())
 			SFX_Explosion.play();
 		explode();
 		player.removeBombPlaced();
@@ -186,20 +186,20 @@ public class Bomb extends Entity {
 	}
 
 	private void killIfEntity(int x, int y) {
-		if(GuiIngame.instance == null)
+		if(GuiIngame.instance() == null)
 			return;
-		for (Item item : GuiIngame.instance.getPowerups()) {
+		for (Item item : GuiIngame.instance().getPowerups()) {
 			if (x == item.getPosition().getX() && y == item.getPosition().getY())
 				item.die();
 		}
 		
-		for (Bomb bomb : GuiIngame.instance.getBombs()) {
+		for (Bomb bomb : GuiIngame.instance().getBombs()) {
 			if (x == bomb.getPosition().getX() && y == bomb.getPosition().getY())
 				if (bomb != this && bomb.getState() < BOMB_EXPLOSION)
 					bomb.instantExplode();
 		}
 
-		for (Entity entity : GuiIngame.instance.getEntitiesLiving()) {
+		for (Entity entity : GuiIngame.instance().getEntitiesLiving()) {
 			if (x == entity.getPosition().getX() && y == entity.getPosition().getY()) {
 				if(player instanceof EntityPlayer)
 					entity.die();
@@ -216,8 +216,8 @@ public class Bomb extends Entity {
 	private void end() {
 		GuiIngame game = GuiIngame.instance();
 		
-		if (game.playerIsAlive() && !GuiIngame.instance().isInDemoMode())
-			if (GuiIngame.instance.getAlivePlayerCount() <= 1)
+		if (game.playerIsAlive() && !game.isInDemoMode())
+			if (game.getAlivePlayerCount() <= 1)
 				game.setWinScreen(GuiIngame.VICTORY);
 			else if (teamMode && game.getTeamLeft() <= 1)
 				game.setWinScreen(GuiIngame.VICTORY);
@@ -228,10 +228,10 @@ public class Bomb extends Entity {
 			
 			
 		if(game.getWinScreen() != GuiIngame.UNKNOW) {
-			for(Bomb bomb : GuiIngame.instance.getBombs())
+			for(Bomb bomb : game.getBombs())
 				if(bomb != null)
 					bomb.cancelExplosion();
-			for(Item item : GuiIngame.instance.getItems())
+			for(Item item : game.getItems())
 				if(item != null) {
 					item.die();
 					item.setState(Item.DISPAWNED);
@@ -244,7 +244,7 @@ public class Bomb extends Entity {
 						GuiIngame game = (GuiIngame) GameWindow.instance().getCurrentGui();
 						game.stopMusic();
 						GameWindow.instance().setCurrentGui(new GuiMainMenu());
-						GuiIngame.instance = null;
+						GuiIngame.clearInstance();
 					}
 				}
 					
@@ -253,35 +253,35 @@ public class Bomb extends Entity {
 	}
 	
 	private void spawnItem(int x, int y) {
-		if(GuiIngame.instance == null)
+		if(GuiIngame.instance() == null)
 			return;
 		Random rand = new Random();
 		int r = rand.nextInt(100);
 		if (r < GuiIngame.instance().getItemChance()) {
 			r = rand.nextInt(100);
 			if (r < 15) {
-				GuiIngame.instance.getPowerups().add(new ItemPowerUp(new Vec2D(x, y), map));
+				GuiIngame.instance().getPowerups().add(new ItemPowerUp(new Vec2D(x, y), map));
 			}
 			else if (r < 30) {
-				GuiIngame.instance.getPowerups().add(new ItemBombUp(new Vec2D(x, y), map));
+				GuiIngame.instance().getPowerups().add(new ItemBombUp(new Vec2D(x, y), map));
 			}
 			else if (r < 45) {
-				GuiIngame.instance.getPowerups().add(new ItemPowerDown(new Vec2D(x, y), map));
+				GuiIngame.instance().getPowerups().add(new ItemPowerDown(new Vec2D(x, y), map));
 			}
 			else if (r < 60) {
-				GuiIngame.instance.getPowerups().add(new ItemBombDown(new Vec2D(x, y), map));
+				GuiIngame.instance().getPowerups().add(new ItemBombDown(new Vec2D(x, y), map));
 			}
 			else if (r <= 75) {
-				GuiIngame.instance.getPowerups().add(new ItemSpeedUp(new Vec2D(x, y), map));
+				GuiIngame.instance().getPowerups().add(new ItemSpeedUp(new Vec2D(x, y), map));
 			}
 			else if (r <= 90) {
-				GuiIngame.instance.getPowerups().add(new ItemSpeedDown(new Vec2D(x, y), map));
+				GuiIngame.instance().getPowerups().add(new ItemSpeedDown(new Vec2D(x, y), map));
 			}
 			else if (r < 95) {
-				GuiIngame.instance.getPowerups().add(new ItemBombMine(new Vec2D(x, y), map));
+				GuiIngame.instance().getPowerups().add(new ItemBombMine(new Vec2D(x, y), map));
 			}
 			else {
-				GuiIngame.instance.getPowerups().add(new ItemGloves(new Vec2D(x, y), map));
+				GuiIngame.instance().getPowerups().add(new ItemGloves(new Vec2D(x, y), map));
 			}
 		}
 	}
@@ -323,7 +323,7 @@ public class Bomb extends Entity {
 	}
 	
 	private void explode() {
-		if(GuiIngame.instance == null)
+		if(GuiIngame.instance() == null)
 			return;
 		int power = player.getPower() + 1;
 
@@ -337,7 +337,7 @@ public class Bomb extends Entity {
 			bombCheck(EnumDirection.NORTH, x, y-i);
 		}
 			
-		if(GuiIngame.instance != null && !GuiIngame.instance.isPaused())
+		if(GuiIngame.instance() != null && !GuiIngame.instance().isPaused())
 			SFX_Trail.play();
 		
 		effects.addAll(effectToAdd);
@@ -393,7 +393,7 @@ public class Bomb extends Entity {
 				map.setTileTypeAt(x, y, Map.TILE_FREE);
 				map.setTileTypeAt(next_position.getX(), next_position.getY(), Map.TILE_FREE);
 				killIfEntity(x, y);
-				if(GuiIngame.instance != null && !GuiIngame.instance.isPaused())
+				if(GuiIngame.instance() != null && !GuiIngame.instance().isPaused())
 					SFX_Explosion.play();
 				explode();
 				player.removeBombPlaced();

@@ -17,6 +17,9 @@ public class Item extends Entity {
 	public final static int DISPAWNED = 2;
 	
 	private Timer dispawnClock;
+	private long dispawnStart;
+	private long dispawnLeft;
+	private final long dispawnTime = 20000;
 	
 	private static BufferedSound SFX_Pick = Assets.getSound("sounds/item_picked.wav", BufferedSound.SFX);
 	
@@ -25,11 +28,23 @@ public class Item extends Entity {
 	public Item(Vec2D position, Map map) {
 		super(position, map, -1);
 		dispawnClock = new Timer();
-		dispawnClock.schedule(dispawn(), 20000);
+		dispawnClock.schedule(dispawn(), dispawnTime);
+	}
+
+	public void cancelDispawn() {
+		dispawnClock.cancel();
+		dispawnClock.purge();
 	}
 	
-	protected void boostPlayer(EntityPlayer player) {
-		
+	public void pause() {
+		long time = System.nanoTime();
+		cancelDispawn();
+		dispawnLeft = (time - dispawnStart)/1000000;
+	}
+	
+	public void resume() {
+		dispawnClock = new Timer();
+		dispawnClock.schedule(dispawn(), dispawnLeft);
 	}
 	
 	public void pick(Entity entity) {

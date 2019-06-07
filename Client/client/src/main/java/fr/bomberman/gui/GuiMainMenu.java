@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -14,7 +16,7 @@ import fr.bomberman.assets.Assets;
 import fr.bomberman.assets.BufferedSound;
 import fr.bomberman.assets.Init;
 
-public class GuiMainMenu extends Container implements MouseListener, MouseMotionListener {
+public class GuiMainMenu extends Container implements MouseListener, MouseMotionListener, KeyListener {
 	
 	// Credit
 	private final String author = "Donné Dylan";
@@ -41,14 +43,15 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 	private GuiButton play = new GuiButton(one_player, GameWindow.WIDTH/2-64, GameWindow.HEIGHT/2+32, 128, 64);
 	private GuiButton resume = new GuiButton(resume_texture,  GameWindow.WIDTH/2-64, GameWindow.HEIGHT/2+96, 128, 64);
 	private GuiButton close = new GuiButton(close_texture, GameWindow.WIDTH-64, 0, 64, 32);
-	private GuiButton demo = new GuiButton(demo_off_texture, 50, GameWindow.HEIGHT-(480+50), 480, 480);
+	private GuiButton demo = new GuiButton(demo_off_texture, 50, GameWindow.HEIGHT-(480+25), 480, 480);
 	
 	// Game Parameters
-	private static GuiSpinner lives = new GuiSpinner("%d Live", 50, 150, 300, 50, 1, 5, GameWindow.getFields(GameWindow.Fields.LIVES.ordinal()), GameWindow.Fields.LIVES.ordinal());
-	private static GuiSpinner AIPlayer = new GuiSpinner("%d Player", 50, 200, 300, 50, 2, 4, GameWindow.getFields(GameWindow.Fields.AIPLAYER.ordinal()), GameWindow.Fields.AIPLAYER.ordinal());
-	private static GuiSpinner team = new GuiSpinner("Team : %s", 50, 250, 300, 50, GuiSpinner.FALSE, GuiSpinner.TRUE, GameWindow.getFields(GameWindow.Fields.TEAM.ordinal()), GameWindow.Fields.TEAM.ordinal());
-	private static GuiSlider plantChance = new GuiSlider("Plant chance : %d", 50, 300, 300, 50, 0, 100, (GameWindow.getFields(GameWindow.Fields.PLANT_CHANCE.ordinal())), GameWindow.Fields.PLANT_CHANCE.ordinal(), GuiSlider.Theme.DARK.ordinal());
-	private static GuiSlider itemChance = new GuiSlider("Item chance : %d", 50, 350, 300, 50, 0, 100, (GameWindow.getFields(GameWindow.Fields.ITEM_CHANCE.ordinal())), GameWindow.Fields.ITEM_CHANCE.ordinal(), GuiSlider.Theme.DARK.ordinal());
+	private static GuiSpinner lives = new GuiSpinner("%d Live", 50, 150, 300, 50, 1, 5, (int) GameWindow.getFields(GameWindow.Fields.LIVES.ordinal()), GameWindow.Fields.LIVES.ordinal());
+	private static GuiSpinner AIPlayer = new GuiSpinner("%d Player", 50, 200, 300, 50, 2, 4, (int) GameWindow.getFields(GameWindow.Fields.AIPLAYER.ordinal()), GameWindow.Fields.AIPLAYER.ordinal());
+	private static GuiSpinner team = new GuiSpinner("Team : %s", 50, 250, 300, 50, GuiSpinner.FALSE, GuiSpinner.TRUE, (int) GameWindow.getFields(GameWindow.Fields.TEAM.ordinal()), GameWindow.Fields.TEAM.ordinal());
+	private static GuiSlider plantChance = new GuiSlider("Plant chance : %d", 50, 300, 300, 50, 0, 100, (int) (GameWindow.getFields(GameWindow.Fields.PLANT_CHANCE.ordinal())), GameWindow.Fields.PLANT_CHANCE.ordinal(), GuiSlider.Theme.DARK.ordinal());
+	private static GuiSlider itemChance = new GuiSlider("Item chance : %d", 50, 350, 300, 50, 0, 100, (int) (GameWindow.getFields(GameWindow.Fields.ITEM_CHANCE.ordinal())), GameWindow.Fields.ITEM_CHANCE.ordinal(), GuiSlider.Theme.DARK.ordinal());
+	private static GuiInput playerName = new GuiInput(50, 400, 300, 50, 0, 15, (String) (GameWindow.getFields(GameWindow.Fields.PLAYER_NAME.ordinal())), GameWindow.Fields.PLAYER_NAME.ordinal());
 	
 	public GuiMainMenu() {
 		music.setLoop(true);
@@ -84,7 +87,7 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 			demo.setImage(demo_on_texture);
 		demo.paint(g);
 		settings.paint(g);
-		if (GuiIngame.instance != null)
+		if (GuiIngame.instance() != null)
 			resume.paint(g);
 		play.paint(g);
 		lives.paint(g);
@@ -92,6 +95,7 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 		team.paint(g);
 		plantChance.paint(g);
 		itemChance.paint(g);
+		playerName.paint(g);
 		super.paint(g);
 	}
 
@@ -103,9 +107,9 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 		}
 		if (resume.isHovered()) {
 			music.stop();
-			if(GuiIngame.instance != null) {
-				GameWindow.instance().setCurrentGui(GuiIngame.instance);
-				GuiIngame.instance.resume();
+			if(GuiIngame.instance() != null) {
+				GameWindow.instance().setCurrentGui(GuiIngame.instance());
+				GuiIngame.instance().resume();
 			}
 			else
 				GameWindow.instance().setCurrentGui(new GuiIngame());
@@ -127,6 +131,7 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 		lives.mouseClicked(event);
 		AIPlayer.mouseClicked(event);
 		team.mouseClicked(event);
+		playerName.mouseClicked(event);
 		Init.writeIniFile();
 	}
 
@@ -166,6 +171,21 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 		resume.mouseMoved(event);
 		demo.mouseMoved(event);
 		settings.mouseMoved(event);
+	}
+
+	@Override
+	public void keyPressed(KeyEvent event) {
+		
+	}
+
+	@Override
+	public void keyReleased(KeyEvent event) {
+		
+	}
+
+	@Override
+	public void keyTyped(KeyEvent event) {
+		playerName.keyTyped(event);
 	}
 
 }

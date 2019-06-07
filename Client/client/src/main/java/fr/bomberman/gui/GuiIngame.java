@@ -50,7 +50,7 @@ public class GuiIngame extends Container implements KeyListener {
 	private static final BufferedSound SFX_BackgroundMusic = Assets.getSound("sounds/background_music.wav", BufferedSound.MUSIC);
 	private static final BufferedSound SFX_ImpossibleAction = Assets.getSound("sounds/impossible_action.wav", BufferedSound.SFX);
 
-	public static GuiIngame instance;
+	private static GuiIngame instance;
 	
 	private Map map;
 	private EntityPlayer player;
@@ -85,13 +85,18 @@ public class GuiIngame extends Container implements KeyListener {
 		this.entities = new CopyOnWriteArrayList<Entity>();
 		this.effects = new CopyOnWriteArrayList<Effect>();
 		this.powerups = new CopyOnWriteArrayList<Item>();
-		int players = GameWindow.getFields(GameWindow.Fields.AIPLAYER.ordinal());
-		this.player = new EntityPlayer("Player", map, spawns[0][0], spawns[0][1], 1);
+		int players = GameWindow.instance().getTotalAIPlayer();
+		this.player = new EntityPlayer(GameWindow.instance().getPlayerName(), map, spawns[0][0], spawns[0][1], 1);
 		for(int i = 1; i < players; i++) {
-			this.entities.add(new EntityAIPlayer("AIplayer".concat(String.valueOf(i)), map, spawns[i][0], spawns[i][1], (teamMode ? (players == 4 && i == 1 ? 1 : 0) : 0)));
+			int[] spawn = spawns[i];
+			this.entities.add(new EntityAIPlayer("AIplayer".concat(String.valueOf(i)), map, spawn[0], spawn[1], (teamMode ? (players == 4 && i == 1 ? 1 : 0) : 0)));
 		}
 		this.entities.add(player);
 		typeWin = UNKNOW;
+	}
+	
+	public static void clearInstance() {
+		instance = null;
 	}
 	
 	public static GuiIngame instance() {
@@ -146,6 +151,11 @@ public class GuiIngame extends Container implements KeyListener {
 		for (Bomb bomb : getBombs())
 			if(bomb != null  && !bomb.isDead())
 				bomb.pause();
+
+		for (Item item : getPowerups())
+			if(item != null  && !item.isDead())
+				item.pause();
+		
 		gamePause = true;
 		stopMusic();
 		GameWindow.instance().setCurrentGui(new GuiMainMenu());
@@ -160,6 +170,10 @@ public class GuiIngame extends Container implements KeyListener {
 		for (Bomb bomb : getBombs())
 			if(bomb != null  && !bomb.isDead())
 				bomb.resume();
+
+		for (Item item : getPowerups())
+			if(item != null  && !item.isDead())
+				item.resume();
 		SFX_BackgroundMusic.play();
 	}
 	
@@ -171,7 +185,7 @@ public class GuiIngame extends Container implements KeyListener {
 		drawEffects(g);
 		drawPowerups(g);
 		displayEndScreen(g);
-		if(GameWindow.getFields(GameWindow.Fields.LIVES.ordinal()) > 1)
+		if(GameWindow.instance().getTotalLives() > 1)
 			displayLivesBar(g);
 		displayPlayerName(g);
 		super.paint(g);

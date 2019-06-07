@@ -144,10 +144,10 @@ public class EntityAIPlayer extends EntityLiving {
 		TimerTask task = new TimerTask() {
 			@Override
 			public void run() {
-				if (GuiIngame.instance == null || isDead()) {
+				if (GuiIngame.instance() == null || isDead()) {
 					this.cancel();
 				}
-				if(GuiIngame.instance != null && GuiIngame.instance.isPaused())
+				if(GuiIngame.instance() != null && GuiIngame.instance().isPaused())
 					return;
 				boolean moved = false;
 				if (pathVector.size() > 1) {
@@ -223,10 +223,10 @@ public class EntityAIPlayer extends EntityLiving {
 				if (ennemyAround()) {
 					placeBomb(entity.getPosition());
 				}
-				if (GuiIngame.instance == null || isDead()) {
+				if (GuiIngame.instance() == null || isDead()) {
 					this.cancel();
 				}
-				if(GuiIngame.instance != null && GuiIngame.instance.isPaused())
+				if(GuiIngame.instance() != null && GuiIngame.instance().isPaused())
 					return;
 				if (!customAction) {
 					Vec2D dest = getNearestEnnemy();

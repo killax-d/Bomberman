@@ -23,11 +23,12 @@ public class GameWindow extends JFrame implements KeyListener, MouseListener, Mo
 	private static int team = GuiSpinner.FALSE;
 	private static int plantChance = 70;
 	private static int itemChance = 50;
+	private static String playerName = "Player";
 	public static int WIDTH;
 	public static int HEIGHT;
 	
 	public static enum Fields{
-		LIVES, AIPLAYER, TEAM, PLANT_CHANCE, ITEM_CHANCE;
+		LIVES, AIPLAYER, TEAM, PLANT_CHANCE, ITEM_CHANCE, PLAYER_NAME;
 	}
 	
 	private GameWindow(String title, int width, int height) {
@@ -49,40 +50,45 @@ public class GameWindow extends JFrame implements KeyListener, MouseListener, Mo
 		addMouseMotionListener(this);
 	}
 	
-	public static void setFields(int type, int value){
+	public static void setFields(int type, Object value){
 	    switch (Fields.values()[type]) {
 	    	case LIVES:
-	    		lives = value;
+	    		lives = (int) value >= 1 && (int) value <= 5 ? (int) value : 1;
 	    		break;
 	    	case AIPLAYER:
-	    		AIPlayer = value;
+	    		AIPlayer = (int) value >= 2 && (int) value <= 4 ? (int) value : 2;
 	    		break;
 	    	case TEAM:
-	    		team = value;
+	    		team = (int) value == GuiSpinner.TRUE || (int) value == GuiSpinner.FALSE ? (int) value : GuiSpinner.FALSE;
 	    		break;
 	    	case PLANT_CHANCE:
-	    		plantChance = value;
+	    		plantChance = (int) value >= 0 && (int) value <= 100 ? (int) value : 70;
 	    		break;
 	    	case ITEM_CHANCE:
-	    		itemChance = value;
+	    		itemChance = (int) value >= 0 && (int) value <= 100 ? (int) value : 50;
+	    		break;
+	    	case PLAYER_NAME:
+	    		playerName = (String) value;
 	    		break;
 	    	default:
 	    		break;
 	    }
 	}
 	
-	public static int getFields(int type){
+	public static Object getFields(int type){
 	    switch (Fields.values()[type]) {
 	    	case LIVES:
-	    		return lives;
+	    		return (int) lives;
 	    	case AIPLAYER:
-	    		return AIPlayer;
+	    		return (int) AIPlayer;
 	    	case TEAM:
-	    		return team;
+	    		return (int) team;
 	    	case PLANT_CHANCE:
-	    		return plantChance;
+	    		return (int) plantChance;
 	    	case ITEM_CHANCE:
-	    		return itemChance;
+	    		return (int) itemChance;
+	    	case PLAYER_NAME:
+	    		return (String) playerName;
 	    	default:
 	    		return 0;
 	    }
@@ -90,23 +96,27 @@ public class GameWindow extends JFrame implements KeyListener, MouseListener, Mo
 	}
 	
 	public int getTotalLives() {
-		return getFields(GameWindow.Fields.LIVES.ordinal());
+		return (int) getFields(GameWindow.Fields.LIVES.ordinal());
 	}
 	
 	public int getTotalAIPlayer() {
-		return getFields(GameWindow.Fields.AIPLAYER.ordinal());
+		return (int) getFields(GameWindow.Fields.AIPLAYER.ordinal());
 	}
 	
 	public boolean isTeamMode() {
-		return getFields(GameWindow.Fields.TEAM.ordinal()) == GuiSpinner.TRUE ? true : false;
+		return (int) getFields(GameWindow.Fields.TEAM.ordinal()) == GuiSpinner.TRUE ? true : false;
 	}
 	
 	public int getPlantChance() {
-		return getFields(GameWindow.Fields.PLANT_CHANCE.ordinal());
+		return (int) getFields(GameWindow.Fields.PLANT_CHANCE.ordinal());
 	}
 	
 	public int getItemChance() {
-		return getFields(GameWindow.Fields.ITEM_CHANCE.ordinal());
+		return (int) getFields(GameWindow.Fields.ITEM_CHANCE.ordinal());
+	}
+	
+	public String getPlayerName() {
+		return (String) playerName;
 	}
 	
 	// DEMO

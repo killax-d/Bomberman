@@ -170,9 +170,9 @@ public abstract class Entity extends TimerTask {
 			break;
 		}
 		if (this instanceof EntityLiving) {
-			if(GuiIngame.instance == null)
+			if(GuiIngame.instance() == null)
 				return;
-			for(Item item : GuiIngame.instance.getPowerups()) {
+			for(Item item : GuiIngame.instance().getPowerups()) {
 				if (next_position.getX() == item.getPosition().getX()
 					&& next_position.getY() == item.getPosition().getY()) {
 					item.pick(this);
@@ -195,7 +195,7 @@ public abstract class Entity extends TimerTask {
 						entity.addMasterBomb();
 				}
 			}
-			for(Effect effect : GuiIngame.instance.getEffects()) {
+			for(Effect effect : GuiIngame.instance().getEffects()) {
 				if (next_position.getX() == effect.getPosition().getX()
 						&& next_position.getY() == effect.getPosition().getY()
 						&& effect instanceof EffectTrail) {
@@ -225,7 +225,7 @@ public abstract class Entity extends TimerTask {
 		GuiIngame game = GuiIngame.instance();
 		
 		if (game.playerIsAlive() & !GuiIngame.instance().isInDemoMode())
-			if (GuiIngame.instance.getAlivePlayerCount() <= 1)
+			if (GuiIngame.instance().getAlivePlayerCount() <= 1)
 				game.setWinScreen(GuiIngame.VICTORY);
 			else if (teamMode && game.getTeamLeft() <= 1)
 				game.setWinScreen(GuiIngame.VICTORY);
@@ -236,10 +236,10 @@ public abstract class Entity extends TimerTask {
 			
 			
 		if(game.getWinScreen() != GuiIngame.UNKNOW) {
-			for(Bomb bomb : GuiIngame.instance.getBombs())
+			for(Bomb bomb : GuiIngame.instance().getBombs())
 				if(bomb != null)
 					bomb.cancelExplosion();
-			for(Item item : GuiIngame.instance.getItems())
+			for(Item item : GuiIngame.instance().getItems())
 				if(item != null) {
 					item.die();
 					item.setState(Item.DISPAWNED);
@@ -252,7 +252,7 @@ public abstract class Entity extends TimerTask {
 						GuiIngame game = (GuiIngame) GameWindow.instance().getCurrentGui();
 						game.stopMusic();
 						GameWindow.instance().setCurrentGui(new GuiMainMenu());
-						GuiIngame.instance = null;
+						GuiIngame.clearInstance();
 					}
 				}
 					
@@ -266,7 +266,7 @@ public abstract class Entity extends TimerTask {
 	
 	public void die() {
 		this.dead = true;
-		GuiIngame.instance.getEntities().remove(this);
+		GuiIngame.instance().getEntities().remove(this);
 	}
 
 	public Vec2D getPosition() {

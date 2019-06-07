@@ -186,8 +186,8 @@ public abstract class EntityLiving extends Entity {
 		switch (direction) {
 		case NORTH:
 			tileType = map.getTileTypeAt(next_position.getX(), next_position.getY() - 1);
-			if(GuiIngame.instance != null && tileType == Map.BOMB_TILE && hasGloves()) {
-				Bomb bomb = GuiIngame.instance.getBombAt(next_position.getX(), next_position.getY() - 1);
+			if(GuiIngame.instance() != null && tileType == Map.BOMB_TILE && hasGloves()) {
+				Bomb bomb = GuiIngame.instance().getBombAt(next_position.getX(), next_position.getY() - 1);
 				if (bomb != null) {
 					while(bomb.canMove(direction)) {
 						bomb.move(direction);
@@ -197,8 +197,8 @@ public abstract class EntityLiving extends Entity {
 			break;
 		case SOUTH:
 			tileType = map.getTileTypeAt(next_position.getX(), next_position.getY() + 1);
-			if(GuiIngame.instance != null && tileType == Map.BOMB_TILE && hasGloves()) {
-				Bomb bomb = GuiIngame.instance.getBombAt(next_position.getX(), next_position.getY() + 1);
+			if(GuiIngame.instance() != null && tileType == Map.BOMB_TILE && hasGloves()) {
+				Bomb bomb = GuiIngame.instance().getBombAt(next_position.getX(), next_position.getY() + 1);
 				if (bomb != null) {
 					while(bomb.canMove(direction)) {
 						bomb.move(direction);
@@ -208,8 +208,8 @@ public abstract class EntityLiving extends Entity {
 			break;
 		case EST:
 			tileType = map.getTileTypeAt(next_position.getX() + 1, next_position.getY());
-			if(GuiIngame.instance != null && tileType == Map.BOMB_TILE && hasGloves()) {
-				Bomb bomb = GuiIngame.instance.getBombAt(next_position.getX() + 1, next_position.getY());
+			if(GuiIngame.instance() != null && tileType == Map.BOMB_TILE && hasGloves()) {
+				Bomb bomb = GuiIngame.instance().getBombAt(next_position.getX() + 1, next_position.getY());
 				if (bomb != null) {
 					while(bomb.canMove(direction)) {
 						bomb.move(direction);
@@ -219,8 +219,8 @@ public abstract class EntityLiving extends Entity {
 			break;
 		case WEST:
 			tileType = map.getTileTypeAt(next_position.getX() - 1, next_position.getY());
-			if(GuiIngame.instance != null && tileType == Map.BOMB_TILE && hasGloves()) {
-				Bomb bomb = GuiIngame.instance.getBombAt(next_position.getX() - 1, next_position.getY());
+			if(GuiIngame.instance() != null && tileType == Map.BOMB_TILE && hasGloves()) {
+				Bomb bomb = GuiIngame.instance().getBombAt(next_position.getX() - 1, next_position.getY());
 				if (bomb != null) {
 					while(bomb.canMove(direction)) {
 						bomb.move(direction);
