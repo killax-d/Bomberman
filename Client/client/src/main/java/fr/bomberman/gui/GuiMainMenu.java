@@ -51,12 +51,11 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 	private static GuiSpinner team = new GuiSpinner("Team : %s", 50, 250, 300, 50, GuiSpinner.FALSE, GuiSpinner.TRUE, (int) GameWindow.getFields(GameWindow.Fields.TEAM.ordinal()), GameWindow.Fields.TEAM.ordinal());
 	private static GuiSlider plantChance = new GuiSlider("Plant chance : %d", 50, 300, 300, 50, 0, 100, (int) (GameWindow.getFields(GameWindow.Fields.PLANT_CHANCE.ordinal())), GameWindow.Fields.PLANT_CHANCE.ordinal(), GuiSlider.Theme.DARK.ordinal());
 	private static GuiSlider itemChance = new GuiSlider("Item chance : %d", 50, 350, 300, 50, 0, 100, (int) (GameWindow.getFields(GameWindow.Fields.ITEM_CHANCE.ordinal())), GameWindow.Fields.ITEM_CHANCE.ordinal(), GuiSlider.Theme.DARK.ordinal());
-	private static GuiInput playerName = new GuiInput(50, 400, 300, 50, 0, 15, (String) (GameWindow.getFields(GameWindow.Fields.PLAYER_NAME.ordinal())), GameWindow.Fields.PLAYER_NAME.ordinal());
+	private static GuiInput playerName = new GuiInput("Name : %s", 50, 400, 300, 50, 0, 12, (String) (GameWindow.getFields(GameWindow.Fields.PLAYER_NAME.ordinal())), GameWindow.Fields.PLAYER_NAME.ordinal());
 	
 	public GuiMainMenu() {
 		music.setLoop(true);
 		music.setLoopPoint(14, -1);
-		music.play();
 		credit = String.format("Developed by %s\n"
 				+ "Version : %s",
 				author, App.version);
@@ -101,6 +100,10 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 
 	@Override
 	public void mouseClicked(MouseEvent event) {
+		lives.mouseClicked(event);
+		AIPlayer.mouseClicked(event);
+		team.mouseClicked(event);
+		playerName.mouseClicked(event);
 		if (play.isHovered()) {
 			music.stop();
 			GameWindow.instance().setCurrentGui(new GuiIngame());
@@ -128,10 +131,6 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 		if (settings.isHovered()) {
 			SettingsWindow.instance();
 		}
-		lives.mouseClicked(event);
-		AIPlayer.mouseClicked(event);
-		team.mouseClicked(event);
-		playerName.mouseClicked(event);
 		Init.writeIniFile();
 	}
 

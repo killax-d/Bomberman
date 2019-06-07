@@ -105,6 +105,8 @@ public class Init {
 					}
 						
 				}
+				
+				Assets.adjustVolume();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

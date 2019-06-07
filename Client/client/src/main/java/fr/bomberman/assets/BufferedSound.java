@@ -43,12 +43,7 @@ public class BufferedSound {
 		open();
 		playing = false;
 		this.type = type;
-		if (type == MUSIC)
-			setVolume(MUSIC_VOLUME);
-		else if (type == SFX)
-			setVolume(SFX_VOLUME);
-		else
-			setVolume(0.1F);
+		setVolume(0.0F);
 	}
 
 	/**

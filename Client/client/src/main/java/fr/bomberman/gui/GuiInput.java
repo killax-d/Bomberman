@@ -19,6 +19,7 @@ public class GuiInput implements MouseListener, MouseMotionListener, KeyListener
 	private boolean visible;
 	private boolean hovered;
 	private boolean focused;
+	private String text;
 	private int x;
 	private int y;
 	private int width;
@@ -30,7 +31,8 @@ public class GuiInput implements MouseListener, MouseMotionListener, KeyListener
 	
 	private float typeBar;
 	
-	public GuiInput(int x, int y, int width, int height, int min, int max, String value, int type) {
+	public GuiInput(String text, int x, int y, int width, int height, int min, int max, String value, int type) {
+		this.text = text;
 		this.x = x;
 		this.y = y;
 		this.width = width;
@@ -71,18 +73,19 @@ public class GuiInput implements MouseListener, MouseMotionListener, KeyListener
 	public void paint(Graphics g) {
 		visible = true;
 		
+		String label = String.format(text, value);
 		g.setColor(Color.BLACK);
 		g.fillRect(x, y, width, height);
 		g.drawRect(x, y, width, height);
 		g.setFont(new Font("Arial", Font.BOLD, fontSize));
 		if(focused) {
 			g.setColor(new Color(1F, 1F, 1F, typeBar/100));
-			int textWidth = g.getFontMetrics().stringWidth(value);
-			typeBar = ++typeBar % 75;
-			g.drawLine(x+textWidth+10+3, y+15, x+textWidth+10+3, y+height-10);
+			int labelWidth = g.getFontMetrics().stringWidth(label);
+			typeBar = (typeBar+2) % 50;
+			g.drawLine(x+labelWidth+10+3, y+15, x+labelWidth+10+3, y+height-10);
 		}
 		g.setColor(Color.WHITE);
-		g.drawString(value, x+10, y+height/2+fontSize/3+2);
+		g.drawString(label, x+10, y+height/2+fontSize/3+2);
 	}
 	
 	public float f(float x) {
@@ -114,6 +117,8 @@ public class GuiInput implements MouseListener, MouseMotionListener, KeyListener
 		}
 		else {
 			focused = false;
+			if(getValue() == "")
+				setValue("Player");
 		}
 	}
 
@@ -155,9 +160,12 @@ public class GuiInput implements MouseListener, MouseMotionListener, KeyListener
 					setValue(value.substring(0, value.length()-1));
 				else
 					setValue("");
-			else if((int) event.getKeyChar() == 10)
+			else if((int) event.getKeyChar() == 10) {
+				if(getValue() == "")
+					setValue("Player");
 				focused = false;
-			else if(event.getKeyChar() != KeyEvent.CHAR_UNDEFINED && (int) event.getKeyChar() != 32)
+			}
+			else if(Character.isAlphabetic(event.getKeyChar()))
 				setValue(value+event.getKeyChar());
 		}
 	}

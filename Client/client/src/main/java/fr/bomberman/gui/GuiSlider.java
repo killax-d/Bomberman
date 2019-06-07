@@ -102,7 +102,7 @@ public class GuiSlider implements MouseListener, MouseMotionListener {
 		g.drawRect(x, y, width, height);
 		g.fillRect(x, y, (width/100)*value, height);
 
-		g.setColor(theme == getThemeType(Theme.LIGHT.ordinal()) ? Color.BLACK : Color.WHITE);
+		g.setColor(Color.WHITE);
 		g.drawString(String.format(text, value).concat("%") , x+width/2-textWidth/2, y+height/2+fontSize/3+2);
 	}
 	
