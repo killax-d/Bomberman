@@ -22,21 +22,35 @@ public class EntityAIPlayer extends EntityLiving {
 	private DefaultDirectedGraph<String, DefaultEdge> graph;
 	private GraphPath<String, DefaultEdge> path;
 	private ArrayList<Vec2D> pathVector;
-	private boolean customAction;
 	private boolean teamMode;
+	
+	private Timer calculPathClock;
+	private Timer movePathClock;
 	
 	public EntityAIPlayer(String name, Map map, int x, int y, int team) {
 		super(name, 1, 1, map, x, y, team);
 		game = GuiIngame.instance();
 		teamMode = game.isTeamMode();
-		this.customAction = false;
 		this.setName(name);
 		this.pathVector = new ArrayList<Vec2D>();
 		this.graph = new DefaultDirectedGraph<String, DefaultEdge>(DefaultEdge.class);
 		this.skin_id = 0;
 		initGraph();
-		new Timer().scheduleAtFixedRate(calculatePath(), 0, 500);
-		new Timer().scheduleAtFixedRate(moveWithPath(), 0, 150);
+		startClock();
+	}
+	
+	private void startClock() {
+		calculPathClock = new Timer();
+		movePathClock = new Timer();
+		calculPathClock.scheduleAtFixedRate(calculatePath(), 0, 500);
+		movePathClock.scheduleAtFixedRate(moveWithPath(), 0, 150);
+	}
+	
+	private void stopClock() {
+		calculPathClock.cancel();
+		movePathClock.cancel();
+		calculPathClock.purge();
+		movePathClock.purge();
 	}
 
 	@Override
@@ -64,28 +78,20 @@ public class EntityAIPlayer extends EntityLiving {
 					nearest = entity.getPosition();
 				}
 		}
+		if (nearest != null)
+			nearest = new Vec2D((int) nearest.getX(), (int) nearest.getY());
 		return nearest;
 	}
 	
 	private boolean ennemyAround() {
 		boolean ennemyPresent = false;
-		for (int x = -1; x < 2; x++) {
-			if (position.getX()+x >= 0 && position.getX()+x <= Map.MAP_WIDTH)
-				for(EntityLiving entity : game.getEntitiesLiving()) {
-					if ((entity != this && !teamMode) | (teamMode && entity != this && entity.getTeam() != getTeam()))
-						if (position.getX()+x == entity.getPosition().getX())
-							ennemyPresent = true;
-				}
+		for (int i = -1; i < 2; i++) {
+			for(EntityLiving entity : game.getEntitiesLivingExceptAI(this)) {
+				if ((!teamMode) | (teamMode && entity.getTeam() != getTeam()))
+					if ((int) position.getX()+i == (int) entity.getPosition().getX() && (int) position.getY()+i == (int) entity.getPosition().getY())
+						ennemyPresent = true;
+			}
 				
-		}
-		for (int y = -1; y < 2; y++) {
-			if (position.getY()+y >= 0 && position.getY()+y <= Map.MAP_HEIGHT)
-				for(EntityLiving entity : game.getEntitiesLiving()) {
-					if ((entity != this && !teamMode) | (teamMode && entity != this && entity.getTeam() != getTeam()))
-						if (position.getY()+y == entity.getPosition().getY() && entity != this)
-							ennemyPresent = true;
-				}
-					
 		}
 		return ennemyPresent;
 	}
@@ -96,29 +102,21 @@ public class EntityAIPlayer extends EntityLiving {
 		if (position.getX() < point.getX()) {
 			if(!canMove(EnumDirection.EST))
 				placeBomb(point);
-			else
-				move(EnumDirection.EST);
 			move(EnumDirection.EST);
 		}
 		else if (position.getX() > point.getX()) {
 			if(!canMove(EnumDirection.WEST))
 				placeBomb(point);
-			else
-				move(EnumDirection.WEST);
 			move(EnumDirection.WEST);
 		}
 		else if (position.getY() < point.getY()) {
 			if(!canMove(EnumDirection.SOUTH))
 				placeBomb(point);
-			else
-				move(EnumDirection.SOUTH);
 			move(EnumDirection.SOUTH);
 		}
 		else if (position.getY() > point.getY()) {
 			if(!canMove(EnumDirection.NORTH)) 
 				placeBomb(point);
-			else
-				move(EnumDirection.NORTH);
 			move(EnumDirection.NORTH);
 		}
 	}
@@ -160,8 +158,9 @@ public class EntityAIPlayer extends EntityLiving {
 						}
 					}
 					if (!moved)
-						if(pathVector.size() > 0 && pathVector.get(0) != null)
+						if(pathVector.size() > 0 && pathVector.get(0) != null) {
 							moveToPoint(pathVector.get(0));
+						}
 				}
 			}
 		};
@@ -207,7 +206,8 @@ public class EntityAIPlayer extends EntityLiving {
 	}
 	
 	private void placeBomb(Vec2D point) {
-		if(canPlaceBomb() && isFreeCell(position) && isFreeCell(point)) {
+		Vec2D p = new Vec2D((int) point.getX(), (int) point.getY());
+		if(canPlaceBomb() && isFreeCell(p)) {
 			game.getEntities().add(new Bomb(this, this.hasMasterBomb(), map, getTeam(), game.getEffects()));
 			addBombPlaced();
 		}
@@ -220,17 +220,16 @@ public class EntityAIPlayer extends EntityLiving {
 
 			@Override
 			public void run() {
-				if (ennemyAround()) {
-					placeBomb(entity.getPosition());
-				}
 				if (GuiIngame.instance() == null || isDead()) {
 					this.cancel();
+					stopClock();
 				}
 				if(GuiIngame.instance() != null && GuiIngame.instance().isPaused())
 					return;
-				if (!customAction) {
-					Vec2D dest = getNearestEnnemy();
-					generateShortPathToPoint(dest);
+				Vec2D dest = getNearestEnnemy();
+				generateShortPathToPoint(dest);
+				if (ennemyAround()) {
+					placeBomb(entity.getPosition());
 				}
 			}
 		};

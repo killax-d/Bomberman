@@ -9,6 +9,8 @@ import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import fr.bomberman.assets.Assets;
@@ -95,6 +97,41 @@ public class GuiIngame extends Container implements KeyListener {
 		typeWin = UNKNOW;
 	}
 	
+	public void checkEnd() {
+		if (playerIsAlive() & !isInDemoMode())
+			if (GuiIngame.instance().getAlivePlayerCount() <= 1)
+				setWinScreen(VICTORY);
+			else if (teamMode && getTeamLeft() <= 1)
+				setWinScreen(VICTORY);
+			else
+				setWinScreen(UNKNOW);
+		else if (!playerIsAlive())
+			setWinScreen(DEFEAT);
+		else
+			setWinScreen(UNKNOW);
+
+		if(getWinScreen() != GuiIngame.UNKNOW) {
+			for(Bomb bomb : GuiIngame.instance().getBombs())
+				if(bomb != null)
+					bomb.cancelExplosion();
+			for(Item item : GuiIngame.instance().getItems())
+				if(item != null) {
+					item.die();
+					item.setState(Item.DISPAWNED);
+				}
+			new Timer().schedule(new TimerTask() {
+		
+				@Override
+				public void run() {
+					stopMusic();
+					GameWindow.instance().setCurrentGui(new GuiMainMenu());
+					clearInstance();
+				}
+					
+			}, 3000);
+		}
+	}
+	
 	public static void clearInstance() {
 		instance = null;
 	}
@@ -103,10 +140,23 @@ public class GuiIngame extends Container implements KeyListener {
 		return instance;
 	}
 	
-	public int getWinScreen() {
+	private int getWinScreen() {
 		return typeWin;
 	}
 
+	private void setWinScreen(int type) {
+		typeWin = type;
+	}
+	
+	public void displayEndScreen(Graphics g) {
+		if (getWinScreen() != UNKNOW)
+			if (getWinScreen() == VICTORY)
+				g.drawImage(victory_screen, 0, 0, getWidth(), getHeight(), null);
+			else
+				g.drawImage(defeat_screen, 0, 0, getWidth(), getHeight(), null);
+			
+	}
+	
 	public boolean isInDemoMode() {
 		return demo;
 	}
@@ -132,7 +182,7 @@ public class GuiIngame extends Container implements KeyListener {
 	}
 	
 	public boolean playerIsAlive() {
-		return !player.isDead();
+		return !((Entity) player).isDead();
 	}
 	
 	public int getTeamLeft() {
@@ -218,6 +268,12 @@ public class GuiIngame extends Container implements KeyListener {
 		return entitiesLiving;
 	}
 	
+	public Set<EntityLiving> getEntitiesLivingExceptAI(EntityAIPlayer e){
+		Set<EntityLiving> entities = getEntitiesLiving();
+		entities.remove(e);
+		return entities;
+	}
+	
 	private Set<EntityLiving> getAlivePlayer(){
 		Set<EntityLiving> entitiesLiving = new HashSet<EntityLiving>();
 		for (Entity entity : getEntitiesLiving()) {
@@ -294,26 +350,13 @@ public class GuiIngame extends Container implements KeyListener {
 
 	}
 	
-	public void setWinScreen(int type) {
-		typeWin = type;
-	}
-	
-	public void displayEndScreen(Graphics g) {
-		if (typeWin != UNKNOW)
-			if (typeWin == VICTORY)
-				g.drawImage(victory_screen, 0, 0, getWidth(), getHeight(), null);
-			else
-				g.drawImage(defeat_screen, 0, 0, getWidth(), getHeight(), null);
-			
-	}
-	
 	public void displayPlayerName(Graphics g) {
 		g.setFont(new Font("Arial", Font.BOLD, 20));
 		for (EntityLiving entity : getAlivePlayer()) {
 			g.setColor(Color.BLACK);
-			g.drawString(entity.getName(), entity.getDisplayX()-2, entity.getDisplayY()-15-2);
-			g.setColor(entity == player ? Color.GREEN : Color.WHITE);
-			g.drawString(entity.getName(), entity.getDisplayX(), entity.getDisplayY()-15);
+			g.drawString(entity.getName(), entity.getDisplayX()-2, entity.getDisplayY()-(lives > 1 ? 15 : 0)-2);
+			g.setColor(entity == player ? Color.CYAN : Color.WHITE);
+			g.drawString(entity.getName(), entity.getDisplayX(), entity.getDisplayY()-(lives > 1 ? 15 : 0));
 		}
 	}
 	
@@ -329,24 +372,15 @@ public class GuiIngame extends Container implements KeyListener {
 	}
 
 	private void drawEntities(Graphics g) {
-		Set<Entity> entityToDisplay = new HashSet<Entity>();
-		Set<Entity> entityToRemove = new HashSet<Entity>();
 		for (Entity entity : entities) {
 			if (entity instanceof Bomb && ((Bomb) entity).getState() == Bomb.BOMB_EXPLODED) {
-				entityToRemove.add((Bomb) entity);
 			}
 			else if(!(entity instanceof Bomb) && entity.isDead()) {
-				entityToRemove.add((Entity) entity);
+				entities.remove(entity);
 			}
 			else
-				entityToDisplay.add(entity);
-		}
-		for (Entity entity : entityToDisplay) {
-			g.drawImage(entity.getSprite(), entity.getDisplayX(), entity.getDisplayY(), Entity.SPRITE_WIDTH,
-					Entity.SPRITE_HEIGHT, null);
-		}
-		for (Entity entity : entityToRemove) {
-			entities.remove(entity);
+				g.drawImage(entity.getSprite(), entity.getDisplayX(), entity.getDisplayY(), Entity.SPRITE_WIDTH,
+						Entity.SPRITE_HEIGHT, null);
 		}
 	}
 	
@@ -355,46 +389,28 @@ public class GuiIngame extends Container implements KeyListener {
 	}
 	
 	private void drawPowerups(Graphics g) {
-		Set<Item> itemToDisplay = new HashSet<Item>();
-		Set<Item> itemToRemove = new HashSet<Item>();
 		for (Item item : powerups) {
 			if(item != null) {
 				if (item.getState() >= Item.PICKED || item.isDead()) {
-					itemToRemove.add(item);
+					powerups.remove(item);
 				}
 				else
-					itemToDisplay.add(item);
+					g.drawImage(item.getSprite(), item.getDisplayX(), item.getDisplayY(), Item.SPRITE_WIDTH,
+							Item.SPRITE_HEIGHT, null);
 			}
-		}
-		for (Item item : itemToDisplay) {
-			if(item != null) {
-				g.drawImage(item.getSprite(), item.getDisplayX(), item.getDisplayY(), Item.SPRITE_WIDTH,
-						Item.SPRITE_HEIGHT, null);
-			}
-		}
-		for (Item item : itemToRemove) {
-			powerups.remove(item);
 		}
 	}
 
 	private void drawEffects(Graphics g) {
-		Set<Effect> effectToDisplay = new HashSet<Effect>();
-		Set<Effect> effectToRemove = new HashSet<Effect>();
 		for (Effect effect : effects) {
 			if(effect != null) {
 				if (effect instanceof EffectTrail && ((EffectTrail) effect).getState() == EffectTrail.EFFECT_ENDED) {
-					effectToRemove.add(effect);
+					effects.remove(effect);
 				}
 				else
-					effectToDisplay.add(effect);
+					g.drawImage(effect.getSprite(), effect.getDisplayX(), effect.getDisplayY(), Effect.SPRITE_WIDTH,
+							Effect.SPRITE_HEIGHT, null);
 			}
-		}
-		for (Effect effect : effectToDisplay) {
-			g.drawImage(effect.getSprite(), effect.getDisplayX(), effect.getDisplayY(), Effect.SPRITE_WIDTH,
-					Effect.SPRITE_HEIGHT, null);
-		}
-		for (Effect effect : effectToRemove) {
-			effects.remove(effect);
 		}
 	}
 

@@ -62,6 +62,7 @@ public abstract class EntityLiving extends Entity {
 		if(--lives <= 0)
 			dead = true;
 		
+		
 		protectionTimer = new Timer();
 		protectionTimer.schedule(new TimerTask() {
 
@@ -71,6 +72,8 @@ public abstract class EntityLiving extends Entity {
 			}
 			
 		}, 1250);
+		
+		GuiIngame.instance().checkEnd();
 	}
 	
 	@Override

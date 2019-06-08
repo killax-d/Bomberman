@@ -10,9 +10,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import fr.bomberman.assets.Assets;
 import fr.bomberman.assets.BufferedSound;
-import fr.bomberman.gui.GameWindow;
 import fr.bomberman.gui.GuiIngame;
-import fr.bomberman.gui.GuiMainMenu;
 import fr.bomberman.utils.Vec2D;
 
 public class Bomb extends Entity {
@@ -207,48 +205,8 @@ public class Bomb extends Entity {
 					if(!teamMode || (teamMode && player.getTeam() != entity.getTeam()))
 						entity.die();
 				SFX_EntityDie.play();
-				end();
 			}
 				
-		}
-	}
-	
-	private void end() {
-		GuiIngame game = GuiIngame.instance();
-		
-		if (game.playerIsAlive() && !game.isInDemoMode())
-			if (game.getAlivePlayerCount() <= 1)
-				game.setWinScreen(GuiIngame.VICTORY);
-			else if (teamMode && game.getTeamLeft() <= 1)
-				game.setWinScreen(GuiIngame.VICTORY);
-		else if (!game.playerIsAlive())
-			game.setWinScreen(GuiIngame.DEFEAT);
-		else
-			game.setWinScreen(GuiIngame.UNKNOW);
-			
-			
-		if(game.getWinScreen() != GuiIngame.UNKNOW) {
-			for(Bomb bomb : game.getBombs())
-				if(bomb != null)
-					bomb.cancelExplosion();
-			for(Item item : game.getItems())
-				if(item != null) {
-					item.die();
-					item.setState(Item.DISPAWNED);
-				}
-			new Timer().schedule(new TimerTask() {
-		
-				@Override
-				public void run() {
-					if (GameWindow.instance().getCurrentGui() instanceof GuiIngame) {
-						GuiIngame game = (GuiIngame) GameWindow.instance().getCurrentGui();
-						game.stopMusic();
-						GameWindow.instance().setCurrentGui(new GuiMainMenu());
-						GuiIngame.clearInstance();
-					}
-				}
-					
-			}, 3000);
 		}
 	}
 	

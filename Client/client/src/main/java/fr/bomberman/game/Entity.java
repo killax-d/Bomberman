@@ -6,9 +6,7 @@ import java.util.TimerTask;
 
 import fr.bomberman.assets.Assets;
 import fr.bomberman.assets.BufferedSound;
-import fr.bomberman.gui.GameWindow;
 import fr.bomberman.gui.GuiIngame;
-import fr.bomberman.gui.GuiMainMenu;
 import fr.bomberman.utils.Vec2D;
 
 public abstract class Entity extends TimerTask {
@@ -209,7 +207,6 @@ public abstract class Entity extends TimerTask {
 									@Override
 									public void run() {
 										entity.die();
-										end();
 									}
 									
 								}, 250);
@@ -218,45 +215,6 @@ public abstract class Entity extends TimerTask {
 						}
 					}
 			}
-		}
-	}	
-	
-	private void end() {
-		GuiIngame game = GuiIngame.instance();
-		
-		if (game.playerIsAlive() & !GuiIngame.instance().isInDemoMode())
-			if (GuiIngame.instance().getAlivePlayerCount() <= 1)
-				game.setWinScreen(GuiIngame.VICTORY);
-			else if (teamMode && game.getTeamLeft() <= 1)
-				game.setWinScreen(GuiIngame.VICTORY);
-		else if (!game.playerIsAlive())
-			game.setWinScreen(GuiIngame.DEFEAT);
-		else
-			game.setWinScreen(GuiIngame.UNKNOW);
-			
-			
-		if(game.getWinScreen() != GuiIngame.UNKNOW) {
-			for(Bomb bomb : GuiIngame.instance().getBombs())
-				if(bomb != null)
-					bomb.cancelExplosion();
-			for(Item item : GuiIngame.instance().getItems())
-				if(item != null) {
-					item.die();
-					item.setState(Item.DISPAWNED);
-				}
-			new Timer().schedule(new TimerTask() {
-		
-				@Override
-				public void run() {
-					if (GameWindow.instance().getCurrentGui() instanceof GuiIngame) {
-						GuiIngame game = (GuiIngame) GameWindow.instance().getCurrentGui();
-						game.stopMusic();
-						GameWindow.instance().setCurrentGui(new GuiMainMenu());
-						GuiIngame.clearInstance();
-					}
-				}
-					
-			}, 3000);
 		}
 	}
 	
