@@ -71,6 +71,7 @@ public class GuiIngame extends Container implements KeyListener {
 			for (Bomb bomb : GuiIngame.instance.getBombs())
 				if(!bomb.isDead())
 					bomb.cancelExplosion();
+		Assets.adjustVolume();
 		SFX_BackgroundMusic.setLoop(true);
 		SFX_BackgroundMusic.play();
 		instance = this;

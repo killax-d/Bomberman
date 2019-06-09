@@ -31,6 +31,8 @@ public class GuiControlLabel extends GuiButton implements MouseMotionListener {
 	public void paint(Graphics g) {
 		visible = true;
 
+		g.setClip(0, 0, GameWindow.WIDTH, GameWindow.HEIGHT);
+		
 		g.setColor((isHovered() ? colorHovered : color));
 		g.drawRect(x, y, width, height);
 

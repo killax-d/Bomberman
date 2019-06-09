@@ -20,16 +20,34 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 	
 	// Credit
 	private final String author = "Donné Dylan";
-	private String credit;
+	
+	// Font
+	private Font pokemon_font = Assets.getFont("Pokemon Solid.ttf", 25f);
+	
+	// Text
+	private GuiTextBox credit = new GuiTextBox(String.format("Developed by %s\n"
+			+ "Version : %s",
+			author, App.version),
+			new Font("Arial", Font.ITALIC, 25), GuiTextBox.Align.RIGHT, GuiTextBox.BaseLine.BOTTOM,
+			0, 0, GameWindow.WIDTH-10, GameWindow.HEIGHT, true);
+	private GuiTextBox playText = new GuiTextBox("Play",
+			pokemon_font, GuiTextBox.Align.LEFT, GuiTextBox.BaseLine.CENTER,
+			0, 0, 128, 64, Color.BLACK);
+	private GuiTextBox settingsText = new GuiTextBox("Settings",
+			pokemon_font, GuiTextBox.Align.LEFT, GuiTextBox.BaseLine.CENTER,
+			0, 0, 192, 64, Color.BLACK);
+	private GuiTextBox resumeText = new GuiTextBox("Resume",
+			pokemon_font, GuiTextBox.Align.LEFT, GuiTextBox.BaseLine.CENTER,
+			0, 0, 192, 64, Color.BLACK);
 	
 	// Image
 	private BufferedImage background = Assets.getImage("title_background.png");
 	private BufferedImage title = Assets.getImage("title_titletext.png");
 	private BufferedImage character = Assets.getImage("title_character.png");
-	private BufferedImage one_player = Assets.getImage("one_player.png");
-	private BufferedImage settings_texture = Assets.getImage("settings.png");
+	private BufferedImage play_icon = Assets.getImage("play_icon.png");
+	private BufferedImage settings_icon = Assets.getImage("settings_icon.png");
+	private BufferedImage resume_icon = Assets.getImage("resume_icon.png");
 	private BufferedImage close_texture = Assets.getImage("close.jpg");
-	private BufferedImage resume_texture = Assets.getImage("resume.png");
 	
 	// Demo Mode
 	private BufferedImage demo_on_texture = Assets.getImage("demo_on.png");
@@ -38,10 +56,20 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 	// Sound
 	private BufferedSound music = Assets.getSound("sounds/menu.wav", BufferedSound.MUSIC);
 	private BufferedSound pikachu = Assets.getSound("sounds/pikachu.wav", BufferedSound.SFX);
+	
+	// Button
+	private int button_height = 64;
+	
+	// Positions
+	private int[] positionButton = new int[] {
+		(int) (GameWindow.getCenter().getY()-(button_height/2)),
+		(int) (GameWindow.getCenter().getY()+(button_height/2)),
+		(int) (GameWindow.getCenter().getY()+(button_height/2)+button_height)
+	};
 
-	private GuiButton settings = new GuiButton(settings_texture, GameWindow.WIDTH/2-64, GameWindow.HEIGHT/2-32, 128, 64);
-	private GuiButton play = new GuiButton(one_player, GameWindow.WIDTH/2-64, GameWindow.HEIGHT/2+32, 128, 64);
-	private GuiButton resume = new GuiButton(resume_texture,  GameWindow.WIDTH/2-64, GameWindow.HEIGHT/2+96, 128, 64);
+	private GuiButton settings = new GuiButton(settings_icon, settingsText, 0, positionButton[0], 192, button_height).align(GuiButton.Align.CENTER);
+	private GuiButton play = new GuiButton(play_icon, playText, 0, positionButton[1], 128, button_height).align(GuiButton.Align.CENTER);
+	private GuiButton resume = new GuiButton(resume_icon, resumeText, 0, positionButton[2], 160, button_height).align(GuiButton.Align.CENTER);
 	private GuiButton close = new GuiButton(close_texture, GameWindow.WIDTH-64, 0, 64, 32);
 	private GuiButton demo = new GuiButton(demo_off_texture, 50, GameWindow.HEIGHT-(480+25), 480, 480);
 	
@@ -56,11 +84,6 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 	public GuiMainMenu() {
 		music.setLoop(true);
 		music.setLoopPoint(14, -1);
-		credit = String.format("Developed by %s\n"
-				+ "Version : %s",
-				author, App.version);
-		
-		
 	}
 
 	@Override
@@ -68,18 +91,6 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 		g.drawImage(background, 0, 0, getWidth(), getHeight(), null);
 		g.drawImage(title, 0, 0, getWidth(), getHeight(), null);
 		g.drawImage(character, 0, 0, getWidth(), getHeight(), null);
-
-		g.setFont(new Font("Arial", Font.ITALIC, 25));
-		int i = 0;
-		for(String line : credit.split("\n")) {
-			if(line != null) {
-				int textWidth = g.getFontMetrics().stringWidth(line);
-				g.setColor(Color.BLACK);
-				g.drawString(line, getWidth()-textWidth-17, getHeight()-i*25-17);
-				g.setColor(Color.WHITE);
-				g.drawString(line, getWidth()-textWidth-15, getHeight()-i++*25-15);
-			}
-		}
 		
 		close.paint(g);
 		if (GameWindow.instance().isInDemoMode())
@@ -95,6 +106,7 @@ public class GuiMainMenu extends Container implements MouseListener, MouseMotion
 		plantChance.paint(g);
 		itemChance.paint(g);
 		playerName.paint(g);
+		credit.paint(g);
 		super.paint(g);
 	}
 

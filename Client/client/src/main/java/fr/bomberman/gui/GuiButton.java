@@ -24,6 +24,11 @@ public class GuiButton implements MouseMotionListener {
 	protected boolean hovered;
 	protected static BufferedSound SFX_ButtonHover = Assets.getSound("sounds/button.wav", BufferedSound.SFX);
 	protected boolean visible;
+	protected GuiTextBox textBox;
+	
+	public static enum Align {
+		LEFT, CENTER, RIGHT;
+	}
 
 	public GuiButton(BufferedImage image, int x, int y, int width, int height) {
 		this("", x, y, width, height);
@@ -48,23 +53,55 @@ public class GuiButton implements MouseMotionListener {
 		this.color = new Color(255, 255, 255, 200);
 		this.colorHovered = new Color(255, 255, 255, 230);
 	}
+	
+	public GuiButton(BufferedImage icon, GuiTextBox textBox, int x, int y, int width, int height) {
+		this("", x, y, width, height);
+		textBox.setWidth(textBox.getWidth()-height);
+		this.image = icon;
+		this.textBox = textBox;
+	}
 
 	public void paint(Graphics g) {
+		g.setClip(0, 0, GameWindow.WIDTH, GameWindow.HEIGHT);
 		this.visible = true;
 		Graphics2D g2d = (Graphics2D) g;
 		if (!hovered) {
 			g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.75F));
 		}
-		if (image != null) {
-			g2d.drawImage(image, x, y, width, height, null);
-		} else {
-			g.setColor(hovered ? colorHovered : color);
-			g.fillRect(x, y, width, height);
-
+		if (textBox == null)
+			if (image != null) {
+				g2d.drawImage(image, x, y, width, height, null);
+			} else {
+				g.setColor(hovered ? colorHovered : color);
+				g.fillRect(x, y, width, height);
+			}
+		else {
+			if (image != null) {
+				g2d.drawImage(image, x, y, height, height, null); // Height x Height proportions;
+			}
+			if (textBox != null) {
+				textBox.setXY(x+height, y);
+				textBox.paint(g);
+			}
 		}
 
 	}
 
+	public GuiButton align(Align align) {
+		switch(align) {
+			case LEFT:
+				this.x = 0;
+				break;
+			case CENTER:
+				this.x = GameWindow.WIDTH/2-width/2;
+				break;
+			case RIGHT:
+				this.x = GameWindow.WIDTH-width;
+				break;
+		}
+		return this;
+	}
+	
 	public void setText(String text) {
 		this.text = text;
 	}

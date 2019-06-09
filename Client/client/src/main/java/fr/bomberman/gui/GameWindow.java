@@ -13,6 +13,7 @@ import java.util.TimerTask;
 import javax.swing.JFrame;
 
 import fr.bomberman.game.Map;
+import fr.bomberman.utils.Vec2D;
 
 public class GameWindow extends JFrame implements KeyListener, MouseListener, MouseMotionListener {
 
@@ -48,6 +49,10 @@ public class GameWindow extends JFrame implements KeyListener, MouseListener, Mo
 		addMouseListener(this);
 		addKeyListener(this);
 		addMouseMotionListener(this);
+	}
+	
+	public static Vec2D getCenter() {
+		return new Vec2D(WIDTH/2, HEIGHT/2);
 	}
 	
 	public static void setFields(int type, Object value){

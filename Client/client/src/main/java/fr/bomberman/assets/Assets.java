@@ -1,10 +1,14 @@
 package fr.bomberman.assets;
 
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontFormatException;
+import java.awt.font.TextAttribute;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
@@ -18,9 +22,11 @@ public class Assets {
 
 	private static Map<String, BufferedImage> assets = new HashMap<String, BufferedImage>();
 	private static Map<String, BufferedSound> sounds = new HashMap<String, BufferedSound>();
+	private static Map<String, Font> fonts = new HashMap<String, Font>();
 
 	// The fail-safe default texture for missing assets
 	private static BufferedImage NO_TEXTURE = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+	private static Font NO_FONT = new Font("Arial", Font.TRUETYPE_FONT, 12);
 	static {
 		NO_TEXTURE.setRGB(0, 0, new Color(140, 87, 113).getRGB());
 	}
@@ -70,6 +76,33 @@ public class Assets {
 		return null;
 	}
 
+	
+	/**
+	 * Font finder and loader
+	 * @param path
+	 * @return Font
+	 */
+	public static Font getFont(String path, float size) {
+		if (fonts.containsKey(path)) {
+			return fonts.get(path).deriveFont(size);
+		}
+		try (InputStream is = Assets.class.getResourceAsStream(path)) {
+		    Hashtable<TextAttribute, Object> map = new Hashtable<TextAttribute, Object>();
+		    map.put(TextAttribute.KERNING, TextAttribute.KERNING_ON);
+		    map.put(TextAttribute.TRACKING, 0.08);
+		    map.put(TextAttribute.SIZE, size);
+			if (is != null) {
+				Font font = Font.createFont(Font.TRUETYPE_FONT, is).deriveFont(map);
+				fonts.putIfAbsent(path, font);
+				return font;
+			}
+		} catch (IOException | FontFormatException e) {
+			e.printStackTrace();
+		}
+		fonts.putIfAbsent(path, NO_FONT);
+		return NO_FONT.deriveFont(size);
+	}
+	
 	
 	/**
 	 * adjust the game volume

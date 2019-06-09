@@ -84,6 +84,8 @@ public class GuiSpinner implements MouseListener, MouseMotionListener {
 	public void paint(Graphics g) {
 		visible = true;
 
+		g.setClip(0, 0, GameWindow.WIDTH, GameWindow.HEIGHT);
+
 		g.setFont(new Font("Arial", Font.BOLD, fontSize));
 		
 		int arrowWidth = g.getFontMetrics().stringWidth("<");

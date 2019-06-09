@@ -72,6 +72,8 @@ public class GuiInput implements MouseListener, MouseMotionListener, KeyListener
 	
 	public void paint(Graphics g) {
 		visible = true;
+
+		g.setClip(0, 0, GameWindow.WIDTH, GameWindow.HEIGHT);
 		
 		String label = String.format(text, value);
 		g.setColor(Color.BLACK);

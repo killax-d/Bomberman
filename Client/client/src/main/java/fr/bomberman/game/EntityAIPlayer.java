@@ -98,25 +98,25 @@ public class EntityAIPlayer extends EntityLiving {
 	
 	public void moveToPoint(Vec2D point) {
 		if (ennemyAround())
-			placeBomb(point);
+			placeBomb();
 		if (position.getX() < point.getX()) {
 			if(!canMove(EnumDirection.EST))
-				placeBomb(point);
+				placeBomb();
 			move(EnumDirection.EST);
 		}
 		else if (position.getX() > point.getX()) {
 			if(!canMove(EnumDirection.WEST))
-				placeBomb(point);
+				placeBomb();
 			move(EnumDirection.WEST);
 		}
 		else if (position.getY() < point.getY()) {
 			if(!canMove(EnumDirection.SOUTH))
-				placeBomb(point);
+				placeBomb();
 			move(EnumDirection.SOUTH);
 		}
 		else if (position.getY() > point.getY()) {
 			if(!canMove(EnumDirection.NORTH)) 
-				placeBomb(point);
+				placeBomb();
 			move(EnumDirection.NORTH);
 		}
 	}
@@ -205,17 +205,14 @@ public class EntityAIPlayer extends EntityLiving {
 		}
 	}
 	
-	private void placeBomb(Vec2D point) {
-		Vec2D p = new Vec2D((int) point.getX(), (int) point.getY());
-		if(canPlaceBomb() && isFreeCell(p)) {
+	private void placeBomb() {
+		if(canPlaceBomb() && isFreeCell(position)) {
 			game.getEntities().add(new Bomb(this, this.hasMasterBomb(), map, getTeam(), game.getEffects()));
 			addBombPlaced();
 		}
-		
 	}
 	
 	public TimerTask calculatePath() {
-		EntityLiving entity = this;
 		TimerTask task = new TimerTask() {
 
 			@Override
@@ -229,7 +226,7 @@ public class EntityAIPlayer extends EntityLiving {
 				Vec2D dest = getNearestEnnemy();
 				generateShortPathToPoint(dest);
 				if (ennemyAround()) {
-					placeBomb(entity.getPosition());
+					placeBomb();
 				}
 			}
 		};
