@@ -87,9 +87,12 @@ public class EntityAIPlayer extends EntityLiving {
 		boolean ennemyPresent = false;
 		for (int i = -1; i < 2; i++) {
 			for(EntityLiving entity : game.getEntitiesLivingExceptAI(this)) {
-				if ((!teamMode) | (teamMode && entity.getTeam() != getTeam()))
-					if ((int) position.getX()+i == (int) entity.getPosition().getX() && (int) position.getY()+i == (int) entity.getPosition().getY())
+				if ((!teamMode) | (teamMode && entity.getTeam() != getTeam())) {
+					if ((int) position.getX()+i == (int) entity.getPosition().getX() && (int) position.getY() == (int) entity.getPosition().getY())
 						ennemyPresent = true;
+					if ((int) position.getX() == (int) entity.getPosition().getX() && (int) position.getY()+i == (int) entity.getPosition().getY())
+						ennemyPresent = true;
+				}
 			}
 				
 		}
