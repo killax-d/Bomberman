@@ -67,10 +67,18 @@ public class GuiIngame extends Container implements KeyListener {
 	private BufferedImage defeat_screen = Assets.getImage("defeat.png");
 
 	public GuiIngame() {
-		if (instance != null)
-			for (Bomb bomb : GuiIngame.instance.getBombs())
-				if(!bomb.isDead())
+		if (instance != null) {
+			for (Bomb bomb : instance.getBombs())
+				if(!bomb.isDead()) {
 					bomb.cancelExplosion();
+					bomb.die();
+				}
+			for(Item item : instance.getItems())
+				if(item != null) {
+					item.die();
+					item.setState(Item.DISPAWNED);
+				}
+			}
 		Assets.adjustVolume();
 		SFX_BackgroundMusic.setLoop(true);
 		SFX_BackgroundMusic.play();
@@ -252,8 +260,13 @@ public class GuiIngame extends Container implements KeyListener {
 		movePlayer(event.getKeyCode());
 	}
 	
-	public CopyOnWriteArrayList<Item> getItems(){
-		return powerups;
+	public Set<Item> getItems(){
+		Set<Item> items = new HashSet<Item>();
+		for (Item item: powerups) {
+			if(!item.isDead())
+				items.add(item);
+		}
+		return items;
 	}
 	
 	public CopyOnWriteArrayList<Entity> getEntities(){

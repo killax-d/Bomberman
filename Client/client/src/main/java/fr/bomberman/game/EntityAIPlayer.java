@@ -209,7 +209,7 @@ public class EntityAIPlayer extends EntityLiving {
 	}
 	
 	private void placeBomb() {
-		if(canPlaceBomb() && isFreeCell(position)) {
+		if(canPlaceBomb() && isFreeCell(position)&& !isDead()) {
 			game.getEntities().add(new Bomb(this, this.hasMasterBomb(), map, getTeam(), game.getEffects()));
 			addBombPlaced();
 		}

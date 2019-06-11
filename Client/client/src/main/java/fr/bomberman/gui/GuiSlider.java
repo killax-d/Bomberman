@@ -131,7 +131,7 @@ public class GuiSlider implements MouseListener, MouseMotionListener {
 			int percent = (int) (value*100);
 			if(value >= 0.0 && value <= 1.0) {
 				setValue(percent);
-				if(type == BufferedSound.MUSIC || type == BufferedSound.MUSIC) {
+				if(type == BufferedSound.MUSIC || type == BufferedSound.SFX) {
 					BufferedSound.setVolumeType(type, value);
 					Assets.adjustVolume();
 				}
